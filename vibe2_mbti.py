@@ -238,7 +238,7 @@ if not st.session_state.started:
         <span style='color:#10b981;'>[AUDIT]</span> Initializing Data Element Value Framework... <span style='color:#00f3ff;'>[OK]</span><br><br>
         <span style='color:#ffffff; font-size: 15px; font-family: "Noto Sans SC", sans-serif; line-height: 1.8;'>
         <b>2026年是数据要素价值全面释放的关键之年。</b><br>
-        在数据资产化与乘数效应的高速演进中，本终端将深度扫描您的核心算力雷达、决策博弈模型与生态协同潜能，为您生成专属的数字身份标识。
+        在数据要素市场化价值化与乘数效应的高速演进中，本终端将深度扫描您的核心算力雷达、决策博弈模型与生态协同潜能，为您生成专属的数字身份标识。
         </span>
     </div>
     """, unsafe_allow_html=True)
@@ -397,3 +397,4 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
+
