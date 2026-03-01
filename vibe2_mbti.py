@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import random
 import time
 import math
@@ -6,7 +7,7 @@ import hashlib
 import html
 import plotly.graph_objects as go
 
-# --- 1. 页面与全局配置 ---
+# --- 1. 页面与全局配置 (沉浸式全屏化) ---
 st.set_page_config(
     page_title="SDE 核心人才图谱 | 全息引擎",
     page_icon="💠",
@@ -14,19 +15,22 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. 赛博科技级 UI 引擎 (修复版：彻底消灭白屏/白字问题) ---
+# --- 2. 赛博科技级 UI 引擎 (沉浸式去白边，屏蔽默认UI) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&display=swap');
+
+    /* 🚨 隐藏 Streamlit 默认的页眉页脚和菜单，实现真全屏 App 体验 */
+    [data-testid="stHeader"] { display: none !important; }
+    [data-testid="stToolbar"] { display: none !important; }
+    footer { display: none !important; }
+    .block-container { padding-top: 2rem !important; padding-bottom: 2rem; max-width: 650px; }
 
     /* 终极锁死全局深网背景 */
     html, body, [class*="css"], .stApp { 
         background-color: #030712 !important; 
         font-family: 'Noto Sans SC', sans-serif !important;
         color: #f8fafc !important;
-    }
-    [data-testid="stAppViewContainer"], [data-testid="stHeader"] { 
-        background-color: transparent !important;
     }
     
     /* 全局 CRT 扫描线与科技网格背景 */
@@ -48,22 +52,16 @@ st.markdown("""
     .stMarkdown, p, span, h2, h3, h4, li, div { color: #f8fafc !important; }
     
     /* 进度条定制 */
-    [data-testid="stProgress"] > div > div > div {
-        background-color: #00f3ff !important;
-        box-shadow: 0 0 15px rgba(0,243,255,0.8);
-    }
+    [data-testid="stProgress"] > div > div > div { background-color: #00f3ff !important; box-shadow: 0 0 15px rgba(0,243,255,0.8); }
     
-    /* Glitch 故障风主标题 - 更加稳重的大气科技感 */
+    /* Glitch 故障风主标题 */
     .hero-title { 
         font-size: 38px !important; font-weight: 900 !important; text-align: center; 
         color: #ffffff !important; letter-spacing: 4px; margin-bottom: 5px;
         text-shadow: 0 0 20px rgba(0,243,255,0.7), 0 0 40px rgba(0,243,255,0.3);
         position: relative; display: inline-block;
     }
-    .hero-title::before, .hero-title::after {
-        content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: transparent;
-    }
+    .hero-title::before, .hero-title::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; }
     .hero-title::before { left: 2px; text-shadow: -2px 0 #f43f5e; animation: glitch-anim-1 2s infinite linear alternate-reverse; }
     .hero-title::after { left: -2px; text-shadow: 2px 0 #00f3ff; animation: glitch-anim-2 3s infinite linear alternate-reverse; }
     
@@ -73,113 +71,44 @@ st.markdown("""
     .hero-subtitle { text-align: center; color: #00f3ff !important; font-size: 13px; letter-spacing: 5px; opacity: 0.9; margin-bottom: 30px; font-family: 'Orbitron', sans-serif !important; font-weight: 700; }
     
     /* 终端缓慢展开自检特效 */
-    .terminal-container {
-        background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(0,243,255,0.4); padding: 25px; 
-        border-radius: 8px; font-family: 'Orbitron', monospace; font-size: 13px; color: #e2e8f0; 
-        box-shadow: inset 0 0 20px rgba(0,243,255,0.1), 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 30px;
-    }
+    .terminal-container { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(0,243,255,0.4); padding: 25px; border-radius: 8px; font-family: 'Orbitron', monospace; font-size: 13px; color: #e2e8f0; box-shadow: inset 0 0 20px rgba(0,243,255,0.1), 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 30px; }
     .term-line { opacity: 0; margin-bottom: 5px; }
     .term-line:nth-child(1) { animation: scanFade 0.2s 0.2s forwards; }
     .term-line:nth-child(2) { animation: scanFade 0.2s 1.0s forwards; }
     .term-line:nth-child(3) { animation: scanFade 0.2s 1.8s forwards; }
     .term-line-main { opacity: 0; animation: scanFade 0.5s 2.6s forwards; }
     @keyframes scanFade { 0% { opacity: 0; transform: translateX(-10px); filter: blur(2px); } 100% { opacity: 1; transform: translateX(0); filter: blur(0); } }
-    
     .cursor-blink { display: inline-block; width: 8px; height: 16px; background: #00f3ff; animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-    /* 输入框样式 */
-    div[data-testid="stTextInput"] > div > div > input {
-        background-color: rgba(2, 6, 23, 0.9) !important;
-        color: #00f3ff !important; font-family: 'Orbitron', monospace !important;
-        border: 1px solid rgba(0,243,255,0.5) !important; border-radius: 6px !important;
-        text-align: center; font-size: 16px !important; font-weight: bold !important; letter-spacing: 2px;
-        box-shadow: inset 0 0 15px rgba(0,243,255,0.1) !important; transition: all 0.3s ease;
-    }
-    div[data-testid="stTextInput"] > div > div > input:focus {
-        border-color: #ffd700 !important; box-shadow: 0 0 20px rgba(255,215,0,0.3), inset 0 0 15px rgba(255,215,0,0.1) !important;
-    }
+    /* 输入框与按钮样式 */
+    div[data-testid="stTextInput"] > div > div > input { background-color: rgba(2, 6, 23, 0.9) !important; color: #00f3ff !important; font-family: 'Orbitron', monospace !important; border: 1px solid rgba(0,243,255,0.5) !important; border-radius: 6px !important; text-align: center; font-size: 16px !important; font-weight: bold !important; letter-spacing: 2px; box-shadow: inset 0 0 15px rgba(0,243,255,0.1) !important; transition: all 0.3s ease; }
+    div[data-testid="stTextInput"] > div > div > input:focus { border-color: #ffd700 !important; box-shadow: 0 0 20px rgba(255,215,0,0.3), inset 0 0 15px rgba(255,215,0,0.1) !important; }
 
-    /* 选项按钮深度穿透 - 优化间距和排版 */
-    div.stButton > button {
-        background: #0f172a !important; border: 1px solid rgba(0, 243, 255, 0.3) !important; 
-        border-left: 4px solid rgba(0, 243, 255, 0.6) !important; border-radius: 6px !important; 
-        min-height: 56px !important; width: 100% !important; padding: 10px 15px !important; text-align: left !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    }
+    div.stButton > button { background: #0f172a !important; border: 1px solid rgba(0, 243, 255, 0.3) !important; border-left: 4px solid rgba(0, 243, 255, 0.6) !important; border-radius: 6px !important; min-height: 56px !important; width: 100% !important; padding: 10px 15px !important; text-align: left !important; box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important; }
     div.stButton > button p { color: #ffffff !important; font-size: 15px !important; line-height: 1.5 !important; font-weight: 500 !important; }
-    div.stButton > button:hover { 
-        background: rgba(0, 243, 255, 0.15) !important; border-color: #00f3ff !important; border-left: 4px solid #00f3ff !important; 
-        box-shadow: 0 0 15px rgba(0,243,255,0.3) !important; transform: translateX(3px) !important; 
-    }
+    div.stButton > button:hover { background: rgba(0, 243, 255, 0.15) !important; border-color: #00f3ff !important; border-left: 4px solid #00f3ff !important; box-shadow: 0 0 15px rgba(0,243,255,0.3) !important; transform: translateX(3px) !important; }
     div.stButton > button:active { transform: scale(0.98) !important; }
-
-    /* 启动与核心按钮颜色特异化 */
-    div.stButton > button[data-testid="baseButton-primary"] {
-        background: linear-gradient(90deg, #00f3ff, #0088ff) !important; border-left: none !important; text-align: center !important;
-    }
+    div.stButton > button[data-testid="baseButton-primary"] { background: linear-gradient(90deg, #00f3ff, #0088ff) !important; border-left: none !important; text-align: center !important; }
     div.stButton > button[data-testid="baseButton-primary"] p { color: #030712 !important; font-weight: 900 !important; font-size: 16px !important; letter-spacing: 1px !important; }
     div.stButton > button[data-testid="baseButton-primary"]:hover { transform: translateY(-2px) !important; box-shadow: 0 0 30px rgba(0,243,255,0.6) !important; }
     
-    /* 结果视窗 */
-    .result-card {
-        padding: 35px 20px; border-radius: 12px; background: rgba(11, 17, 32, 0.95) !important; 
-        border: 1px solid rgba(255,215,0,0.3); border-top: 5px solid #ffd700; 
-        text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin-bottom: 30px;
-    }
-    .mbti-code { font-family: 'Orbitron', sans-serif !important; font-size: 72px; font-weight: 900; color: #ffd700 !important; line-height: 1.1; letter-spacing: 4px; text-shadow: 0 0 25px rgba(255,215,0,0.5); margin: 0;}
-    .cli-box {
-        background: #000000; border: 1px solid #334155; border-left: 4px solid #00f3ff;
-        padding: 20px; border-radius: 6px; font-family: 'Orbitron', monospace; font-size: 13px;
-        color: #4ade80; box-shadow: inset 0 0 20px rgba(0,243,255,0.1); margin-top: 50px; text-transform: uppercase;
-    }
+    .cli-box { background: #000000; border: 1px solid #334155; border-left: 4px solid #00f3ff; padding: 20px; border-radius: 6px; font-family: 'Orbitron', monospace; font-size: 13px; color: #4ade80; box-shadow: inset 0 0 20px rgba(0,243,255,0.1); margin-top: 50px; text-transform: uppercase; }
 
-    /* =========================================================
-       🚀 终极修复：彻底接管 st.code 复制代码块样式，告别白屏！
-       ========================================================= */
-    [data-testid="stCodeBlock"] {
-        border-radius: 8px !important;
-        margin-top: 10px;
-    }
-    /* 强制重写代码块底板 */
-    [data-testid="stCodeBlock"] > div {
-        background-color: rgba(5, 10, 21, 0.95) !important; 
-        border: 1px solid rgba(0, 243, 255, 0.4) !important;
-        border-radius: 8px !important;
-        box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.1) !important;
-    }
-    /* 强行抹除内部所有自带的白底，文字染成银白色 */
-    [data-testid="stCodeBlock"] pre, 
-    [data-testid="stCodeBlock"] code,
-    [data-testid="stCodeBlock"] span {
-        background-color: transparent !important;
-        color: #e2e8f0 !important; 
-        font-family: 'Noto Sans SC', monospace !important;
-        font-size: 13px !important;
-        line-height: 1.6 !important;
-        white-space: pre-wrap !important; /* 保证微信排版绝对换行不越界 */
-        text-shadow: none !important;
-    }
-    /* 强行定制 st.code 右上角的 Copy 复制按钮 */
-    [data-testid="stCodeBlock"] button {
-        background-color: rgba(2, 6, 23, 0.9) !important;
-        border: 1px solid rgba(0, 243, 255, 0.4) !important;
-        border-radius: 4px !important;
-        opacity: 1 !important; 
-        transition: all 0.3s ease !important;
-    }
-    [data-testid="stCodeBlock"] button:hover {
-        background-color: rgba(0, 243, 255, 0.2) !important;
-        border-color: #00f3ff !important;
-        transform: scale(1.05) !important;
-    }
-    /* 让复制图标变成发光赛博蓝 */
-    [data-testid="stCodeBlock"] button svg { 
-        fill: #00f3ff !important; 
-        stroke: #00f3ff !important;
-    }
+    /* 专属 Tabs 标签页 UI 穿透 */
+    [data-testid="stTabs"] button { color: #94a3b8 !important; font-family: 'Noto Sans SC', sans-serif !important; font-weight: bold !important; font-size: 15px !important; padding-bottom: 10px !important; }
+    [data-testid="stTabs"] button[aria-selected="true"] { color: #00f3ff !important; border-bottom-color: #00f3ff !important; text-shadow: 0 0 10px rgba(0,243,255,0.5); }
+    [data-testid="stTabs"] button:hover { color: #ffffff !important; }
 
-    /* 性能优化版结算烟花 */
+    /* 代码块样式修复 */
+    [data-testid="stCodeBlock"] { border-radius: 8px !important; margin-top: 10px; }
+    [data-testid="stCodeBlock"] > div { background-color: rgba(5, 10, 21, 0.95) !important; border: 1px solid rgba(0, 243, 255, 0.4) !important; border-radius: 8px !important; box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.1) !important; }
+    [data-testid="stCodeBlock"] pre, [data-testid="stCodeBlock"] code, [data-testid="stCodeBlock"] span { background-color: transparent !important; color: #e2e8f0 !important; font-family: 'Noto Sans SC', monospace !important; font-size: 13px !important; line-height: 1.6 !important; white-space: pre-wrap !important; text-shadow: none !important; }
+    [data-testid="stCodeBlock"] button { background-color: rgba(2, 6, 23, 0.9) !important; border: 1px solid rgba(0, 243, 255, 0.4) !important; border-radius: 4px !important; opacity: 1 !important; transition: all 0.3s ease !important; }
+    [data-testid="stCodeBlock"] button:hover { background-color: rgba(0, 243, 255, 0.2) !important; border-color: #00f3ff !important; transform: scale(1.05) !important; }
+    [data-testid="stCodeBlock"] button svg { fill: #00f3ff !important; stroke: #00f3ff !important; }
+
+    /* 结算烟花 */
     .firework-center { position: fixed; top: 50%; left: 50%; z-index: 99998; pointer-events: none; font-weight: 900; font-family: 'Orbitron', sans-serif; color: #00f3ff; text-shadow: 0 0 20px #00f3ff, 0 0 30px #ffffff; animation: supernova 1.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; will-change: transform, opacity;}
     @keyframes supernova { 0% { transform: translate(-50%, -50%) scale(0.1) rotate(0deg); opacity: 1; } 100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--s)) rotate(var(--rot)); opacity: 0; filter: blur(2px);} }
 </style>
@@ -188,7 +117,7 @@ st.markdown("""
 def trigger_supernova():
     html_str = ""
     symbols = ["DATA", "SDE", "NODE", "HASH", "ASSET", "SYNC"]
-    for _ in range(40): 
+    for _ in range(35): 
         angle = random.uniform(0, 2 * math.pi)
         distance = random.uniform(250, 900)
         tx, ty = distance * math.cos(angle), distance * math.sin(angle)
@@ -392,61 +321,193 @@ else:
     mbti = ("E" if res["E"] >= 0 else "I") + ("S" if res["S"] >= 0 else "N") + ("T" if res["T"] >= 0 else "F") + ("J" if res["J"] >= 0 else "P")
     data = mbti_details.get(mbti)
     safe_alias_final = st.session_state.user_alias.upper()
+    role_name = data['role']
     
-    st.markdown(f"""
-    <div class="result-card">
-        <div class="orbitron-font" style="font-size:13px; color:#94a3b8; letter-spacing:4px; margin-bottom:15px;">MATRIX DECODED SUCCESSFULLY</div>
-        <div style="color:#00f3ff; font-family:'Orbitron', monospace; font-size:13px; margin-bottom:5px; border-bottom:1px dashed #334155; padding-bottom:10px; display:inline-block;">AUTH_NODE: {safe_alias_final}</div>
-        <div class="mbti-code" style="margin-top:10px;">{mbti}</div>
-        <div style="font-size: 20px; font-weight: 900; color: #00f3ff !important; margin: 15px 0; letter-spacing: 1px;">【 {data['role']} 】</div>
-        <div style="color:#e2e8f0 !important; font-size:14px; line-height:1.8; margin-bottom:25px; font-weight:400; text-align:left; padding:0 10px;">{data['desc']}</div>
-        <div>
-            {" ".join([f'<span style="background:rgba(0, 243, 255, 0.1); color:#00f3ff !important; border:1px solid rgba(0,243,255,0.4); padding:5px 12px; border-radius:4px; font-size:12px; font-weight:700; margin:4px; display:inline-block; font-family:\'Noto Sans SC\', sans-serif;">{t}</span>' for t in data['tags']])}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🕸️ 核心算力拓扑矩阵</h4>", unsafe_allow_html=True)
-    def get_intensity(score): return max(15, min(100, 50 + (score / (len(questions)/4) * 50)))
+    # 获取绝对安全的数值范围 (0-100)
+    def get_intensity(score): return int(max(15, min(100, 50 + (score / (len(questions)/4) * 50))))
     val_E, val_I = get_intensity(res["E"]), 100 - get_intensity(res["E"])
     val_S, val_N = get_intensity(res["S"]), 100 - get_intensity(res["S"])
     val_T, val_F = get_intensity(res["T"]), 100 - get_intensity(res["T"])
     val_J, val_P = get_intensity(res["J"]), 100 - get_intensity(res["J"])
-    
-    categories = ['生态协同(E)', '颗粒实勘(S)', '量化风控(T)', '架构秩序(J)', '底层深潜(I)', '战略前瞻(N)', '生态共情(F)', '敏捷演进(P)']
-    values = [val_E, val_S, val_T, val_J, val_I, val_N, val_F, val_P]
-    
-    fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.1)', line=dict(color='rgba(0, 243, 255, 0.2)', width=8), hoverinfo='none'))
-    fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.25)', line=dict(color='#00f3ff', width=2.5), marker=dict(color='#ff003c', size=6, symbol='diamond')))
-    
-    fig.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=12), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=55, r=55, t=30, b=30), height=350)
-    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
-    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🎛️ 风险过载阈值仪</h4>", unsafe_allow_html=True)
     p_score = -res.get("J", 0)
     s_score = res.get("S", 0)
-    risk_score = max(5, min(95, 50 + (p_score * 1.5) - (s_score * 1.5)))
+    risk_score = int(max(5, min(95, 50 + (p_score * 1.5) - (s_score * 1.5))))
     
     if risk_score < 35: r_tag, r_color, r_desc = "底线合规与安全防线", "#10b981", "运行极其稳健，对合规红线有天然敬畏，适合把守数据存证与资产确权大门，是交易所底层的安全装甲。"
     elif risk_score < 65: r_tag, r_color, r_desc = "动态演进与边界平衡", "#ffd700", "能够在监管锁死与商业吞吐间寻求黄金接口，适合主导跨部门协作与全网业务流转统筹。"
     else: r_tag, r_color, r_desc = "无界扩张与前沿破局", "#f43f5e", "渴望突破陈旧的业务规则枷锁，拥有高爆发性的业务创新实战能力，能快速抢占新兴要素生态阵地。"
-    
-    st.markdown(f"<div style='text-align:center; font-size:16px; font-weight:bold; color:{r_color}; font-family:Noto Sans SC; margin-top: 15px;'>{r_tag}</div>", unsafe_allow_html=True)
 
-    fig_gauge = go.Figure(go.Indicator(
-        mode="gauge+number", value=risk_score, 
-        number={'suffix': "%", 'font': {'family': 'Orbitron, sans-serif', 'color': r_color, 'size': 42}}, 
-        gauge={'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#334155"}, 'bar': {'color': r_color}, 'bgcolor': "rgba(255,255,255,0.05)", 'steps': [{'range': [0, 35], 'color': "rgba(16, 185, 129, 0.15)"}, {'range': [35, 65], 'color': "rgba(255, 215, 0, 0.15)"}, {'range': [65, 100], 'color': "rgba(244, 63, 94, 0.15)"}]}
-    ))
-    fig_gauge.update_layout(paper_bgcolor='rgba(0,0,0,0)', font={'color': "#94a3b8"}, height=240, margin=dict(l=30, r=30, t=10, b=20))
-    st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False})
+    time_taken = st.session_state.end_time - st.session_state.start_time
+    hash_code = hashlib.sha256(f"{safe_alias_final}{mbti}{time_taken}".encode()).hexdigest()[:16].upper()
+
+    # =========================================================================
+    # ✨✨✨ 终极黑科技：引入 Tabs 将功能分为“图片海报”与“文本复制” ✨✨✨
+    # =========================================================================
+    st.markdown("<br><h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>💠 身份密钥与海报提取中心</h4>", unsafe_allow_html=True)
     
-    st.markdown(f"""
-    <div style='background: rgba(2,6,23,0.5); border-radius:6px; padding:15px; color:#cbd5e1 !important; font-size:13px; text-align:center; margin-top:-10px; margin-bottom:25px; line-height:1.6; border: 1px solid rgba(255,255,255,0.05);'>
-        {r_desc}
-    </div>
-    """, unsafe_allow_html=True)
+    tab1, tab2 = st.tabs(["📸 生成全息图文海报 (推荐朋友圈)", "📝 提取纯文本格式 (适合群聊)"])
+
+    with tab1:
+        # ---- 构造防伪条形码 (用纯 CSS 重复线性渐变生成，保证截图不丢失) ----
+        random.seed(hash_code)
+        gradient_stops = []
+        current_pos = 0
+        while current_pos < 100:
+            width = random.uniform(0.5, 3.0)
+            space = random.uniform(0.5, 2.0)
+            gradient_stops.append(f"rgba(0,243,255,0.6) {current_pos}%, rgba(0,243,255,0.6) {current_pos + width}%, transparent {current_pos + width}%, transparent {current_pos + width + space}%")
+            current_pos += width + space
+        barcode_css = "linear-gradient(90deg, " + ", ".join(gradient_stops) + ")"
+
+        tags_html = "".join([f'<div style="background:rgba(0,243,255,0.1); border:1px solid rgba(0,243,255,0.4); padding:4px 8px; border-radius:4px; font-size:12px; color:#00f3ff; font-weight:bold;">{t}</div>' for t in data['tags']])
+
+        html_to_image_script = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+            <style>
+                body {{ margin: 0; display: flex; flex-direction: column; align-items: center; background-color: transparent; font-family: 'Noto Sans SC', sans-serif; user-select: none; padding: 10px 0;}}
+                
+                /* 被隐藏的高清渲染母版 */
+                #capture-box {{
+                    width: 340px; background-color: #030712; padding: 30px 25px; border-radius: 16px;
+                    border: 1px solid rgba(0, 243, 255, 0.4); box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
+                    position: relative; overflow: hidden; color: #fff; box-sizing: border-box;
+                }}
+                /* 赛博网格底纹：改用独立的层以完美兼容 Html2Canvas */
+                .cyber-grid {{
+                    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+                    background-image: linear-gradient(0deg, rgba(0,243,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.04) 1px, transparent 1px);
+                    background-size: 20px 20px; z-index: 0; pointer-events: none;
+                }}
+                /* 顶部流光边缘 */
+                .top-glow {{ position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, transparent, #00f3ff, transparent); z-index: 1; }}
+                
+                .content {{ position: relative; z-index: 2; }}
+                .header {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(0,243,255,0.3); padding-bottom: 15px; margin-bottom: 25px; }}
+                .logo-text {{ color: #00f3ff; font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 900; letter-spacing: 1px; }}
+                .sub-logo {{ font-size: 18px; font-weight: 900; margin-top: 5px; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255,255,255,0.2);}}
+                .auth-box {{ text-align: right; }}
+                .auth-title {{ color: #94a3b8; font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 1px; }}
+                .auth-hash {{ color: #00f3ff; font-family: 'Orbitron', monospace; font-size: 12px; font-weight: bold; margin-top: 3px; }}
+                
+                .user-name {{ text-align: center; font-size: 22px; font-weight: 900; letter-spacing: 2px; color: #fff; margin-bottom: 15px; text-transform: uppercase; }}
+                .mbti {{ font-family: 'Orbitron', sans-serif; font-size: 68px; font-weight: 900; color: #ffd700; line-height: 1; text-align: center; text-shadow: 0 0 25px rgba(255,215,0,0.6); margin-bottom: 10px; letter-spacing: 4px; }}
+                .role {{ text-align: center; font-size: 16px; font-weight: 900; color: #00f3ff; margin-bottom: 25px; letter-spacing: 1px; }}
+                
+                .tags {{ display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 25px; }}
+                
+                .metrics-box {{ background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 15px; margin-bottom: 25px; }}
+                .stat-row {{ display: flex; align-items: center; margin-bottom: 10px; font-size: 11px; font-weight: bold; }}
+                .stat-row:last-child {{ margin-bottom: 0; }}
+                
+                .risk-box {{ border-left: 4px solid {r_color}; background: {r_color}1A; padding: 12px; border-radius: 0 6px 6px 0; margin-bottom: 25px; }}
+                .risk-title {{ font-size: 10px; color: #e2e8f0; margin-bottom: 4px; }}
+                .risk-val {{ color: {r_color}; font-size: 16px; font-weight: 900; text-shadow: 0 0 10px {r_color}88; }}
+                
+                .footer {{ text-align: center; color: #64748b; font-family: 'Orbitron', monospace; font-size: 9px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }}
+                .barcode {{ width: 85%; height: 25px; margin: 0 auto 10px auto; background: {barcode_css}; }}
+
+                /* 渲染过程动画与真实图片 */
+                #loading-ui {{ font-family: 'Orbitron', sans-serif; color: #00f3ff; font-size: 13px; text-align: center; padding: 40px; animation: pulse 1s infinite alternate; letter-spacing: 2px; }}
+                @keyframes pulse {{ 0% {{ opacity: 1; text-shadow: 0 0 10px #00f3ff; }} 100% {{ opacity: 0.4; text-shadow: none; }} }}
+                
+                #result-img {{ display: none; width: 100%; max-width: 340px; border-radius: 16px; border: 1px solid rgba(0,243,255,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.8); pointer-events: auto; -webkit-touch-callout: default; }}
+                .hint-box {{ display: none; color: #10b981; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); padding: 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-align: center; margin-top: 20px; line-height: 1.6; width: 100%; max-width: 340px; box-sizing: border-box; }}
+            </style>
+        </head>
+        <body>
+            <div id="render-target" style="position: absolute; left: -9999px;">
+                <div id="capture-box">
+                    <div class="cyber-grid"></div>
+                    <div class="top-glow"></div>
+                    <div class="content">
+                        <div class="header">
+                            <div><div class="logo-text">SDE MATRIX</div><div class="sub-logo">上海数据交易所</div></div>
+                            <div class="auth-box"><div class="auth-title">SYS_HASH</div><div class="auth-hash">0x{hash_code[:6]}</div></div>
+                        </div>
+                        <div style="font-size:10px; color:#94a3b8; text-align:center; font-family:'Orbitron', monospace; margin-bottom:4px;">AUTHORIZED NODE</div>
+                        <div class="user-name">{safe_alias_final}</div>
+                        <div class="mbti">{mbti}</div>
+                        <div class="role">【 {role_name} 】</div>
+                        <div class="tags">{tags_html}</div>
+                        
+                        <div class="metrics-box">
+                            <div style="font-family: 'Orbitron', monospace; font-size: 9px; color: #00f3ff; text-align: center; margin-bottom: 12px;">/// CAPABILITY METRICS ///</div>
+                            <div class="stat-row"><span style="color:#e2e8f0; width:45px;">生态(E)</span><div style="flex-grow:1; height:6px; background:#1e293b; border-radius:3px; margin:0 10px; position:relative; overflow:hidden;"><div style="position:absolute; left:0; top:0; height:100%; width:{val_E}%; background:#00f3ff; box-shadow:0 0 8px #00f3ff; border-radius:3px;"></div></div><span style="color:#94a3b8; width:45px; text-align:right;">深潜(I)</span></div>
+                            <div class="stat-row"><span style="color:#e2e8f0; width:45px;">实勘(S)</span><div style="flex-grow:1; height:6px; background:#1e293b; border-radius:3px; margin:0 10px; position:relative; overflow:hidden;"><div style="position:absolute; left:0; top:0; height:100%; width:{val_S}%; background:#a855f7; box-shadow:0 0 8px #a855f7; border-radius:3px;"></div></div><span style="color:#94a3b8; width:45px; text-align:right;">前瞻(N)</span></div>
+                            <div class="stat-row"><span style="color:#e2e8f0; width:45px;">量化(T)</span><div style="flex-grow:1; height:6px; background:#1e293b; border-radius:3px; margin:0 10px; position:relative; overflow:hidden;"><div style="position:absolute; left:0; top:0; height:100%; width:{val_T}%; background:#3b82f6; box-shadow:0 0 8px #3b82f6; border-radius:3px;"></div></div><span style="color:#94a3b8; width:45px; text-align:right;">共情(F)</span></div>
+                            <div class="stat-row"><span style="color:#e2e8f0; width:45px;">秩序(J)</span><div style="flex-grow:1; height:6px; background:#1e293b; border-radius:3px; margin:0 10px; position:relative; overflow:hidden;"><div style="position:absolute; left:0; top:0; height:100%; width:{val_J}%; background:#10b981; box-shadow:0 0 8px #10b981; border-radius:3px;"></div></div><span style="color:#94a3b8; width:45px; text-align:right;">敏捷(P)</span></div>
+                        </div>
+                        
+                        <div class="risk-box">
+                            <div class="risk-title">风控熔断判定阈值</div>
+                            <div class="risk-val">{r_tag}</div>
+                        </div>
+                        
+                        <div class="footer">
+                            <div class="barcode"></div>
+                            <div style="margin-bottom: 4px;">2026 SDE DATA ELEMENT KERNEL</div>
+                            <div>FULL_HASH: 0x{hash_code}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loading-ui">[ GENERATING HOLOGRAPHIC ID... ]</div>
+            <img id="result-img" alt="SDE Matrix Card" title="长按保存或分享" />
+            <div id="hint" class="hint-box">✅ 海报压制成功！<br><span style="color:#fff;">👆 手机端请 <b>长按上方图片</b><br>即可「发送给朋友」或「保存到相册」</span></div>
+
+            <script>
+                // 确保自定义字体加载完毕后，再进行 Canvas 截图
+                document.fonts.ready.then(() => {{
+                    setTimeout(() => {{
+                        const target = document.getElementById('capture-box');
+                        html2canvas(target, {{
+                            scale: 3, // 输出3倍高清视网膜图，发朋友圈绝不模糊
+                            backgroundColor: '#030712',
+                            useCORS: true
+                        }}).then(canvas => {{
+                            document.getElementById('result-img').src = canvas.toDataURL('image/png');
+                            document.getElementById('loading-ui').style.display = 'none';
+                            document.getElementById('result-img').style.display = 'block';
+                            document.getElementById('hint').style.display = 'block';
+                            // 清理不再需要的隐藏 DOM
+                            document.getElementById('render-target').remove();
+                        }});
+                    }}, 1200); // 留出 1.2 秒确保所有样式特效准确落位
+                }});
+            </script>
+        </body>
+        </html>
+        """
+        # 挂载这个隐形渲染沙盒（高度预留足够显示最终图片）
+        components.html(html_to_image_script, height=750)
+
+    with tab2:
+        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 备选方案：点击下方代码框右上角的 <b style='color:#00f3ff;'>Copy</b> 图标，复制纯文字版供群聊使用：</div>", unsafe_allow_html=True)
+        share_card = f"""【上海数据交易所 · 人才全息图谱】
+=================================
+👤 授权节点：{safe_alias_final}
+🧬 核心架构：{mbti} ({role_name})
+🎯 赋能标签：{' · '.join(data['tags'])}
+⚖️ 风控偏好：{r_tag}
+=================================
+🌐 2026 数据要素突破之年，寻找你的协同节点！
+🔗 [全息链路校验哈希: 0x{hash_code}]"""
+        st.code(share_card, language="plaintext")
+
+    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🕸️ 核心算力拓扑矩阵</h4>", unsafe_allow_html=True)
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.1)', line=dict(color='rgba(0, 243, 255, 0.2)', width=8), hoverinfo='none'))
+    fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.25)', line=dict(color='#00f3ff', width=2.5), marker=dict(color='#ff003c', size=6, symbol='diamond')))
+    fig.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=12), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=55, r=55, t=30, b=30), height=350)
+    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
     st.markdown("<h4 style='color:#10b981 !important; border-left:4px solid #10b981; padding-left:10px; font-weight:900;'>💡 生态网络协同指引</h4>", unsafe_allow_html=True)
     st.markdown(f"""
@@ -455,26 +516,11 @@ else:
         <div style='margin-bottom:15px; color:#ffffff !important; font-weight:900; font-size:15px;'>{data['partner']}</div>
         <div style='color: #10b981 !important; font-weight: 900; font-size: 13px; margin-bottom: 8px; font-family: "Orbitron", sans-serif !important; letter-spacing: 2px;'>[ 算力超频建议 ]</div>
         <div>{data['advice']}</div>
+        <div style='margin-top:15px; border-top:1px dashed rgba(16,185,129,0.3); padding-top:15px; color:#94a3b8; font-size:12px;'>
+            {r_desc}
+        </div>
     </div>
     """, unsafe_allow_html=True)
-
-    time_taken = st.session_state.end_time - st.session_state.start_time
-    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>💠 专属身份密钥下发</h4>", unsafe_allow_html=True)
-    hash_code = hashlib.sha256(f"{safe_alias_final}{mbti}{time_taken}".encode()).hexdigest()[:16].upper()
-    
-    share_card = f"""【上海数据交易所 · 人才全息图谱】
-=================================
-👤 授权节点：{safe_alias_final}
-🧬 核心架构：{mbti} ({data['role'].split(' / ')[0]})
-🎯 赋能标签：{' · '.join(data['tags'])}
-⚖️ 风控偏好：{r_tag}
-=================================
-🌐 2026 数据要素突破之年，寻找你的协同节点！
-🔗 [全息链路校验哈希: 0x{hash_code}]"""
-    
-    st.markdown("<div style='font-size:12px; color:#94a3b8; margin-bottom:5px;'>👇 点击下方代码框右上角的 <b style='color:#00f3ff;'>Copy 图标</b>，即可完美粘贴至微信对话：</div>", unsafe_allow_html=True)
-    
-    st.code(share_card, language="plaintext")
 
     def reset_system():
         st.session_state.started = False
@@ -499,5 +545,3 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
-
-
