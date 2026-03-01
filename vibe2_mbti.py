@@ -275,7 +275,7 @@ if not st.session_state.started:
     
     with st.form(key="login_form", border=False):
         st.markdown("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:8px; text-align:center;'>▼ MOUNT NODE ALIAS (输入职场称呼 / 授权代号) ▼</div>", unsafe_allow_html=True)
-        st.text_input("", key="login_input", placeholder="例如：合规部_吴总监", label_visibility="collapsed")
+        st.text_input("", key="login_input", placeholder="例如：Compliance_NILIU_WUMING", label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
         st.form_submit_button("▶ 授予系统权限并执行深度扫描", on_click=start_assessment_callback, type="primary", use_container_width=True)
     
@@ -468,3 +468,4 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
+
