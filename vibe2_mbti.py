@@ -1,10 +1,11 @@
 import streamlit as st
-import pandas as pd
 import random
 import time
 import math
 import hashlib
+import html  # 用于防范 XSS 攻击
 import plotly.graph_objects as go
+# 已经彻底移除了无用的 pandas 依赖，提升冷启动速度
 
 # --- 1. 页面与全局配置 ---
 st.set_page_config(
@@ -14,12 +15,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. 绝对防御级 UI 引擎 (彻底剿灭白屏与白按钮) ---
+# --- 2. 绝对防御级 UI 与赛博动效注入 ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&display=swap');
 
-    /* 1. 终极锁死全局背景，无视任何浅色主题覆盖 */
+    /* 终极锁死全局背景 */
     html, body, [class*="css"], .stApp { 
         background-color: #030712 !important; 
         font-family: 'Noto Sans SC', sans-serif !important;
@@ -37,79 +38,59 @@ st.markdown("""
     }
     .stMarkdown, p, span, h2, h3, h4, li, div { color: #f8fafc !important; }
     
-    /* 2. 丝滑转场动画 */
+    /* 丝滑转场动画 */
     [data-testid="stAppViewBlockContainer"] { animation: smoothFadeIn 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
     @keyframes smoothFadeIn { 0% { opacity: 0; transform: translateY(10px); filter: blur(2px); } 100% { opacity: 1; transform: translateY(0); filter: blur(0); } }
     
-    /* 3. 标题与高定光感 */
+    /* 标题高定光感 */
     .hero-title { 
         font-size: 38px !important; font-weight: 900 !important; text-align: center; 
         color: #ffffff !important; letter-spacing: 3px; margin-bottom: 5px;
         text-shadow: 0 0 20px rgba(0,243,255,0.8), 0 0 40px rgba(0,243,255,0.4);
     }
     .hero-subtitle { text-align: center; color: #00f3ff !important; font-size: 13px; letter-spacing: 6px; opacity: 0.9; margin-bottom: 30px; font-family: 'Orbitron', sans-serif !important; font-weight: 700; }
-    
+
     /* 赛博风输入框 */
     div[data-testid="stTextInput"] > div > div > input {
-        background-color: rgba(2, 6, 23, 0.9) !important;
-        color: #00f3ff !important; font-family: 'Orbitron', monospace !important;
+        background-color: rgba(2, 6, 23, 0.9) !important; color: #00f3ff !important; font-family: 'Orbitron', monospace !important;
         border: 1px solid rgba(0,243,255,0.5) !important; border-radius: 8px !important;
         text-align: center; font-size: 18px !important; font-weight: bold !important; letter-spacing: 2px;
         box-shadow: inset 0 0 15px rgba(0,243,255,0.1) !important;
     }
-    div[data-testid="stTextInput"] > div > div > input:focus {
-        border-color: #ffd700 !important; box-shadow: 0 0 20px rgba(255,215,0,0.3), inset 0 0 15px rgba(255,215,0,0.2) !important;
-    }
+    div[data-testid="stTextInput"] > div > div > input:focus { border-color: #ffd700 !important; box-shadow: 0 0 20px rgba(255,215,0,0.3), inset 0 0 15px rgba(255,215,0,0.2) !important; }
 
-    /* =========================================================================
-       ✨ 4. 终极按钮穿透 CSS (彻底解决白按钮、白底白字、看不清的问题)
-       ========================================================================= */
+    /* 靶向接管选项按钮 */
     div.stButton > button {
-        background: #0f172a !important; /* 强行锁死深空黑底色 */
-        border: 1px solid rgba(0, 243, 255, 0.3) !important; 
-        border-left: 4px solid rgba(0, 243, 255, 0.6) !important;
-        border-radius: 8px !important; min-height: 60px !important; width: 100% !important;
-        padding: 12px 15px !important; text-align: left !important;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.6) !important; 
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        background: #0f172a !important; border: 1px solid rgba(0, 243, 255, 0.3) !important; border-left: 4px solid rgba(0, 243, 255, 0.6) !important;
+        border-radius: 8px !important; min-height: 60px !important; width: 100% !important; padding: 12px 15px !important; text-align: left !important;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.6) !important; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     }
-    div.stButton > button p, div.stButton > button span { 
-        color: #ffffff !important; /* 强行锁死纯白文字，防止与背景糊在一起 */
-        font-size: 15px !important; line-height: 1.5 !important; 
-        white-space: normal !important; font-weight: 500 !important; 
-    }
-    div.stButton > button:hover { 
-        background: rgba(0, 243, 255, 0.15) !important; 
-        border-color: #00f3ff !important; 
-        border-left: 4px solid #00f3ff !important; 
-        box-shadow: 0 0 20px rgba(0,243,255,0.3) !important; 
-        transform: translateX(4px) !important; 
-    }
+    div.stButton > button p, div.stButton > button span { color: #ffffff !important; font-size: 15px !important; line-height: 1.5 !important; white-space: normal !important; font-weight: 500 !important; }
+    div.stButton > button:hover { background: rgba(0, 243, 255, 0.15) !important; border-color: #00f3ff !important; border-left: 4px solid #00f3ff !important; box-shadow: 0 0 20px rgba(0,243,255,0.3) !important; transform: translateX(4px) !important; }
     div.stButton > button:active { transform: scale(0.98) !important; }
 
-    /* 5. 启动与重启的 Primary 按钮颜色特异化 */
+    /* 启动与重启的 Primary 按钮 */
     div.stButton > button[data-testid="baseButton-primary"] {
-        background: linear-gradient(90deg, #00f3ff, #0088ff) !important;
-        border-left: none !important;
-        text-align: center !important;
+        background: linear-gradient(90deg, #00f3ff, #0088ff) !important; border-left: none !important; text-align: center !important;
     }
-    div.stButton > button[data-testid="baseButton-primary"] p { 
-        color: #030712 !important; font-weight: 900 !important; font-size: 16px !important; letter-spacing: 2px !important; 
-    }
-    div.stButton > button[data-testid="baseButton-primary"]:hover { 
-        transform: translateY(-2px) scale(1.02) !important; box-shadow: 0 0 40px rgba(0,243,255,0.8) !important; 
-    }
+    div.stButton > button[data-testid="baseButton-primary"] p { color: #030712 !important; font-weight: 900 !important; font-size: 16px !important; letter-spacing: 2px !important; }
+    div.stButton > button[data-testid="baseButton-primary"]:hover { transform: translateY(-2px) scale(1.02) !important; box-shadow: 0 0 40px rgba(0,243,255,0.8) !important; }
     
-    /* 6. 结果视窗 */
+    /* ✨ txt建议落实：彻底接管进度条，实现赛博风发光 */
+    [data-testid="stProgress"] > div > div > div {
+        background-color: #00f3ff !important;
+        box-shadow: 0 0 10px rgba(0,243,255,0.6) !important;
+    }
+
+    /* 结果视窗 */
     .result-card {
         padding: 40px 25px; border-radius: 16px; background: rgba(11, 17, 32, 0.95) !important; 
         border: 1px solid rgba(255,215,0,0.3); border-top: 6px solid #ffd700; 
         text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.8); margin-bottom: 30px;
     }
     .mbti-code { font-family: 'Orbitron', sans-serif !important; font-size: 80px; font-weight: 900; color: #ffd700 !important; line-height: 1.1; letter-spacing: 4px; text-shadow: 0 0 35px rgba(255,215,0,0.6); margin: 0;}
-    .mbti-post { font-size: 22px; font-weight: 900; color: #00f3ff !important; margin: 15px 0; letter-spacing: 1px;}
     
-    /* 7. 专属终端控制台样式 */
+    /* 专属终端控制台 */
     .cli-box {
         background: #000000; border: 1px solid #334155; border-left: 4px solid #00f3ff;
         padding: 20px; border-radius: 8px; font-family: 'Orbitron', monospace; font-size: 13px;
@@ -117,10 +98,9 @@ st.markdown("""
     }
     .orbitron-font { font-family: 'Orbitron', sans-serif !important; font-weight: 700; color: #00f3ff; }
 
-    /* 8. 性能优化版烟花 */
+    /* 性能优化版烟花 */
     .firework-center { position: fixed; top: 50%; left: 50%; z-index: 99999; pointer-events: none; font-weight: 900; font-family: 'Orbitron', sans-serif; color: #00f3ff; text-shadow: 0 0 20px #00f3ff, 0 0 40px #ffffff; animation: supernova 1.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; will-change: transform, opacity;}
     @keyframes supernova { 0% { transform: translate(-50%, -50%) scale(0.1) rotate(0deg); opacity: 1; } 100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--s)) rotate(var(--rot)); opacity: 0; } }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -138,7 +118,7 @@ def trigger_supernova():
         html_str += f'<div class="firework-center" style="--tx:{tx}px; --ty:{ty}px; --s:{scale}; --rot:{rot}deg; animation-delay:{delay}s; font-size:{random.randint(18, 28)}px;">{text}</div>'
     st.markdown(html_str, unsafe_allow_html=True)
 
-# --- 3. 题库库 (全 40 道) ---
+# --- 3. 题库核心引擎 (如需分离，可挪至 data.py) ---
 questions = [
     {"q": "面对数商生态中各方利益的博弈冲突，我倾向于亲自到现场进行高频次的调解与游说。", "dim": "E"},
     {"q": "代表交易所进行政策咨询时，我享受通过专业表达输出机构影响力的过程。", "dim": "E"},
@@ -182,7 +162,7 @@ questions = [
     {"q": "面对多线任务，我必须先梳理优先级并获得确认，才能安心执行。", "dim": "J"}
 ]
 
-# --- 4. 画像数据库 (正向协同赋能版) ---
+# --- 4. 组织节点画像数据库 ---
 mbti_details = {
     "INTJ": {"role": "首席制度架构师", "desc": "数据要素世界的“造物主”，致力于构建严密的数据治理公理体系。", "tags": ["逻辑闭环", "顶层设计", "制度自信"], "partner": "ENTJ (强效执行节点) / INTP (极客算法节点)", "advice": "在构建宏大的底层规则架构时，请适当为业务部门预留“沙盒容错”空间；倾听一线的非结构化反馈，能让制度更具生命力。"},
     "INTP": {"role": "风控模型专家", "desc": "穿透迷雾，寻找业务背后底层的逻辑漏洞与算力平衡。", "tags": ["黑客思维", "算法驱动", "极致解构"], "partner": "INTJ (框架锚定节点) / ENTP (模式发散节点)", "advice": "尝试将你极其高维的理论模型降维封装，形成非技术人员也能看懂的业务操作手册，让优秀的逻辑转化为具体的生产力。"},
@@ -202,7 +182,7 @@ mbti_details = {
     "ESFP": {"role": "公共关系大使", "desc": "交易所形象代言人，天生具备将复杂的业务逻辑转化为大众传播话术的天赋。", "tags": ["表现力", "当下主义", "快乐源泉"], "partner": "ISFP (视觉美学节点) / ENFP (创意破局节点)", "advice": "花时间深潜研究数据要素的底层逻辑与政策文件。将你的绝佳表现力建立在扎实的产业根基上，形成无可替代的权威影响力。"}
 }
 
-# --- 5. 状态路由管理 ---
+# --- 5. 核心状态机管理 ---
 if 'started' not in st.session_state: st.session_state.started = False
 if 'current_q' not in st.session_state: st.session_state.current_q = 0
 if 'total_scores' not in st.session_state: st.session_state.total_scores = {"E": 0, "S": 0, "T": 0, "J": 0}
@@ -210,16 +190,15 @@ if 'start_time' not in st.session_state: st.session_state.start_time = None
 if 'end_time' not in st.session_state: st.session_state.end_time = None
 if 'calculating' not in st.session_state: st.session_state.calculating = False
 if 'user_alias' not in st.session_state: st.session_state.user_alias = "SDE_NODE"
+# ✨ txt建议落实：防止烟花无限重播的锁
+if 'firework_played' not in st.session_state: st.session_state.firework_played = False
 
-def start_assessment(alias):
-    st.session_state.user_alias = alias if alias else "SDE_NODE"
-    st.session_state.started = True
-    st.session_state.start_time = time.time()
-
+# ✨ txt建议落实：使用官方原生 on_click 回调函数，彻底解决答题闪烁和点击冲突
 def answer_clicked(val, dim):
     st.session_state.total_scores[dim] += (val - 3)
     st.session_state.current_q += 1
-    if st.session_state.current_q == 40:
+    # ✨ txt建议落实：消灭魔法数字 40，使用 len(questions)
+    if st.session_state.current_q == len(questions):
         st.session_state.end_time = time.time()
         st.session_state.calculating = True
 
@@ -227,9 +206,8 @@ def answer_clicked(val, dim):
 if not st.session_state.started:
     st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("<h1 class='hero-title'>上海数据交易所<br>人才图谱全息引擎</h1>", unsafe_allow_html=True)
-    st.markdown("<div class='hero-subtitle'>▶ SDE MATRIX V22.0_SECURE</div>", unsafe_allow_html=True)
+    st.markdown("<div class='hero-subtitle'>▶ SDE MATRIX V23.0_GENESIS</div>", unsafe_allow_html=True)
     
-    # ✨ 核心更正：按照指示融合 2026 价值释放年的官方表述
     st.markdown("""
     <div style='background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(0,243,255,0.4); padding: 25px; border-radius: 12px; font-family: monospace; font-size: 14px; color: #e2e8f0; box-shadow: inset 0 0 20px rgba(0,243,255,0.1), 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 30px;'>
         <span style='color:#94a3b8;'>[SYSTEM]</span> Establishing secure connection to SDE Core...<br>
@@ -239,24 +217,33 @@ if not st.session_state.started:
     </div>
     """, unsafe_allow_html=True)
     
-    st.markdown("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:5px;'>▶ ENTER NODE ALIAS (输入授权代号/姓名):</div>", unsafe_allow_html=True)
-    input_alias = st.text_input("", placeholder="e.g. Director_Wu", label_visibility="collapsed")
+    # ✨ txt建议落实：采用 st.form 表单，支持回车键无缝登录
+    with st.form(key="login_form", border=False):
+        st.markdown("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:5px;'>▶ ENTER NODE ALIAS (输入授权代号/姓名):</div>", unsafe_allow_html=True)
+        input_alias = st.text_input("", placeholder="e.g. Director_Wu", label_visibility="collapsed")
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # 提交表单时触发
+        if st.form_submit_button("▶ 授予系统权限并启动扫描", type="primary", use_container_width=True):
+            # 防 XSS 注入并保存名字
+            st.session_state.user_alias = html.escape(input_alias.strip()) if input_alias.strip() else "SDE_NODE"
+            st.session_state.started = True
+            st.session_state.start_time = time.time()
+            st.rerun()
     
-    st.markdown("<br>", unsafe_allow_html=True)
-    if st.button("▶ 授予系统权限并启动扫描", type="primary", use_container_width=True):
-        start_assessment(input_alias)
-        st.rerun()
-    
-    st.markdown("<div style='text-align:center; color:#475569; font-size:11px; margin-top:40px; font-family:monospace;'>END-TO-END ENCRYPTED · AUDIT TRAIL ENABLED</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center; color:#475569; font-size:11px; margin-top:20px; font-family:monospace;'>END-TO-END ENCRYPTED · AUDIT TRAIL ENABLED</div>", unsafe_allow_html=True)
 
-elif st.session_state.current_q < 40:
+# ✨ txt建议落实：消灭魔法数字
+elif st.session_state.current_q < len(questions):
     q_data = questions[st.session_state.current_q]
-    dim_map = {"E": "生态节点拓扑 (NODE_SYNERGY)", "S": "数据颗粒解析 (DATA_GRANULARITY)", "T": "交易共识逻辑 (LOGIC_CONSENSUS)", "J": "架构秩序引擎 (SYS_GOVERNANCE)"}
+    dim_map = {"E": "生态链路拓扑 (ECO_TOPOLOGY)", "S": "要素颗粒解析 (ASSET_GRANULARITY)", "T": "合规风控共识 (RISK_CONSENSUS)", "J": "演化秩序引擎 (EVOLUTION_GOVERNANCE)"}
     module_name = dim_map.get(q_data['dim'], "特征算力提取 (CORE_EXTRACTION)")
-    dynamic_hash = hashlib.sha256(f"{q_data['q']}{time.time()}".encode()).hexdigest()[:10].upper()
+    
+    # ✨ txt建议落实：摒弃 time.time()，采用静态题号生成 Hash，彻底消除 Hash 闪烁
+    dynamic_hash = hashlib.sha256(f"BLOCK_{st.session_state.current_q}_{q_data['q']}".encode()).hexdigest()[:10].upper()
     
     st.markdown("<div style='padding-top:10px;'></div>", unsafe_allow_html=True)
-    st.progress((st.session_state.current_q + 1) / 40)
+    st.progress((st.session_state.current_q + 1) / len(questions))
     
     st.markdown(f"""
     <div style='background: rgba(2, 6, 23, 0.8); border: 1px solid rgba(0, 243, 255, 0.4); border-radius: 12px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 15px rgba(0, 243, 255, 0.05); margin-top: 15px; margin-bottom: 25px; border-left: 5px solid #00f3ff;'>
@@ -270,7 +257,6 @@ elif st.session_state.current_q < 40:
     </div>
     """, unsafe_allow_html=True)
     
-    # ✨ 核心修复：彻底去除了 <span> 标签，防止 Streamlit 在按钮内将其转义为纯文本（修复代码裸奔）
     opts = [
         ("[ 00% ] 拒绝指令：完全背离业务直觉", 1),
         ("[ 25% ] 偏离轨道：较不符合执行习惯", 2),
@@ -280,15 +266,20 @@ elif st.session_state.current_q < 40:
     ]
     
     for text, val in opts:
-        if st.button(text, type="secondary", key=f"q_{st.session_state.current_q}_{val}"):
-            answer_clicked(val, q_data['dim'])
-            st.rerun()
+        # ✨ txt建议落实：采用 on_click 原生回调，不再在循环内写 st.rerun()
+        st.button(
+            text, 
+            type="secondary", 
+            key=f"q_{st.session_state.current_q}_{val}",
+            on_click=answer_clicked,
+            args=(val, q_data['dim'])
+        )
 
 elif st.session_state.calculating:
     st.markdown("<h2 style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; letter-spacing:4px; text-shadow:0 0 15px rgba(0,243,255,0.8); text-align:center; margin-top:50px;'>[ SYSTEM DECODING ]</h2>", unsafe_allow_html=True)
     terminal = st.empty()
     logs = [
-        f"VERIFYING NODE: {st.session_state.user_alias.upper()}...",
+        f"VERIFYING NODE: {st.session_state.user_alias}...",
         "EXTRACTING COGNITIVE VECTORS...",
         "QUANTIFYING RISK APPETITE & COMPLIANCE THRESHOLD...",
         "MAPPING TO SDE TALENT TOPOLOGY...",
@@ -305,7 +296,10 @@ elif st.session_state.calculating:
     st.rerun()
 
 else:
-    trigger_supernova()
+    # ✨ txt建议落实：防烟花重播锁发挥作用
+    if not st.session_state.firework_played:
+        trigger_supernova()
+        st.session_state.firework_played = True
     
     res = st.session_state.total_scores
     mbti = ("E" if res["E"] >= 0 else "I") + ("S" if res["S"] >= 0 else "N") + ("T" if res["T"] >= 0 else "F") + ("J" if res["J"] >= 0 else "P")
@@ -314,7 +308,7 @@ else:
     st.markdown(f"""
     <div class="result-card">
         <div class="orbitron-font" style="font-size:13px; color:#94a3b8; letter-spacing:4px; margin-bottom:15px;">MATRIX DECODED SUCCESSFULLY</div>
-        <div style="color:#00f3ff; font-family:'Orbitron', monospace; font-size:13px; margin-bottom:5px; border-bottom:1px dashed #334155; padding-bottom:10px; display:inline-block;">AUTH_NODE: {st.session_state.user_alias.upper()}</div>
+        <div style="color:#00f3ff; font-family:'Orbitron', monospace; font-size:13px; margin-bottom:5px; border-bottom:1px dashed #334155; padding-bottom:10px; display:inline-block;">AUTH_NODE: {st.session_state.user_alias}</div>
         <div class="mbti-code" style="margin-top:10px;">{mbti}</div>
         <div class="mbti-post">【 {data['role']} 】</div>
         <div style="color:#e2e8f0 !important; font-size:15px; line-height:1.8; margin-bottom:25px; font-weight:400;">{data['desc']}</div>
@@ -340,9 +334,8 @@ else:
     fig.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=13), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=35, r=35, t=20, b=20), height=300)
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
-    # ✨ 核心修复：彻底解决 KeyError 'P' 的崩溃问题
     st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🎛️ 业务风控与决策仪表</h4>", unsafe_allow_html=True)
-    p_score = -res.get("J", 0) # 使用安全提取，J 的对立面即是 P 的属性
+    p_score = -res.get("J", 0) 
     s_score = res.get("S", 0)
     risk_score = max(5, min(95, 50 + (p_score * 1.5) - (s_score * 1.5)))
     
@@ -370,7 +363,7 @@ else:
     hash_code = hashlib.sha256(f"{st.session_state.user_alias}{mbti}{time_taken}".encode()).hexdigest()[:12].upper()
     share_card = f"""【SDE 人才能力图谱解析报告】
 ============================
-◈ 授权节点：{st.session_state.user_alias.upper()}
+◈ 授权节点：{st.session_state.user_alias}
 ◈ 特征序列：{mbti} ({data['role'].split(' / ')[0]})
 ◈ 核心素质：{' · '.join(data['tags'])}
 ◈ 决策偏好：{r_tag}
@@ -389,6 +382,7 @@ else:
         st.session_state.start_time = None
         st.session_state.end_time = None
         st.session_state.calculating = False
+        st.session_state.firework_played = False
         st.session_state.user_alias = "SDE_NODE"
         st.rerun()
 
