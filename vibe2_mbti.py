@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. 赛博科技级 UI 引擎 (视觉保留极客风，排版全面优化) ---
+# --- 2. 赛博科技级 UI 引擎 (修复版：彻底消灭白屏/白字问题) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&display=swap');
@@ -134,6 +134,51 @@ st.markdown("""
         color: #4ade80; box-shadow: inset 0 0 20px rgba(0,243,255,0.1); margin-top: 50px; text-transform: uppercase;
     }
 
+    /* =========================================================
+       🚀 终极修复：彻底接管 st.code 复制代码块样式，告别白屏！
+       ========================================================= */
+    [data-testid="stCodeBlock"] {
+        border-radius: 8px !important;
+        margin-top: 10px;
+    }
+    /* 强制重写代码块底板 */
+    [data-testid="stCodeBlock"] > div {
+        background-color: rgba(5, 10, 21, 0.95) !important; 
+        border: 1px solid rgba(0, 243, 255, 0.4) !important;
+        border-radius: 8px !important;
+        box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.1) !important;
+    }
+    /* 强行抹除内部所有自带的白底，文字染成银白色 */
+    [data-testid="stCodeBlock"] pre, 
+    [data-testid="stCodeBlock"] code,
+    [data-testid="stCodeBlock"] span {
+        background-color: transparent !important;
+        color: #e2e8f0 !important; 
+        font-family: 'Noto Sans SC', monospace !important;
+        font-size: 13px !important;
+        line-height: 1.6 !important;
+        white-space: pre-wrap !important; /* 保证微信排版绝对换行不越界 */
+        text-shadow: none !important;
+    }
+    /* 强行定制 st.code 右上角的 Copy 复制按钮 */
+    [data-testid="stCodeBlock"] button {
+        background-color: rgba(2, 6, 23, 0.9) !important;
+        border: 1px solid rgba(0, 243, 255, 0.4) !important;
+        border-radius: 4px !important;
+        opacity: 1 !important; 
+        transition: all 0.3s ease !important;
+    }
+    [data-testid="stCodeBlock"] button:hover {
+        background-color: rgba(0, 243, 255, 0.2) !important;
+        border-color: #00f3ff !important;
+        transform: scale(1.05) !important;
+    }
+    /* 让复制图标变成发光赛博蓝 */
+    [data-testid="stCodeBlock"] button svg { 
+        fill: #00f3ff !important; 
+        stroke: #00f3ff !important;
+    }
+
     /* 性能优化版结算烟花 */
     .firework-center { position: fixed; top: 50%; left: 50%; z-index: 99998; pointer-events: none; font-weight: 900; font-family: 'Orbitron', sans-serif; color: #00f3ff; text-shadow: 0 0 20px #00f3ff, 0 0 30px #ffffff; animation: supernova 1.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; will-change: transform, opacity;}
     @keyframes supernova { 0% { transform: translate(-50%, -50%) scale(0.1) rotate(0deg); opacity: 1; } 100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--s)) rotate(var(--rot)); opacity: 0; filter: blur(2px);} }
@@ -156,7 +201,6 @@ def trigger_supernova():
 
 # --- 3. 深度定制的 SDE 业务语境题库 ---
 questions = [
-    # E vs I (生态协同/外部发声 vs 深度研究/内向沉淀)
     {"q": "推动数商入场时，我倾向于亲自拜访机构进行面对面沟通，而非仅在线上发送标准入驻指引。", "dim": "E"},
     {"q": "代表数据交易所参与行业峰会，发表演讲并扩大 SDE 的市场影响力，会让我充满能量。", "dim": "E"},
     {"q": "面对复杂的数据跨境业务闭环，我更喜欢召集跨部门进行“头脑风暴”，而非独自撰写可行性报告。", "dim": "E"},
@@ -168,7 +212,6 @@ questions = [
     {"q": "相比于坐在工位上独自研究定价模型，我更向往去各省市的大数据中心及数商企业实地调研交流。", "dim": "E"},
     {"q": "我坚信推动数据流通的最大阻力往往源于“信任缺失”，而建立信任最好的方式是高频的线下人际交互。", "dim": "E"},
 
-    # S vs N (实务颗粒/关注当下 vs 战略前瞻/宏观推演)
     {"q": "在评估一项数据资产入表案例时，我会死磕财务科目映射、摊销年限与合规确权等底层细节。", "dim": "S"},
     {"q": "我更信任交易大盘上的真实成交曲线与存证笔数，而不是研究报告中那些定性的宏观趋势预判。", "dim": "S"},
     {"q": "当听到“隐私计算”、“可信数据空间”等前沿概念时，我最先关心的是它在 SDE 现有机房和架构里如何具体落地。", "dim": "S"},
@@ -180,7 +223,6 @@ questions = [
     {"q": "我偏好有明确时间节点的阶段性交付成果，即使它只是交易系统后台一个字段的微小改良。", "dim": "S"},
     {"q": "我认为现阶段数据要素市场的建设，最缺的是脚踏实地的“施工图”，而不是天花乱坠的“概念图”。", "dim": "S"},
 
-    # T vs F (量化风控/客观逻辑 vs 价值共情/生态关系)
     {"q": "即使某个数据产品能带来巨大的短期交易额，只要被我发现存在合规硬伤或溯源不清，我也会毫不犹豫按下终止键。", "dim": "T"},
     {"q": "在评选“年度优秀数商”时，我主张完全依靠交易贡献度等客观算法指标，剔除任何行业人情和生态扶持的主观分。", "dim": "T"},
     {"q": "面对前线业务部门抱怨合规流程过于繁琐，我会列举法律底线直接回绝，认为交易所的红线不容人情变通。", "dim": "T"},
@@ -192,7 +234,6 @@ questions = [
     {"q": "当公司推行一项新的管理或考核制度，我首先审查其逻辑是否严密、标准是否可量化，而非员工的第一情感接受度。", "dim": "T"},
     {"q": "我认为数据交易所的核心护城河是“严密的规则体系与技术底座”，而非“温情脉脉的商业客情关系”。", "dim": "T"},
 
-    # J vs P (架构秩序/严密规划 vs 敏捷演进/灵活拥抱)
     {"q": "在主导大型数据创新项目（如新版交易大盘上线）前，我会建立极其严密的倒排计划表，非常反感进度失去控制。", "dim": "J"},
     {"q": "我的云盘文件夹、数据资产文档拥有严丝合缝的分类与命名逻辑，任何文件乱放都会让我感到极度不适。", "dim": "J"},
     {"q": "如果一场跨部门业务讨论会没有形成明确的会议纪要、SOP决议和责任人，我会认为这是在严重浪费时间。", "dim": "J"},
@@ -275,7 +316,7 @@ if not st.session_state.started:
     
     with st.form(key="login_form", border=False):
         st.markdown("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:8px; text-align:center;'>▼ MOUNT NODE ALIAS (输入职场称呼 / 授权代号) ▼</div>", unsafe_allow_html=True)
-        st.text_input("", key="login_input", placeholder="例如：Compliance_NILIU_WUMING", label_visibility="collapsed")
+        st.text_input("", key="login_input", placeholder="例如：Compliance_Wu", label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
         st.form_submit_button("▶ 授予系统权限并执行深度扫描", on_click=start_assessment_callback, type="primary", use_container_width=True)
     
@@ -303,7 +344,6 @@ elif st.session_state.calculating:
 elif st.session_state.current_q < len(questions):
     q_data = questions[st.session_state.current_q]
     
-    # 【专业模块命名重写】
     dim_map = {
         "E": "[生态交互] 外部联结协同 vs 内部深潜研判", 
         "S": "[感知落地] 颗粒实务穿透 vs 宏观战略推演", 
@@ -332,7 +372,6 @@ elif st.session_state.current_q < len(questions):
     </div>
     """, unsafe_allow_html=True)
     
-    # 【选项话术升级，符合职场专业度】
     opts = [
         ("❌ [ 极度排斥 ] 强制阻断：完全背离我的工作直觉", 1),
         ("⚠️ [ 较少符合 ] 弱态耦合：仅在特定场景下采用", 2),
@@ -367,7 +406,6 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-    # ✨ 【重构一：雷达图加大 Margin 防止两侧文字被裁切】✨
     st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🕸️ 核心算力拓扑矩阵</h4>", unsafe_allow_html=True)
     def get_intensity(score): return max(15, min(100, 50 + (score / (len(questions)/4) * 50)))
     val_E, val_I = get_intensity(res["E"]), 100 - get_intensity(res["E"])
@@ -385,7 +423,6 @@ else:
     fig.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=12), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=55, r=55, t=30, b=30), height=350)
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
-    # ✨ 【重构二：仪表盘文本彻底剥离 HTML 渲染，永不吃字】✨
     st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🎛️ 风险过载阈值仪</h4>", unsafe_allow_html=True)
     p_score = -res.get("J", 0)
     s_score = res.get("S", 0)
@@ -395,10 +432,8 @@ else:
     elif risk_score < 65: r_tag, r_color, r_desc = "动态演进与边界平衡", "#ffd700", "能够在监管锁死与商业吞吐间寻求黄金接口，适合主导跨部门协作与全网业务流转统筹。"
     else: r_tag, r_color, r_desc = "无界扩张与前沿破局", "#f43f5e", "渴望突破陈旧的业务规则枷锁，拥有高爆发性的业务创新实战能力，能快速抢占新兴要素生态阵地。"
     
-    # 将标题剥离出图表，用独立 DIV 渲染
     st.markdown(f"<div style='text-align:center; font-size:16px; font-weight:bold; color:{r_color}; font-family:Noto Sans SC; margin-top: 15px;'>{r_tag}</div>", unsafe_allow_html=True)
 
-    # 去除了 title 属性，增加了上下边缘 Margin，让半圆居中展示
     fig_gauge = go.Figure(go.Indicator(
         mode="gauge+number", value=risk_score, 
         number={'suffix': "%", 'font': {'family': 'Orbitron, sans-serif', 'color': r_color, 'size': 42}}, 
@@ -407,7 +442,6 @@ else:
     fig_gauge.update_layout(paper_bgcolor='rgba(0,0,0,0)', font={'color': "#94a3b8"}, height=240, margin=dict(l=30, r=30, t=10, b=20))
     st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False})
     
-    # 底部描述同样独立渲染
     st.markdown(f"""
     <div style='background: rgba(2,6,23,0.5); border-radius:6px; padding:15px; color:#cbd5e1 !important; font-size:13px; text-align:center; margin-top:-10px; margin-bottom:25px; line-height:1.6; border: 1px solid rgba(255,255,255,0.05);'>
         {r_desc}
@@ -428,7 +462,6 @@ else:
     st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>💠 专属身份密钥下发</h4>", unsafe_allow_html=True)
     hash_code = hashlib.sha256(f"{safe_alias_final}{mbti}{time_taken}".encode()).hexdigest()[:16].upper()
     
-    # ✨ 【重构三：原生代码块实现一键复制与微信神级排版】✨
     share_card = f"""【上海数据交易所 · 人才全息图谱】
 =================================
 👤 授权节点：{safe_alias_final}
@@ -439,10 +472,8 @@ else:
 🌐 2026 数据要素突破之年，寻找你的协同节点！
 🔗 [全息链路校验哈希: 0x{hash_code}]"""
     
-    # 引导用户点击右上角的复制按钮
-    st.markdown("<div style='font-size:12px; color:#94a3b8; margin-bottom:5px;'>👇 点击下方深色区域右上角的 <b style='color:#00f3ff;'>Copy (复制) 图标</b>，即可完美粘贴至微信对话：</div>", unsafe_allow_html=True)
+    st.markdown("<div style='font-size:12px; color:#94a3b8; margin-bottom:5px;'>👇 点击下方代码框右上角的 <b style='color:#00f3ff;'>Copy 图标</b>，即可完美粘贴至微信对话：</div>", unsafe_allow_html=True)
     
-    # 利用 st.code 触发 Streamlit 原生的 Copy 按钮
     st.code(share_card, language="plaintext")
 
     def reset_system():
@@ -468,4 +499,3 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
-
