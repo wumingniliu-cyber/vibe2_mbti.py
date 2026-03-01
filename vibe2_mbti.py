@@ -35,7 +35,8 @@ st.markdown("""
     
     /* 全局 CRT 扫描线与科技网格背景 */
     [data-testid="stAppViewContainer"]::after {
-        content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        content: "";
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                     linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
         background-size: 100% 3px, 3px 100%;
@@ -56,7 +57,8 @@ st.markdown("""
     
     /* Glitch 故障风主标题 */
     .hero-title { 
-        font-size: 38px !important; font-weight: 900 !important; text-align: center; 
+        font-size: 38px !important;
+        font-weight: 900 !important; text-align: center; 
         color: #ffffff !important; letter-spacing: 4px; margin-bottom: 5px;
         text-shadow: 0 0 20px rgba(0,243,255,0.7), 0 0 40px rgba(0,243,255,0.3);
         position: relative; display: inline-block;
@@ -468,7 +470,7 @@ else:
                     setTimeout(() => {{
                         const target = document.getElementById('capture-box');
                         html2canvas(target, {{
-                            scale: 3, // 输出3倍高清视网膜图，发朋友圈绝不模糊
+                            scale: 3, // 输出3倍高清视网膜图
                             backgroundColor: '#030712',
                             useCORS: true
                         }}).then(canvas => {{
@@ -476,16 +478,15 @@ else:
                             document.getElementById('loading-ui').style.display = 'none';
                             document.getElementById('result-img').style.display = 'block';
                             document.getElementById('hint').style.display = 'block';
-                            // 清理不再需要的隐藏 DOM
                             document.getElementById('render-target').remove();
                         }});
-                    }}, 1200); // 留出 1.2 秒确保所有样式特效准确落位
+                    }}, 1200);
                 }});
             </script>
         </body>
         </html>
         """
-        # 挂载这个隐形渲染沙盒（高度预留足够显示最终图片）
+        # 挂载隐形渲染沙盒
         components.html(html_to_image_script, height=750)
 
     with tab2:
@@ -500,6 +501,10 @@ else:
 🌐 2026 数据要素突破之年，寻找你的协同节点！
 🔗 [全息链路校验哈希: 0x{hash_code}]"""
         st.code(share_card, language="plaintext")
+
+    # ✨ 雷达图与仪表盘绘制之前，重新定义 categories 与 values，解决 NameError！
+    categories = ['生态拓展(E)', '实务风控(S)', '逻辑共识(T)', '秩序合规(J)', '节点深潜(I)', '宏观架构(N)', '价值共情(F)', '敏捷演化(P)']
+    values = [val_E, val_S, val_T, val_J, val_I, val_N, val_F, val_P]
 
     st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🕸️ 核心算力拓扑矩阵</h4>", unsafe_allow_html=True)
     
