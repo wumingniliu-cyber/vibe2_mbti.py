@@ -95,7 +95,7 @@ st.markdown("""
     
     .cli-box { background: #000000; border: 1px solid #334155; border-left: 4px solid #00f3ff; padding: 20px; border-radius: 6px; font-family: 'Orbitron', monospace; font-size: 13px; color: #4ade80; box-shadow: inset 0 0 20px rgba(0,243,255,0.1); margin-top: 50px; text-transform: uppercase; }
 
-    /* 原生网页端酷炫结果大金卡 (已回归) */
+    /* 原生网页端酷炫结果大金卡 (已全面恢复) */
     .result-card { padding: 35px 20px; border-radius: 12px; background: rgba(11, 17, 32, 0.95) !important; border: 1px solid rgba(255,215,0,0.3); border-top: 5px solid #ffd700; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin-bottom: 30px; }
     .mbti-code { font-family: 'Orbitron', sans-serif !important; font-size: 72px; font-weight: 900; color: #ffd700 !important; line-height: 1.1; letter-spacing: 4px; text-shadow: 0 0 25px rgba(255,215,0,0.5); margin: 0;}
 
@@ -228,7 +228,7 @@ if not st.session_state.started:
         <div style="text-align: center; margin-bottom: 20px;">
             <h1 class="hero-title" data-text="上海数据交易所">上海数据交易所</h1><br>
             <h1 class="hero-title" data-text="核心人才全息引擎" style="font-size:32px !important;">核心人才全息引擎</h1>
-            <div class="hero-subtitle">▶ SDE MATRIX V1.0_SECURE</div>
+            <div class="hero-subtitle">▶ SDE MATRIX V26.0_SECURE</div>
         </div>
     """, unsafe_allow_html=True)
     
@@ -249,11 +249,9 @@ if not st.session_state.started:
     
     with st.form(key="login_form", border=False):
         st.markdown("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:8px; text-align:center;'>▼ MOUNT NODE ALIAS (输入职场称呼 / 授权代号) ▼</div>", unsafe_allow_html=True)
-        st.text_input("", key="login_input", placeholder="例如：Compliance_Wu", label_visibility="collapsed")
+        st.text_input("", key="login_input", placeholder="例如：Complicance_wu", label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
         st.form_submit_button("▶ 授予系统权限并执行深度扫描", on_click=start_assessment_callback, type="primary", use_container_width=True)
-    
-    st.markdown("<div style='text-align:center; color:#475569; font-size:11px; margin-top:40px; font-family:monospace;'>END-TO-END ENCRYPTED · AUDIT TRAIL ENABLED</div>", unsafe_allow_html=True)
 
 elif st.session_state.calculating:
     st.markdown("<h2 class='hero-title' data-text='[ DECODING MATRIX ]' style='font-size:32px !important; margin-top:50px;'>[ DECODING MATRIX ]</h2>", unsafe_allow_html=True)
@@ -328,14 +326,13 @@ else:
     safe_alias_final = st.session_state.user_alias.upper()
     role_name = data['role']
     
-    # ==== 核心数值计算与雷达图变量定义 (🚨 修复 NameError 的关键) ====
+    # 🚨 核心修复 1：补回雷达图的类别和数值定义，彻底消灭 NameError
     def get_intensity(score): return int(max(15, min(100, 50 + (score / (len(questions)/4) * 50))))
     val_E, val_I = get_intensity(res["E"]), 100 - get_intensity(res["E"])
     val_S, val_N = get_intensity(res["S"]), 100 - get_intensity(res["S"])
     val_T, val_F = get_intensity(res["T"]), 100 - get_intensity(res["T"])
     val_J, val_P = get_intensity(res["J"]), 100 - get_intensity(res["J"])
 
-    # 🚨 重新补回雷达图所需要的类别与数值数组
     categories = ['生态协同(E)', '颗粒实勘(S)', '量化风控(T)', '架构秩序(J)', '底层深潜(I)', '战略前瞻(N)', '生态共情(F)', '敏捷演进(P)']
     values = [val_E, val_S, val_T, val_J, val_I, val_N, val_F, val_P]
 
@@ -351,7 +348,7 @@ else:
     hash_code = hashlib.sha256(f"{safe_alias_final}{mbti}{time_taken}".encode()).hexdigest()[:16].upper()
 
     # =========================================================================
-    # ✨✨✨ 1. 恢复：动态沉浸式的原生 UI 数据卡片区 ✨✨✨
+    # ✨✨ 1. 网页端原生图表区 (高光卡片、雷达图、表盘 全量满血回归！) ✨✨
     # =========================================================================
     st.markdown(f"""
     <div class="result-card">
@@ -366,19 +363,15 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-    # 1.1 恢复：Plotly 雷达图
     st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🕸️ 核心算力拓扑矩阵</h4>", unsafe_allow_html=True)
-    
     fig = go.Figure()
     fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.1)', line=dict(color='rgba(0, 243, 255, 0.2)', width=8), hoverinfo='none'))
     fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.25)', line=dict(color='#00f3ff', width=2.5), marker=dict(color='#ff003c', size=6, symbol='diamond')))
     fig.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=12), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=55, r=55, t=30, b=30), height=350)
     st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
 
-    # 1.2 恢复：Plotly 风险仪表盘
     st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🎛️ 风险过载阈值仪</h4>", unsafe_allow_html=True)
     st.markdown(f"<div style='text-align:center; font-size:16px; font-weight:bold; color:{r_color}; font-family:Noto Sans SC; margin-top: 15px;'>{r_tag}</div>", unsafe_allow_html=True)
-
     fig_gauge = go.Figure(go.Indicator(
         mode="gauge+number", value=risk_score, 
         number={'suffix': "%", 'font': {'family': 'Orbitron, sans-serif', 'color': r_color, 'size': 42}}, 
@@ -386,10 +379,8 @@ else:
     ))
     fig_gauge.update_layout(paper_bgcolor='rgba(0,0,0,0)', font={'color': "#94a3b8"}, height=240, margin=dict(l=30, r=30, t=10, b=20))
     st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False})
-    
     st.markdown(f"<div style='background: rgba(2,6,23,0.5); border-radius:6px; padding:15px; color:#cbd5e1 !important; font-size:13px; text-align:center; margin-top:-10px; margin-bottom:25px; line-height:1.6; border: 1px solid rgba(255,255,255,0.05);'>{r_desc}</div>", unsafe_allow_html=True)
 
-    # 1.3 恢复：生态协同网络指引
     st.markdown("<h4 style='color:#10b981 !important; border-left:4px solid #10b981; padding-left:10px; font-weight:900;'>💡 生态网络协同指引</h4>", unsafe_allow_html=True)
     st.markdown(f"""
     <div style='background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(0,0,0,0)); border-left: 4px solid #10b981; padding: 20px; border-radius: 4px; font-size: 14px; line-height: 1.7; color: #e2e8f0 !important; border-top: 1px solid rgba(16, 185, 129, 0.3); border-bottom: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 5px 20px rgba(0,0,0,0.5); margin: 15px 0 30px 0;'>
@@ -401,14 +392,13 @@ else:
     """, unsafe_allow_html=True)
 
     # =========================================================================
-    # ✨✨✨ 2. 保留：一键生成朋友圈高逼格分享海报与名片区 ✨✨✨
+    # ✨✨ 2. 一键生成海报区 (🚨 核心修复 2：防卡死、防溢出、强制渲染) ✨✨
     # =========================================================================
-    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>💠 身份密钥与海报提取中心</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900; margin-top:40px;'>💠 身份海报提取中心</h4>", unsafe_allow_html=True)
     
     tab1, tab2 = st.tabs(["📸 生成全息图文海报 (推荐朋友圈)", "📝 提取纯文本格式 (适合群聊)"])
 
     with tab1:
-        # 构造专属防伪赛博条形码
         random.seed(hash_code)
         gradient_stops = []
         current_pos = 0
@@ -430,16 +420,11 @@ else:
             <style>
                 body {{ margin: 0; display: flex; flex-direction: column; align-items: center; background-color: transparent; font-family: 'Noto Sans SC', sans-serif; user-select: none; padding: 10px 0;}}
                 
-                #capture-box {{
-                    width: 340px; background-color: #030712; padding: 30px 25px; border-radius: 16px;
-                    border: 1px solid rgba(0, 243, 255, 0.4); box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
-                    position: relative; overflow: hidden; color: #fff; box-sizing: border-box;
-                }}
-                .cyber-grid {{
-                    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-                    background-image: linear-gradient(0deg, rgba(0,243,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.04) 1px, transparent 1px);
-                    background-size: 20px 20px; z-index: 0; pointer-events: none;
-                }}
+                /* 🚨 修复 A：骗过 Safari 的渲染机制，不移出屏幕，而是将其透明度降为 0.01 放在顶部 */
+                #render-target {{ position: absolute; top: 0; left: 0; opacity: 0.01; pointer-events: none; z-index: -100; }}
+                
+                #capture-box {{ width: 340px; background-color: #030712; padding: 30px 25px; border-radius: 16px; border: 1px solid rgba(0, 243, 255, 0.4); box-shadow: 0 0 30px rgba(0, 243, 255, 0.2); position: relative; overflow: hidden; color: #fff; box-sizing: border-box; }}
+                .cyber-grid {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(0deg, rgba(0,243,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.04) 1px, transparent 1px); background-size: 20px 20px; z-index: 0; pointer-events: none; }}
                 .top-glow {{ position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, transparent, #00f3ff, transparent); z-index: 1; }}
                 
                 .content {{ position: relative; z-index: 2; }}
@@ -470,12 +455,12 @@ else:
                 #loading-ui {{ font-family: 'Orbitron', sans-serif; color: #00f3ff; font-size: 13px; text-align: center; padding: 40px; animation: pulse 1s infinite alternate; letter-spacing: 2px; }}
                 @keyframes pulse {{ 0% {{ opacity: 1; text-shadow: 0 0 10px #00f3ff; }} 100% {{ opacity: 0.4; text-shadow: none; }} }}
                 
-                #result-img {{ display: none; width: 100%; max-width: 340px; border-radius: 16px; border: 1px solid rgba(0,243,255,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.8); pointer-events: auto; -webkit-touch-callout: default; }}
+                #result-img {{ display: none; width: 100%; max-width: 340px; border-radius: 16px; border: 1px solid rgba(0,243,255,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.8); pointer-events: auto; -webkit-touch-callout: default; margin-top: 5px; }}
                 .hint-box {{ display: none; color: #10b981; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); padding: 12px; border-radius: 6px; font-size: 13px; font-weight: bold; text-align: center; margin-top: 20px; line-height: 1.6; width: 100%; max-width: 340px; box-sizing: border-box; }}
             </style>
         </head>
         <body>
-            <div id="render-target" style="position: absolute; left: -9999px;">
+            <div id="render-target">
                 <div id="capture-box">
                     <div class="cyber-grid"></div>
                     <div class="top-glow"></div>
@@ -517,32 +502,44 @@ else:
             <div id="hint" class="hint-box">✅ 海报压制成功！<br><span style="color:#fff;">👆 手机端请 <b>长按上方图片</b><br>即可「发送给朋友」或「保存到相册」</span></div>
 
             <script>
-                // 确保自定义字体加载完毕后，再进行 Canvas 截图
-                document.fonts.ready.then(() => {{
-                    setTimeout(() => {{
-                        const target = document.getElementById('capture-box');
-                        html2canvas(target, {{
-                            scale: 3, // 输出3倍高清视网膜图
-                            backgroundColor: '#030712',
-                            useCORS: true
-                        }}).then(canvas => {{
-                            document.getElementById('result-img').src = canvas.toDataURL('image/png');
-                            document.getElementById('loading-ui').style.display = 'none';
-                            document.getElementById('result-img').style.display = 'block';
-                            document.getElementById('hint').style.display = 'block';
-                            document.getElementById('render-target').remove();
-                        }});
-                    }}, 1200); 
-                }});
+                // 🚨 修复 B：放弃易死锁的 document.fonts.ready，改为简单粗暴但绝对稳健的强制定时渲染
+                setTimeout(() => {{
+                    const target = document.getElementById('capture-box');
+                    if (typeof html2canvas === 'undefined') {{
+                        document.getElementById('loading-ui').innerHTML = '❌ 渲染引擎加载失败，请检查网络。';
+                        return;
+                    }}
+                    
+                    // 🚨 修复 C：倍率从 3 降为 2，对手机依然极清，但彻底杜绝微信浏览器的显存溢出崩溃！
+                    html2canvas(target, {{
+                        scale: 2, 
+                        backgroundColor: '#030712',
+                        useCORS: true,
+                        allowTaint: true,
+                        logging: false
+                    }}).then(canvas => {{
+                        document.getElementById('result-img').src = canvas.toDataURL('image/png');
+                        document.getElementById('loading-ui').style.display = 'none';
+                        document.getElementById('result-img').style.display = 'block';
+                        document.getElementById('hint').style.display = 'block';
+                        
+                        const rt = document.getElementById('render-target');
+                        if (rt) rt.style.display = 'none'; // 生成完毕后安全抹除占位DOM
+                    }}).catch(err => {{
+                        // 🚨 修复 D：哪怕遇到极限老旧机型卡死，也能给出提示，不再白屏转圈
+                        document.getElementById('loading-ui').innerHTML = '⚠️ 手机内存受限，海报生成中止。您可以直接截屏保存上方网页内容。';
+                        console.error(err);
+                    }});
+                }}, 1500); // 预留 1.5 秒确保 CSS 特效和字体排版完成
             </script>
         </body>
         </html>
         """
-        # 挂载这个隐形渲染沙盒
+        # 预留足够高度，防止由于滚动条导致的裁剪
         components.html(html_to_image_script, height=750)
 
     with tab2:
-        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 点击下方黑框右上角的 <b style='color:#00f3ff;'>Copy</b> 图标，复制纯文字版供群聊使用：</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 备选方案：点击下方代码框右上角的 <b style='color:#00f3ff;'>Copy</b> 图标，复制纯文字版供群聊使用：</div>", unsafe_allow_html=True)
         share_card = f"""【上海数据交易所 · 人才全息图谱】
 =================================
 👤 授权节点：{safe_alias_final}
@@ -567,15 +564,19 @@ else:
     st.markdown("<br>", unsafe_allow_html=True)
     st.button("⏏ 弹出磁盘并重启矩阵 (SYS_REBOOT)", on_click=reset_system, type="primary", use_container_width=True)
 
+# =========================================================================
+# ✨✨ 3. 新增需求：底部专属版权归属声明 ✨✨
+# =========================================================================
 st.markdown("""
-    <div style='text-align:center; margin-top:50px; margin-bottom:20px; font-family:\"Orbitron\", monospace; position:relative; z-index:10;'>
+    <div style='text-align:center; margin-top:60px; margin-bottom:30px; font-family:\"Orbitron\", monospace; position:relative; z-index:10;'>
         <div style='color:#00f3ff !important; font-size:10px; opacity:0.4; letter-spacing:4px; margin-bottom:5px;'>
             POWERED BY SDE DATA ELEMENT KERNEL
         </div>
-        <div style='color:#00f3ff !important; font-size:10px; opacity:0.2; letter-spacing:2px;'>
+        <div style='color:#00f3ff !important; font-size:10px; opacity:0.2; letter-spacing:2px; margin-bottom:20px;'>
             SECURE ENTERPRISE BUILD
+        </div>
+        <div style='color:#94a3b8 !important; font-size:11px; opacity:0.6; font-family: "Noto Sans SC", sans-serif; letter-spacing:1px; border-top: 1px dashed rgba(148,163,184,0.3); padding-top: 15px; display: inline-block;'>
+            © 2026 版权归属 <b style='color:#00f3ff;'>无名逆流</b>
         </div>
     </div>
 """, unsafe_allow_html=True)
-
-
