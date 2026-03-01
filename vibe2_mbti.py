@@ -228,7 +228,7 @@ if not st.session_state.started:
         <div style="text-align: center; margin-bottom: 20px;">
             <h1 class="hero-title" data-text="上海数据交易所">上海数据交易所</h1><br>
             <h1 class="hero-title" data-text="核心人才全息引擎" style="font-size:32px !important;">核心人才全息引擎</h1>
-            <div class="hero-subtitle">▶ SDE MATRIX V26.0_SECURE</div>
+            <div class="hero-subtitle">▶ SDE MATRIX V1.0_SECURE</div>
         </div>
     """, unsafe_allow_html=True)
     
@@ -580,3 +580,4 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
+
