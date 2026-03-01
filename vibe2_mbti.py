@@ -145,7 +145,7 @@ questions = [
     {"q": "当公司推行一项新的管理或考核制度，我首先审查其逻辑是否严密、标准是否可量化，而非员工的第一情感接受度。", "dim": "T"},
     {"q": "我认为数据交易所的核心护城河是“严密的规则体系与技术底座”，而非“温情脉脉的商业客情关系”。", "dim": "T"},
     {"q": "在主导大型数据创新项目（如新版交易大盘上线）前，我会建立极其严密的倒排计划表，非常反感进度失去控制。", "dim": "J"},
-    {"q": "我的云盘文件夹、数据资产文档拥有严丝合缝的分类与命名逻辑，任何文件乱放都会让我感到极度不适。", "dim": "J"},
+    {"q": "我的云盘文件夹、数据工作文档拥有严丝合缝的分类与命名逻辑，任何文件乱放都会让我感到极度不适。", "dim": "J"},
     {"q": "如果一场跨部门业务讨论会没有形成明确的会议纪要、SOP决议和责任人，我会认为这是在严重浪费时间。", "dim": "J"},
     {"q": "我倾向于在系统开发初期就锁定所有的核心业务需求，对中途频繁变更“数据产品业务形态”持强烈排斥态度。", "dim": "J"},
     {"q": "即便面临极高压的交易旺季，我也坚持每天下班前进行工作复盘，并雷打不动地更新第二天的待办任务清单。", "dim": "J"},
@@ -237,7 +237,7 @@ mbti_details = {
     },
     "ENTP": {
         "role": "模式创新顾问", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.2%", "base_hash": 9400,
-        "desc": "传统交易规则的敏锐挑战者，致力于通过跨界思维寻找下一代数据资产流转范式。",
+        "desc": "传统交易规则的敏锐挑战者，致力于通过跨界思维寻找下一代数据要素流转范式。",
         "tags": ["范式重构", "逻辑激辩", "思维跳跃"],
         "partner": "INTP (逻辑验证节点) / ESTP (市场收割节点)",
         "partner_advice": "把您天马行空的狂野点子丢给 INTP 进行逻辑降维，并指挥 ESTP 去市场上快速收割第一波红利。",
@@ -551,7 +551,7 @@ else:
 </div>
 """, unsafe_allow_html=True)
 
-    st.markdown("<h4 style='color:#ff003c !important; border-left:4px solid #ff003c; padding-left:10px; font-weight:900;'>🔮 2030 终极形态推演</h4>", unsafe_allow_html=True)
+    st.markdown("<h4 style='color:#ff003c !important; border-left:4px solid #ff003c; padding-left:10px; font-weight:900;'>🔮 2026 终极形态推演</h4>", unsafe_allow_html=True)
     st.markdown(f"""
 <div style="background: rgba(255, 0, 60, 0.05); border: 1px solid rgba(255, 0, 60, 0.4); border-radius: 8px; padding: 20px; margin-bottom: 30px;">
 <div style="color: #ff003c; font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 2px; margin-bottom: 10px; border-bottom: 1px dashed rgba(255, 0, 60, 0.3); padding-bottom: 10px;">/// ULTIMATE EVOLUTION ///</div>
@@ -687,7 +687,7 @@ else:
 
             <div id="loading-ui">[ MINTING POSTER TO CLIENT... ]</div>
             <img id="result-img" alt="SDE Matrix Card" title="长按保存或分享" />
-            <div id="hint" class="hint-box">✅ 数据资产海报生成成功！<br><span style="color:#fff;">👆 手机端请 <b>长按上方图片</b><br>即可「发送给朋友」或「保存到相册」</span></div>
+            <div id="hint" class="hint-box">✅ 个人算力仪表海报生成成功！<br><span style="color:#fff;">👆 手机端请 <b>长按上方图片</b><br>即可「发送给朋友」或「保存到相册」</span></div>
 
             <script>
                 setTimeout(() => {{
@@ -785,3 +785,4 @@ SECURE ENTERPRISE BUILD
 </div>
 </div>
 """, unsafe_allow_html=True)
+
