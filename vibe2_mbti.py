@@ -18,7 +18,6 @@ st.set_page_config(
 )
 
 # --- 2. 赛博科技级 UI 引擎 ---
-# 🚨 彻底去除了所有导致 Markdown 误解析为代码块的缩进
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&display=swap');
@@ -130,7 +129,7 @@ questions = [
     {"q": "当听到“隐私计算”、“可信数据空间”等前沿概念时，我最先关心的是它在 SDE 现有机房和架构里如何具体落地。", "dim": "S"},
     {"q": "我认为数据交易所当前最核心的任务是把“确权、存证、交付、清算”的每一个动作做到极致的规范与零差错。", "dim": "S"},
     {"q": "审核数据产品上架时，我严格依赖合规审查操作清单，极度排斥带有主观弹性的价值评估。", "dim": "S"},
-    {"q": "相比于畅想 2030 年国家级数据大市场的宏伟蓝图，我更关心下个季度的结算系统并发量和撮合效率能否提升。", "dim": "S"},
+    {"q": "相比于畅想 2026 年国家数据统一大市场的宏伟蓝图，我更关心下个季度的结算系统并发量和撮合效率能否提升。", "dim": "S"},
     {"q": "撰写业务汇报时，我习惯于堆叠详实的交易对比数据和案例证据，极少使用天马行空的产业战略隐喻。", "dim": "S"},
     {"q": "面对复杂的场内交易规则与法律文本，我总能像“排雷”一样敏锐捕捉到可能导致实操卡壳的具体措辞隐患。", "dim": "S"},
     {"q": "我偏好有明确时间节点的阶段性交付成果，即使它只是交易系统后台一个字段的微小改良。", "dim": "S"},
@@ -157,34 +156,194 @@ questions = [
     {"q": "面对多线并行的复杂任务（如同时筹备路演与审核规则），我必须先向领导确认优先级并排好序，否则绝对无法安心执行。", "dim": "J"}
 ]
 
-# --- 4. 史诗级进化大厂数据库 (全属性补齐，彻底解决 KeyError，恢复所有核心要素) ---
+# --- 4. 史诗级进化大厂数据库 (全面修复 KeyError 漏洞) ---
 mbti_details = {
-    "INTJ": {"role": "首席数据架构师", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.2%", "base_hash": 9850, "desc": "数据要素底座的“造物主”，致力于为错综复杂的数字经济构建严密的底层制度与逻辑规则。", "tags": ["顶层设计", "逻辑闭环", "制度自信"], "partner": "ENTJ (高效执行统筹) / INTP (极客算法节点)", "advice": "在构建宏大的交易规则体系时，请适当为前台业务预留“沙盒容错”空间；捕获一线的非结构化反馈，能让制度更具生命力。", "tasks": ["主导 SDE 核心确权底层逻辑架构设计", "重构下一代高并发撮合交易引擎逻辑"], "black_swan": "过度追求底层架构完美闭环。面临突发政策转向时，系统极易因过于重型而无法敏捷掉头。", "evolution": "【绝对算力主宰】掌控国家级数据大市场的终极业务定价权"},
-    "INTP": {"role": "量化风控专家", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.1%", "base_hash": 9620, "desc": "穿透数据迷雾，寻找复杂业务表象下的底层逻辑漏洞与确权定价模型的最优解。", "tags": ["深度解构", "模型驱动", "极客思维"], "partner": "INTJ (架构锚定节点) / ENTP (模式发散节点)", "advice": "尝试将您极其高维的理论模型降维封装，形成非技术人员也能看懂的《操作指南》，让优秀的算法模型转化为实际生产力。", "tasks": ["研发基于特征因子的数据资产动态定价算法", "建立实时数据异常交易嗅探与阻断模型"], "black_swan": "陷入“分析瘫痪”。在需要极速拍板的确权灰度地带，过度追求模型最优解往往导致商机流失。", "evolution": "【全知算法先知】构建百分百无损的跨网底层风控引擎"},
-    "ISTJ": {"role": "合规审查主理官", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 11.6%", "base_hash": 8850, "desc": "SDE 底层防线的守夜人，您的评估本身就是安全、严谨与业务零失误的代名词。", "tags": ["绝对合规", "程序正义", "风险兜底"], "partner": "ESTJ (业务推进节点) / ISFJ (后勤保障节点)", "advice": "在死守数据合规红线的同时，面对狂飙突进的创新产品，试着用“如何让它合规地上架”来指导业务，成为创新的坚实护航者。", "tasks": ["主导头部数商“数据资产入表”全链路审计", "设计业务合同与智能合约的合规映射SOP"], "black_swan": "过度依赖既有 SOP。面临无先例创新业务时，容易因“无库可查”产生本能的排斥与误杀。", "evolution": "【绝对防御壁垒】国家级要素流转网络的终极守门人"},
-    "ESTJ": {"role": "核心业务统筹官", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 8.7%", "base_hash": 9500, "desc": "无可争议的推进器，擅长将国家宏观政策拆解为团队可绝对执行的 KPI 矩阵。", "tags": ["强效统帅", "结果导向", "流程大师"], "partner": "ISTJ (合规审查节点) / ISTP (应急排障节点)", "advice": "在下发高压任务指令时，适度向团队释放“情绪价值”。一支具备高信任感的团队，往往比单纯的数字化目标走得更稳健。", "tasks": ["发起并统筹 SDE 年度交易额破局百亿攻坚战", "强力调度跨部门资源打通确权交易清算堵点"], "black_swan": "KPI压倒一切导致“团队算力过载”。强推项目时易忽视一线团队的情绪阈值，引发内耗。", "evolution": "【全域秩序引擎】宏观数据业务推进的心脏中枢"},
-    "INFJ": {"role": "产业生态智囊", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 0.9%", "base_hash": 9200, "desc": "具备极强的跨频段共情能力，能精准预判数据流转对未来实体经济产生的深远变革。", "tags": ["远见卓识", "使命驱动", "战略前瞻"], "partner": "ENFJ (共识布道节点) / ENFP (火种传播节点)", "advice": "学会用精确的财务测算、合规条文来锚定您的宏大产业愿景。将“先知直觉”转化为具体的业务政策专报，提升落地的说服力。", "tasks": ["规划 SDE 未来五年在实体经济的数据赋能版图", "发起“数据向善”及社会公益数据要素流通倡议"], "black_swan": "强烈的战略直觉若缺乏硬核量化数据支撑，向实干型领导汇报时极易被贴上“不切实际”标签。", "evolution": "【全域生态先知】主导数字经济时代的底层精神共识"},
-    "INFP": {"role": "生态价值主张官", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 4.4%", "base_hash": 8650, "desc": "冷酷数据背后的灵魂捕捉者，擅长在机械的交易网络中注入引人共鸣的生态文化。", "tags": ["价值感召", "组织粘合", "品牌定调"], "partner": "ENFJ (外部护航节点) / ISFP (美学交互节点)", "advice": "在跨部门协同博弈中，学会熟练利用预算工具和业务导向来捍卫您的核心价值主张。", "tasks": ["重塑 SDE 在数据交易领域的全球品牌叙事", "实施内部文化与跨部门协作协同凝聚力工程"], "black_swan": "在跨部门冷酷的算力与预算博弈中，容易因厌恶冲突而退缩，导致核心价值观无法落地。", "evolution": "【灵魂共振奇核】赋予极客冷数据极其昂贵的品牌溢价"},
-    "ENTJ": {"role": "战略开拓领军人", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.8%", "base_hash": 9900, "desc": "天生的矩阵建设者，在数据跨境、公共数据授权等探索区中展现极强的破局能力。", "tags": ["开疆拓土", "战略铁腕", "极致破局"], "partner": "INTJ (战略智囊节点) / ISTP (技术攻坚节点)", "advice": "在极速开疆拓土时，请时刻保持与合规团队的同步。听听风控预警，能让您避开隐蔽的系统性风险。", "tasks": ["主导“公共数据授权运营”省级破冰与资源抢占", "制定并执行跨链互认及全国数据大市场吞并战略"], "black_swan": "狂飙突进时的风控盲区。在极速吞并外部资源时极易因忽视底层合规红线而触发监管熔断。", "evolution": "【无界版图霸主】国家级数据大市场的超级统帅"},
-    "ENTP": {"role": "模式创新顾问", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.2%", "base_hash": 9400, "desc": "传统交易规则的敏锐挑战者，致力于通过跨界思维寻找下一代数据资产流转范式。", "tags": ["范式重构", "逻辑激辩", "思维跳跃"], "partner": "INTP (逻辑验证节点) / ESTP (市场收割节点)", "advice": "适当收敛发散思维，选择一个极具潜力的创新点深度闭环跟进至最终交付，用结果验证前瞻。", "tasks": ["研发首个基于 Web3 的新型数据要素凭证通证", "在监管沙盒内主导蓝海型数字产品变现测试"], "black_swan": "无限发散思维导致的交付烂尾。若缺乏强力的落地跟进节点，极易沦为纯粹的纸上谈兵。", "evolution": "【范式秩序破坏者】亲手定义下个十年的交易元规则"},
-    "ENFJ": {"role": "数商生态总监", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 2.5%", "base_hash": 9350, "desc": "数据交易所的枢纽中心，能通过卓越的共识构建能力将多方利益竞争者聚拢为盟友。", "tags": ["关系枢纽", "温情领导力", "利益协同"], "partner": "INFJ (深度研究节点) / ESFJ (落地协同节点)", "advice": "在协调多方利益分配时，大胆引入客观的量化算法与智能合约刚性指标，确保“生态和谐”。", "tasks": ["构建辐射全国的 SDE 头部数商与第三方服务联盟", "维稳数据要素多边市场，调解核心生态伙伴冲突"], "black_swan": "对生态伙伴过度包容。处理违规事件时容易被“人情”裹挟，从而损害交易所的绝对中立性。", "evolution": "【共识引力波】垄断全国超头数据商的绝对心智"},
-    "ENFP": {"role": "平台资源布道大使", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 8.1%", "base_hash": 8900, "desc": "充满感染力的生态火苗，让每一场路演与推介都变成数据要素市场的狂热共识。", "tags": ["无限创意", "跨界纽带", "高频驱动"], "partner": "INFJ (导航纠偏节点) / INTJ (架构落地节点)", "advice": "引入严密的商机日程表与里程碑管理。将您天马行空的创意转化为可追踪的业务转化漏斗。", "tasks": ["领衔 SDE 全国核心城市业务路演与生态宣发大循环", "策划并主持面向千家数商的“数据赋能创新工坊”"], "black_swan": "缺乏结构化数据追踪。路演现场火热但无法转化为 CRM 里的真实入驻率，商业核算价值打折。", "evolution": "【无界传播基站】把控国家全域要素市场的流量高地"},
-    "ISFJ": {"role": "清结算运营中枢", "tier": "R", "tier_color": "#3b82f6", "rarity": "Top 13.8%", "base_hash": 8200, "desc": "最坚韧的底层支点，通过极致纠错与细节控场支撑起整个平台的专业信誉与高吞吐。", "tags": ["极致支撑", "服务巅峰", "高可用节点"], "partner": "ESFJ (对外链接节点) / ISTJ (合规审核节点)", "advice": "在完美支撑中后台运转之余，尝试主动提出冗余流程的优化提案。您的实操痛点极具价值。", "tasks": ["保障全天候撮合及大额资金清结算体系 0 宕机", "极速响应并闭环处理生态节点与数商的底层工单"], "black_swan": "默默承受过载的技术债。不善于向上抗议，可能在交易洪峰期因人工审核量爆表而面临崩溃。", "evolution": "【绝对永动节点】维持交易所生命线的最终坚盾"},
-    "ESFJ": {"role": "政企商务枢纽", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 12.3%", "base_hash": 8750, "desc": "超级连接器，擅长经营多维度的外部政企生态关系，是前线业务部门的最强润滑剂。", "tags": ["协作典范", "客情控制", "社会化支撑"], "partner": "ISFJ (精细支持节点) / ESTJ (宏观决策节点)", "advice": "在维护复杂商务生态时，建立更独立的合规风险过滤网。在照顾合作方诉求时保持底线清醒。", "tasks": ["高频维护国家部委及地方大数据局的核心 G 端客情", "统筹落地具有全国影响力的年度数据要素高峰论坛"], "black_swan": "过度满足多方诉求导致的边界失守。极易因“谁都想讨好”而签下严重偏离平台底线的协议。", "evolution": "【政企超导桥梁】构筑不可替代的 G 端业务护城河"},
-    "ISTP": {"role": "平台风控与排障专家", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 5.4%", "base_hash": 8950, "desc": "数据底座的实干派，只对事实和逻辑代码负责，是系统面临大并发技术故障时的定海神针。", "tags": ["极简实干", "故障排查", "硬核运维"], "partner": "ESTP (前线实战节点) / INTP (算法优化节点)", "advice": "尝试将您极度内隐的底层排查经验，沉淀为可视化的《应急响应标准手册》。打破沟通壁垒。", "tasks": ["执行 SDE 核心交易链路的灾备拉起与物理级排障", "在不影响前台撮合的前提下执行底层架构高危热更新"], "black_swan": "技术彻底黑盒化。过度依赖个人的“极客直觉”排障，一旦休假离线会导致整个系统应急瘫痪。", "evolution": "【底层代码幽灵】掌控国家要素机房的绝对生命力"},
-    "ISFP": {"role": "资产交互体验官", "tier": "R", "tier_color": "#3b82f6", "rarity": "Top 8.8%", "base_hash": 8150, "desc": "赋予枯燥数据以美学权重，致力于提升数字资产在终端大屏展示时的绝对视觉专业质感。", "tags": ["审美溢价", "感官叙事", "体验极致"], "partner": "ESFP (公众表达节点) / INFP (共情叙事节点)", "advice": "适度增加对核心确权流转逻辑的理解，让您的作品拥有直击商业痛点的力量。", "tasks": ["重构 SDE 实时交易大盘的动态数据全息视觉渲染", "主导面向数商终端的 UI/UX 操作流敏捷体验升级"], "black_swan": "陷入纯粹形式主义。设计出极其炫酷的大屏，却完全脱离了“数据确权撮合”的核心商业逻辑。", "evolution": "【感官具象师】以一己之力拉升数字资产视觉溢价"},
-    "ESTP": {"role": "前沿敏捷先锋", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 4.3%", "base_hash": 8800, "desc": "数据流通一线的敏锐猎手，能极快捕捉到瞬息万变的市场红利与应用空间的套利机会。", "tags": ["市场直觉", "敏捷收割", "实战专家"], "partner": "ISTP (底层兜底节点) / ENTJ (战略统筹节点)", "advice": "在展现高效行动力促成交易时，务必将前置合规审查纳入操作流程中，装上安全的制动阀。", "tasks": ["敏锐收割新政策出台后的第一波“短期数据流通红利”", "针对区域内竞所的市场抢夺发起极速实战反制突击"], "black_swan": "为了极速促成首单，倾向于利用捷径绕过繁琐的合规防火墙，一旦溯源出瑕疵将面临毁灭性反噬。", "evolution": "【极速套利猎手】全网数据交易套利空间的绝杀狙击者"},
-    "ESFP": {"role": "官方品牌发声信标", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 9.9%", "base_hash": 8300, "desc": "交易所的前台形象窗口，天生具备将复杂的政策解码为大众传播话术的超级天赋。", "tags": ["全域表现", "舆情响应", "公关信标"], "partner": "ISFP (视觉美学节点) / ENFP (创意破局节点)", "advice": "深潜研究底层逻辑与政策红头文件。将绝佳表现力建立在扎实的产业根基上。", "tasks": ["在全网引爆 SDE 最新明星数据产品的展会级宣发流量", "冲在第一线对冲平台突发的负面市场舆情并进行柔性公关"], "black_swan": "由于对底层条款理解深度不够，对外宣发时极易出现“用词越界”，引发监管舆情风险。", "evolution": "【极速情绪信标】左右资本市场情绪波动的首席发声端"}
+    "INTJ": {
+        "role": "首席数据架构师", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.2%", "base_hash": 9850,
+        "desc": "数据要素底座的“造物主”，致力于为错综复杂的数字经济构建严密的底层制度与逻辑规则。",
+        "tags": ["顶层设计", "逻辑闭环", "制度自信"],
+        "partner": "ENTJ (高效执行统筹) / INTP (极客算法节点)",
+        "partner_advice": "将战略落地全权交由 ENTJ 推进，把 INTP 作为高维模型的逻辑验算机，您只需稳控全局架构不跑偏。",
+        "tasks": ["主导 SDE 核心确权底层逻辑架构设计", "重构下一代高并发撮合交易引擎逻辑"],
+        "black_swan": "过度追求底层架构完美闭环。面临突发政策转向时，系统极易因过于重型而无法敏捷掉头。",
+        "patch": "在构建宏大的交易规则体系时，请适当为前台业务预留“沙盒容错”空间；捕获一线的非结构化反馈，能让制度更具生命力。",
+        "evolution": "【绝对算力主宰】掌控国家级数据大市场的终极业务定价权"
+    },
+    "INTP": {
+        "role": "量化风控专家", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.1%", "base_hash": 9620,
+        "desc": "穿透数据迷雾，寻找复杂业务表象下的底层逻辑漏洞与确权定价模型的最优解。",
+        "tags": ["深度解构", "模型驱动", "极客思维"],
+        "partner": "INTJ (架构锚定节点) / ENTP (模式发散节点)",
+        "partner_advice": "依托 INTJ 将您的理论模型锚定在现实业务框架内，并借助 ENTP 的发散思维寻找商业变现出口。",
+        "tasks": ["研发基于特征因子的数据资产动态定价算法", "建立实时数据异常交易嗅探与阻断模型"],
+        "black_swan": "陷入“分析瘫痪”。在需要极速拍板的确权灰度地带，过度追求模型最优解往往导致商机流失。",
+        "patch": "尝试将您极其高维的理论模型降维封装，形成非技术人员也能看懂的《操作指南》，让算法模型转化为生产力。",
+        "evolution": "【全知算法先知】构建百分百无损的跨网底层风控引擎"
+    },
+    "ISTJ": {
+        "role": "合规审查主理官", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 11.6%", "base_hash": 8850,
+        "desc": "SDE 底层防线的守夜人，您的评估本身就是安全、严谨与业务零失误的代名词。",
+        "tags": ["绝对合规", "程序正义", "风险兜底"],
+        "partner": "ESTJ (业务推进节点) / ISFJ (后勤保障节点)",
+        "partner_advice": "配合 ESTJ 建立坚不可摧的业务推进流水线，由 ISFJ 负责兜底后勤细节，形成最硬核的交付闭环。",
+        "tasks": ["主导头部数商“数据资产入表”全链路审计", "设计业务合同与智能合约的合规映射SOP"],
+        "black_swan": "过度依赖既有 SOP。面临无先例创新业务时，容易因“无库可查”产生本能的排斥与误杀。",
+        "patch": "在死守数据合规红线的同时，面对狂飙突进的创新产品，试着用“如何让它合规地上架”来指导业务。",
+        "evolution": "【绝对防御壁垒】国家级要素流转网络的终极守门人"
+    },
+    "ESTJ": {
+        "role": "核心业务统筹官", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 8.7%", "base_hash": 9500,
+        "desc": "无可争议的推进器，擅长将国家宏观政策拆解为团队可绝对执行的 KPI 矩阵。",
+        "tags": ["强效统帅", "结果导向", "流程大师"],
+        "partner": "ISTJ (合规审查节点) / ISTP (应急排障节点)",
+        "partner_advice": "让 ISTJ 担任您的品控质检员，在突发高并发危机时，直接将排障指挥权临时移交给 ISTP。",
+        "tasks": ["发起并统筹 SDE 年度交易额破局百亿攻坚战", "强力调度跨部门资源打通确权交易清算堵点"],
+        "black_swan": "KPI压倒一切导致“团队算力过载”。强推项目时易忽视一线团队的情绪阈值，引发内耗。",
+        "patch": "在下发高压任务指令时，适度向团队释放“情绪价值”。具备高信任感的团队往往比单纯的数字目标走得更稳健。",
+        "evolution": "【全域秩序引擎】宏观数据业务推进的心脏中枢"
+    },
+    "INFJ": {
+        "role": "产业生态智囊", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 0.9%", "base_hash": 9200,
+        "desc": "具备极强的跨频段共情能力，能精准预判数据流转对未来实体经济产生的深远变革。",
+        "tags": ["远见卓识", "使命驱动", "战略前瞻"],
+        "partner": "ENFJ (共识布道节点) / ENFP (火种传播节点)",
+        "partner_advice": "将您的远见卓识交由 ENFJ 在核心圈层构建共识，让 ENFP 作为布道火种将您的理念扩散至全行业。",
+        "tasks": ["规划 SDE 未来五年在实体经济的数据赋能版图", "发起“数据向善”及社会公益数据要素流通倡议"],
+        "black_swan": "强烈的战略直觉若缺乏硬核量化数据支撑，向实干型领导汇报时极易被贴上“不切实际”标签。",
+        "patch": "学会用精确的财务测算、合规条文来锚定您的宏大产业愿景。将“先知直觉”转化为具体的业务政策专报。",
+        "evolution": "【全域生态先知】主导数字经济时代的底层精神共识"
+    },
+    "INFP": {
+        "role": "生态价值主张官", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 4.4%", "base_hash": 8650,
+        "desc": "冷酷数据背后的灵魂捕捉者，擅长在机械的交易网络中注入引人共鸣的生态文化。",
+        "tags": ["价值感召", "组织粘合", "品牌定调"],
+        "partner": "ENFJ (外部护航节点) / ISFP (美学交互节点)",
+        "partner_advice": "依托 ENFJ 的手腕在跨部门博弈中为您护航，联合 ISFP 将抽象的文化主张具象化为绝美的视觉产品。",
+        "tasks": ["重塑 SDE 在数据交易领域的全球品牌叙事", "实施内部文化与跨部门协作协同凝聚力工程"],
+        "black_swan": "在跨部门冷酷的算力与预算博弈中，容易因厌恶冲突而退缩，导致核心价值观无法落地。",
+        "patch": "在跨部门协同博弈中，学会熟练利用预算工具和业务导向来捍卫您的核心价值主张，将柔性文化转化为硬性资产。",
+        "evolution": "【灵魂共振奇核】赋予极客冷数据极其昂贵的品牌溢价"
+    },
+    "ENTJ": {
+        "role": "战略开拓领军人", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.8%", "base_hash": 9900,
+        "desc": "天生的矩阵建设者，在数据跨境、公共数据授权等探索区中展现极强的破局能力。",
+        "tags": ["开疆拓土", "战略铁腕", "极致破局"],
+        "partner": "INTJ (战略智囊节点) / ISTP (技术攻坚节点)",
+        "partner_advice": "冲锋时将后背交给 INTJ 进行战略兜底，遇到底层技术阻击时，立刻呼叫 ISTP 进行定点爆破。",
+        "tasks": ["主导“公共数据授权运营”省级破冰与资源抢占", "制定并执行跨链互认及全国数据大市场吞并战略"],
+        "black_swan": "狂飙突进时的风控盲区。在极速吞并外部资源时极易因忽视底层合规红线而触发监管熔断。",
+        "patch": "在极速开疆拓土时，请时刻保持与合规团队的数据同步。有时放慢半拍听听风控预警，能避开系统性风险。",
+        "evolution": "【无界版图霸主】国家级数据大市场的超级统帅"
+    },
+    "ENTP": {
+        "role": "模式创新顾问", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.2%", "base_hash": 9400,
+        "desc": "传统交易规则的敏锐挑战者，致力于通过跨界思维寻找下一代数据资产流转范式。",
+        "tags": ["范式重构", "逻辑激辩", "思维跳跃"],
+        "partner": "INTP (逻辑验证节点) / ESTP (市场收割节点)",
+        "partner_advice": "把您天马行空的狂野点子丢给 INTP 进行逻辑降维，并指挥 ESTP 去市场上快速收割第一波红利。",
+        "tasks": ["研发首个基于 Web3 的新型数据要素凭证通证", "在监管沙盒内主导蓝海型数字产品变现测试"],
+        "black_swan": "无限发散思维导致的交付烂尾。若缺乏强力的落地跟进节点，极易沦为纯粹的纸上谈兵。",
+        "patch": "适当收敛发散思维，选择一个极具潜力的创新点（如特定行业数据凭证），深度闭环跟进至最终交付。",
+        "evolution": "【范式秩序破坏者】亲手定义下个十年的交易元规则"
+    },
+    "ENFJ": {
+        "role": "数商生态总监", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 2.5%", "base_hash": 9350,
+        "desc": "数据交易所的枢纽中心，能通过卓越的共识构建能力将多方利益竞争者聚拢为盟友。",
+        "tags": ["关系枢纽", "温情领导力", "利益协同"],
+        "partner": "INFJ (深度研究节点) / ESFJ (落地协同节点)",
+        "partner_advice": "汲取 INFJ 的深度产业洞察作为布道弹药，并由 ESFJ 将您的宏观共识转化为具体的客情跟进单。",
+        "tasks": ["构建辐射全国的 SDE 头部数商与第三方服务联盟", "维稳数据要素多边市场，调解核心生态伙伴冲突"],
+        "black_swan": "对生态伙伴过度包容。处理违规事件时容易被“人情”裹挟，从而损害交易所的绝对中立性。",
+        "patch": "在协调多方利益分配时，大胆引入客观的量化算法与智能合约刚性指标，确保“生态和谐”建立在规则基石之上。",
+        "evolution": "【共识引力波】垄断全国超头数据商的绝对心智"
+    },
+    "ENFP": {
+        "role": "平台资源布道大使", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 8.1%", "base_hash": 8900,
+        "desc": "充满感染力的生态火苗，让每一场路演与推介都变成数据要素市场的狂热共识。",
+        "tags": ["无限创意", "跨界纽带", "高频驱动"],
+        "partner": "INFJ (导航纠偏节点) / INTJ (架构落地节点)",
+        "partner_advice": "在您的创意发散即将失控时，请务必听从 INFJ 的战略纠偏，并强迫自己遵循 INTJ 设定的节点框架。",
+        "tasks": ["领衔 SDE 全国核心城市业务路演与生态宣发大循环", "策划并主持面向千家数商的“数据赋能创新工坊”"],
+        "black_swan": "缺乏结构化数据追踪。路演现场火热但无法转化为 CRM 里的真实入驻率，商业核算价值打折。",
+        "patch": "引入严密的商机日程表与里程碑管理。将您天马行空的生态创意转化为可追踪的业务转化漏斗。",
+        "evolution": "【无界传播基站】把控国家全域要素市场的流量高地"
+    },
+    "ISFJ": {
+        "role": "清结算运营中枢", "tier": "R", "tier_color": "#3b82f6", "rarity": "Top 13.8%", "base_hash": 8200,
+        "desc": "最坚韧的底层支点，通过极致纠错与细节控场支撑起整个平台的专业信誉与高吞吐。",
+        "tags": ["极致支撑", "服务巅峰", "高可用节点"],
+        "partner": "ESFJ (对外链接节点) / ISTJ (合规审核节点)",
+        "partner_advice": "将对外的复杂客情交由 ESFJ 抵挡，您只需与 ISTJ 背靠背，打造坚不可摧的后方清结算堡垒。",
+        "tasks": ["保障全天候撮合及大额资金清结算体系 0 宕机", "极速响应并闭环处理生态节点与数商的底层工单"],
+        "black_swan": "默默承受过载的技术债。不善于向上抗议，可能在交易洪峰期因人工审核量爆表而面临崩溃。",
+        "patch": "在完美支撑中后台运转之余，尝试主动提出冗余流程的优化提案。您的实操痛点极具价值。",
+        "evolution": "【绝对永动节点】维持交易所生命线的最终坚盾"
+    },
+    "ESFJ": {
+        "role": "政企商务枢纽", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 12.3%", "base_hash": 8750,
+        "desc": "超级连接器，擅长经营多维度的外部政企生态关系，是前线业务部门的最强润滑剂。",
+        "tags": ["协作典范", "客情控制", "社会化支撑"],
+        "partner": "ISFJ (精细支持节点) / ESTJ (宏观决策节点)",
+        "partner_advice": "在前线维护八方客情时，把繁杂的合同流转放心抛给 ISFJ，遇到合规红线问题立刻请 ESTJ 强硬回绝。",
+        "tasks": ["高频维护国家部委及地方大数据局的核心 G 端客情", "统筹落地具有全国影响力的年度数据要素高峰论坛"],
+        "black_swan": "过度满足多方诉求导致的边界失守。极易因“谁都想讨好”而签下严重偏离平台底线的协议。",
+        "patch": "在维护复杂商务生态时，建立更独立的合规风险过滤网。在照顾合作方诉求时保持底线清醒。",
+        "evolution": "【政企超导桥梁】构筑不可替代的 G 端业务护城河"
+    },
+    "ISTP": {
+        "role": "平台风控与排障专家", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 5.4%", "base_hash": 8950,
+        "desc": "数据底座的实干派，只对事实和逻辑代码负责，是系统面临大并发技术故障时的定海神针。",
+        "tags": ["极简实干", "故障排查", "硬核运维"],
+        "partner": "ESTP (前线实战节点) / INTP (算法优化节点)",
+        "partner_advice": "当 ESTP 在前线疯狂接单导致系统过载时，由您负责底层扩容，并与 INTP 联手重构最优并发算法。",
+        "tasks": ["执行 SDE 核心交易链路的灾备拉起与物理级排障", "在不影响前台撮合的前提下执行底层架构高危热更新"],
+        "black_swan": "技术彻底黑盒化。过度依赖个人的“极客直觉”排障，一旦休假离线会导致整个系统应急瘫痪。",
+        "patch": "尝试将您极度内隐的底层排查经验，沉淀为可视化的《应急响应标准手册》。打破沟通壁垒。",
+        "evolution": "【底层代码幽灵】掌控国家要素机房的绝对生命力"
+    },
+    "ISFP": {
+        "role": "资产交互体验官", "tier": "R", "tier_color": "#3b82f6", "rarity": "Top 8.8%", "base_hash": 8150,
+        "desc": "赋予枯燥数据以美学权重，致力于提升数字资产在终端大屏展示时的绝对视觉专业质感。",
+        "tags": ["审美溢价", "感官叙事", "体验极致"],
+        "partner": "ESFP (公众表达节点) / INFP (共情叙事节点)",
+        "partner_advice": "将您的美学产出交由 ESFP 在各大峰会上高调发布，并从 INFP 构筑的生态故事中汲取设计灵感。",
+        "tasks": ["重构 SDE 实时交易大盘的动态数据全息视觉渲染", "主导面向数商终端的 UI/UX 操作流敏捷体验升级"],
+        "black_swan": "陷入纯粹形式主义。设计出极其炫酷的大屏，却完全脱离了“数据确权撮合”的核心商业逻辑。",
+        "patch": "在追求终端展示的美学溢价时，适度增加对核心确权流转逻辑和底层交易协议的理解。",
+        "evolution": "【感官具象师】以一己之力拉升数字资产视觉溢价"
+    },
+    "ESTP": {
+        "role": "前沿敏捷先锋", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 4.3%", "base_hash": 8800,
+        "desc": "数据流通一线的敏锐猎手，能极快捕捉到瞬息万变的市场红利与应用空间的套利机会。",
+        "tags": ["市场直觉", "敏捷收割", "实战专家"],
+        "partner": "ISTP (底层兜底节点) / ENTJ (战略统筹节点)",
+        "partner_advice": "尽情在市场前线厮杀套利，让 ISTP 为您搭建最稳固的技术跳板，遇到僵局迅速呼叫 ENTJ 支援。",
+        "tasks": ["敏锐收割新政策出台后的第一波“短期数据流通红利”", "针对区域内竞所的市场抢夺发起极速实战反制突击"],
+        "black_swan": "为了极速促成首单，倾向于利用捷径绕过繁琐的合规防火墙，一旦溯源出瑕疵将面临毁灭性反噬。",
+        "patch": "在捕捉市场瞬时机遇、展现高效行动力促成交易时，务必将前置合规审查纳入操作流程中。",
+        "evolution": "【极速套利猎手】全网数据交易套利空间的绝杀狙击者"
+    },
+    "ESFP": {
+        "role": "官方品牌发声信标", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 9.9%", "base_hash": 8300,
+        "desc": "交易所的前台形象窗口，天生具备将复杂的政策解码为大众传播话术的超级天赋。",
+        "tags": ["全域表现", "舆情响应", "公关信标"],
+        "partner": "ISFP (视觉美学节点) / ENFP (创意破局节点)",
+        "partner_advice": "用您极具感染力的表现为 ISFP 的视觉产品带货，并与 ENFP 联手策划能掀起全网狂潮的顶级路演。",
+        "tasks": ["在全网引爆 SDE 最新明星数据产品的展会级宣发流量", "冲在第一线对冲平台突发的负面市场舆情并进行柔性公关"],
+        "black_swan": "由于对底层条款理解深度不够，对外宣发时极易出现“用词越界”，引发监管舆情风险。",
+        "patch": "花时间深潜研究数据要素的底层逻辑与政策红头文件。将您的绝佳表现力建立在扎实的产业根基上。",
+        "evolution": "【极速情绪信标】左右资本市场情绪波动的首席发声端"
+    }
 }
 
 # 🤝 协同算法引擎
 def calculate_synergy(mbti1, mbti2):
     diff = sum(1 for a, b in zip(mbti1, mbti2) if a != b)
-    if diff == 0: return 92, "【绝对镜像】决策回路高度一致，沟通0延迟，但需警惕认知盲区严重重叠导致翻车。"
+    if diff == 0: return 92, "【绝对镜像】决策回路高度一致，沟通0延迟，但需警惕认知盲区严重重叠导致集体翻车。"
     elif diff == 1: return 98, "【黄金握手】核心逻辑一致且具备极佳微调互补性，堪称 SDE 最强业务推土机小队！"
     elif diff == 2: return 85, "【灰度平衡】思维角度存在差异，能通过激烈碰撞打磨出更抗风险、更完美的业务闭环。"
-    elif diff == 3: return 65, "【高频摩擦】存在极大的底层通信壁垒，协同作业时必须强制引入第三方确立明确的中间缓冲协议。"
-    else: return 99, "【极致反转】代码完全相反！在日常沟通中极度痛苦，但若各司其职背靠背，能实现无死角的全域战略包抄！"
+    elif diff == 3: return 65, "【高频摩擦】存在极大的底层通信壁垒，协同作业时必须强制引入第三方确立明确的中间协议。"
+    else: return 99, "【极致反转】代码完全相反！在日常沟通中极度痛苦，但若各司其职背靠背，能实现无死角的全域包抄！"
 
 # --- 5. 极速状态机 ---
 for key, init_val in [('started', False), ('current_q', 0), ('start_time', None), ('end_time', None), ('calculating', False), ('user_alias', "SDE_NODE"), ('total_scores', {"E": 0, "S": 0, "T": 0, "J": 0}), ('firework_played', False)]:
@@ -193,12 +352,15 @@ for key, init_val in [('started', False), ('current_q', 0), ('start_time', None)
 def start_assessment_callback():
     alias = st.session_state.login_input.strip()
     st.session_state.user_alias = html.escape(alias) if alias else "SDE_NODE"
-    st.session_state.started = True; st.session_state.start_time = time.time()
+    st.session_state.started = True
+    st.session_state.start_time = time.time()
 
 def answer_callback(val, dim):
-    st.session_state.total_scores[dim] += (val - 3); st.session_state.current_q += 1
+    st.session_state.total_scores[dim] += (val - 3)
+    st.session_state.current_q += 1
     if st.session_state.current_q >= len(questions):
-        st.session_state.end_time = time.time(); st.session_state.calculating = True
+        st.session_state.end_time = time.time()
+        st.session_state.calculating = True
 
 # --- 6. 核心渲染路由 ---
 if not st.session_state.started:
@@ -208,7 +370,7 @@ if not st.session_state.started:
 <div style="text-align: center; margin-bottom: 20px;">
 <h1 class="hero-title" data-text="上海数据交易所">上海数据交易所</h1><br>
 <h1 class="hero-title" data-text="算力实战仪表盘" style="font-size:32px !important;">算力实战仪表盘</h1>
-<div class="hero-subtitle">▶ SDE MATRIX V1.0</div>
+<div class="hero-subtitle">▶ SDE MATRIX V1.0_FINAL</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -241,7 +403,8 @@ elif st.session_state.calculating:
         hash_logs = f"<span style='color:#94a3b8;'>[TX_HASH]</span> <span style='color:#ffd700;'>0x{fake_hash}</span> <span style='color:#10b981;'>[CONFIRMED]</span><br>" + hash_logs
         mint_box.markdown(f"<div class='cli-box' style='font-size:11px; height:220px; overflow:hidden; border-color:#ffd700;'>{hash_logs}</div>", unsafe_allow_html=True)
         time.sleep(0.12)
-    st.session_state.calculating = False; st.rerun()
+    st.session_state.calculating = False
+    st.rerun()
 
 elif st.session_state.current_q < len(questions):
     q_data = questions[st.session_state.current_q]
@@ -250,7 +413,8 @@ elif st.session_state.current_q < len(questions):
     dynamic_hash = hashlib.sha256(f"BLOCK_{st.session_state.current_q}_{q_data['q']}".encode()).hexdigest()[:10].upper()
     
     st.markdown("<div style='padding-top:10px;'></div>", unsafe_allow_html=True)
-    progress_val = (st.session_state.current_q + 1) / len(questions); st.progress(progress_val)
+    progress_val = (st.session_state.current_q + 1) / len(questions)
+    st.progress(progress_val)
     st.markdown(f"<div style='text-align:right; font-family:Orbitron, monospace; color:#00f3ff; font-size:12px; margin-top:5px;'>MINTING PROCESS: {int(progress_val*100)}%</div>", unsafe_allow_html=True)
     
     st.markdown(f"""
@@ -267,7 +431,9 @@ elif st.session_state.current_q < len(questions):
     for text, val in opts: st.button(text, type="secondary", key=f"q_{st.session_state.current_q}_{val}", on_click=answer_callback, args=(val, q_data['dim']))
 
 else:
-    if not st.session_state.firework_played: trigger_supernova(); st.session_state.firework_played = True
+    if not st.session_state.firework_played: 
+        trigger_supernova()
+        st.session_state.firework_played = True
         
     res = st.session_state.total_scores
     mbti = ("E" if res["E"] >= 0 else "I") + ("S" if res["S"] >= 0 else "N") + ("T" if res["T"] >= 0 else "F") + ("J" if res["J"] >= 0 else "P")
@@ -306,9 +472,6 @@ else:
     syn_biz = min(98, max(20, (85 if 'E' in mbti else 60) + (10 if 'P' in mbti else 0) + ((h_int >> 4) % 15) - 7))
     syn_comp = min(98, max(20, (85 if 'J' in mbti else 60) + (10 if 'S' in mbti else 0) + ((h_int >> 8) % 15) - 7))
 
-    # =========================================================================
-    # ✨ 核心面板区 (彻底避免 Markdown 误解析为代码块的白板 Bug) ✨
-    # =========================================================================
     st.markdown(f"""
 <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 15px; border-radius: 8px; margin-bottom: 25px; display: flex; align-items: center; box-shadow: 0 0 15px rgba(16,185,129,0.2);">
 <div style="font-size: 24px; margin-right: 15px;">✅</div>
@@ -369,7 +532,6 @@ else:
 </div>
 """, unsafe_allow_html=True)
 
-    # 🔥 历史神仙功能完美复活：黄金并网节点
     st.markdown("<h4 style='color:#10b981 !important; border-left:4px solid #10b981; padding-left:10px; font-weight:900; margin-top:30px;'>💡 生态网络协同指引</h4>", unsafe_allow_html=True)
     st.markdown(f"""
 <div style="background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(0,0,0,0)); border-left: 4px solid #10b981; padding: 20px; border-radius: 4px; font-size: 14px; line-height: 1.7; color: #e2e8f0; border-top: 1px solid rgba(16, 185, 129, 0.3); border-bottom: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 5px 20px rgba(0,0,0,0.5); margin: 15px 0 30px 0;">
@@ -423,9 +585,6 @@ else:
     fig_gauge.update_layout(paper_bgcolor='rgba(0,0,0,0)', font={'color': "#94a3b8"}, height=240, margin=dict(l=30, r=30, t=10, b=20))
     st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False})
 
-    # =========================================================================
-    # ✨✨ 提取中心 (无 BUG 安全压制海报版) ✨✨
-    # =========================================================================
     st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900; margin-top:40px;'>💠 链上资产提取中心</h4>", unsafe_allow_html=True)
     tab1, tab2, tab3 = st.tabs(["📸 生成全息大屏海报 (长按发圈)", "📝 提取纯文本名片", "📥 JSON 极客底包下载"])
 
@@ -494,7 +653,6 @@ else:
                         <div class="user-name">{safe_alias_final}</div>
                         <div class="mbti">{mbti}</div>
                         <div class="role">【 {role_name} 】</div>
-                        
                         <div style="display:flex; justify-content:space-between; text-align:center; margin-bottom: 20px; background:rgba(0,0,0,0.6); border:1px solid rgba(255,215,0,0.3); padding:10px; border-radius:8px;">
                             <div style="flex:1;">
                                 <div style="font-size:9px; color:#94a3b8; font-family:Orbitron;">ASSET VALUATION (SDE)</div>
@@ -506,9 +664,7 @@ else:
                                 <div style="font-size:18px; color:#00f3ff; font-weight:bold; font-family:Orbitron; text-shadow:0 0 10px rgba(0,243,255,0.5);">⚡ {decisiveness}/100</div>
                             </div>
                         </div>
-
                         <div class="tags">{tags_html_poster}</div>
-                        
                         <div class="metrics-box">
                             <div style="font-family: 'Orbitron', monospace; font-size: 9px; color: #00f3ff; text-align: center; margin-bottom: 12px;">/// HASH METRICS ///</div>
                             <div class="stat-row"><span style="color:#e2e8f0; width:45px;">生态(E)</span><div style="flex-grow:1; height:6px; background:#1e293b; border-radius:3px; margin:0 10px; position:relative; overflow:hidden;"><div style="position:absolute; left:0; top:0; height:100%; width:{val_E}%; background:#00f3ff;"></div></div><span style="color:#94a3b8; width:45px; text-align:right;">深潜(I)</span></div>
@@ -516,12 +672,10 @@ else:
                             <div class="stat-row"><span style="color:#e2e8f0; width:45px;">量化(T)</span><div style="flex-grow:1; height:6px; background:#1e293b; border-radius:3px; margin:0 10px; position:relative; overflow:hidden;"><div style="position:absolute; left:0; top:0; height:100%; width:{val_T}%; background:#3b82f6;"></div></div><span style="color:#94a3b8; width:45px; text-align:right;">共情(F)</span></div>
                             <div class="stat-row"><span style="color:#e2e8f0; width:45px;">秩序(J)</span><div style="flex-grow:1; height:6px; background:#1e293b; border-radius:3px; margin:0 10px; position:relative; overflow:hidden;"><div style="position:absolute; left:0; top:0; height:100%; width:{val_J}%; background:#10b981;"></div></div><span style="color:#94a3b8; width:45px; text-align:right;">敏捷(P)</span></div>
                         </div>
-                        
                         <div style="background: rgba(255,0,60,0.1); border-left: 4px solid #ff003c; padding: 12px; margin-bottom: 20px; border-radius: 0 6px 6px 0;">
                             <div style="font-size:9px; color:#ff003c; font-family:'Orbitron'; margin-bottom:4px; letter-spacing:1px;">/// 2030 EVOLUTION ///</div>
                             <div style="font-size:14px; font-weight:bold; color:#fff; text-shadow:0 0 10px rgba(255,0,60,0.6);">{data['evolution']}</div>
                         </div>
-                        
                         <div class="footer">
                             <div class="barcode"></div>
                             <div style="margin-bottom: 4px;">2026 SDE DATA ELEMENT KERNEL V1.0</div>
@@ -603,9 +757,14 @@ else:
         st.download_button(label="📥 立即下载节点加密档案 (.JSON)", data=json_str, file_name=f"SDE_NODE_{safe_alias_final}.json", mime="application/json", use_container_width=True)
 
     def reset_system():
-        st.session_state.started = False; st.session_state.current_q = 0; st.session_state.total_scores = {"E": 0, "S": 0, "T": 0, "J": 0}
-        st.session_state.start_time = None; st.session_state.end_time = None; st.session_state.calculating = False
-        st.session_state.user_alias = "SDE_NODE"; st.session_state.firework_played = False
+        st.session_state.started = False
+        st.session_state.current_q = 0
+        st.session_state.total_scores = {"E": 0, "S": 0, "T": 0, "J": 0}
+        st.session_state.start_time = None
+        st.session_state.end_time = None
+        st.session_state.calculating = False
+        st.session_state.user_alias = "SDE_NODE"
+        st.session_state.firework_played = False
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.button("⏏ 弹出磁盘并重启矩阵 (SYS_REBOOT)", on_click=reset_system, type="primary", use_container_width=True)
@@ -626,4 +785,3 @@ SECURE ENTERPRISE BUILD
 </div>
 </div>
 """, unsafe_allow_html=True)
-
