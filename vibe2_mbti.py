@@ -167,7 +167,7 @@ mbti_details = {
         "tasks": ["主导 SDE 核心确权底层逻辑架构设计", "重构下一代高并发撮合交易引擎逻辑"],
         "black_swan": "过度追求底层架构完美闭环。面临突发政策转向时，系统极易因过于重型而无法敏捷掉头。",
         "patch": "在构建宏大的交易规则体系时，请适当为前台业务预留“沙盒容错”空间；捕获一线的非结构化反馈，能让制度更具生命力。",
-        "evolution": "【绝对算力主宰】掌控国家级数据大市场的终极业务定价权"
+        "evolution": "【绝对算力主宰】掌控数据产品的终极业务定价权"
     },
     "INTP": {
         "role": "量化风控专家", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.1%", "base_hash": 9620,
@@ -189,7 +189,7 @@ mbti_details = {
         "tasks": ["主导头部数商“数据资产入表”全链路审计", "设计业务合同与智能合约的合规映射SOP"],
         "black_swan": "过度依赖既有 SOP。面临无先例创新业务时，容易因“无库可查”产生本能的排斥与误杀。",
         "patch": "在死守数据合规红线的同时，面对狂飙突进的创新产品，试着用“如何让它合规地上架”来指导业务。",
-        "evolution": "【绝对防御壁垒】国家级要素流转网络的终极守门人"
+        "evolution": "【绝对防御壁垒】全国一体化数据市场要素流转网络的终极守门人"
     },
     "ESTJ": {
         "role": "核心业务统筹官", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 8.7%", "base_hash": 9500,
@@ -233,7 +233,7 @@ mbti_details = {
         "tasks": ["主导“公共数据授权运营”省级破冰与资源抢占", "制定并执行跨链互认及全国数据大市场吞并战略"],
         "black_swan": "狂飙突进时的风控盲区。在极速吞并外部资源时极易因忽视底层合规红线而触发监管熔断。",
         "patch": "在极速开疆拓土时，请时刻保持与合规团队的数据同步。有时放慢半拍听听风控预警，能避开系统性风险。",
-        "evolution": "【无界版图霸主】国家级数据大市场的超级统帅"
+        "evolution": "【无界版图霸主】全国一体化数据市场的超级统帅"
     },
     "ENTP": {
         "role": "模式创新顾问", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.2%", "base_hash": 9400,
@@ -556,7 +556,7 @@ else:
 <div style="background: rgba(255, 0, 60, 0.05); border: 1px solid rgba(255, 0, 60, 0.4); border-radius: 8px; padding: 20px; margin-bottom: 30px;">
 <div style="color: #ff003c; font-family: 'Orbitron', sans-serif; font-size: 11px; letter-spacing: 2px; margin-bottom: 10px; border-bottom: 1px dashed rgba(255, 0, 60, 0.3); padding-bottom: 10px;">/// ULTIMATE EVOLUTION ///</div>
 <div style="font-size: 18px; font-weight: 900; color: #fff; text-shadow: 0 0 15px rgba(255, 0, 60, 0.6); margin-bottom: 8px;">{data['evolution']}</div>
-<div style="font-size: 12px; color: #94a3b8; line-height:1.6;">基于您的底层算力特质，这是您在未来国家级数据大市场下的终极职场统治形态。</div>
+<div style="font-size: 12px; color: #94a3b8; line-height:1.6;">基于您的底层算力特质，这是您在未来全国一体化数据市场下的终极职场统治形态。</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -785,4 +785,5 @@ SECURE ENTERPRISE BUILD
 </div>
 </div>
 """, unsafe_allow_html=True)
+
 
