@@ -226,7 +226,7 @@ if not st.session_state.started:
         <div style="text-align: center; margin-bottom: 20px;">
             <h1 class="hero-title" data-text="上海数据交易所">上海数据交易所</h1><br>
             <h1 class="hero-title" data-text="核心人才全息引擎" style="font-size:32px !important;">核心人才全息引擎</h1>
-            <div class="hero-subtitle">▶ SDE MATRIX V1.0_SECURE</div>
+            <div class="hero-subtitle">▶ SDE MATRIX V24.0_SECURE</div>
         </div>
     """, unsafe_allow_html=True)
     
@@ -247,7 +247,7 @@ if not st.session_state.started:
     
     with st.form(key="login_form", border=False):
         st.markdown("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:8px; text-align:center;'>▼ MOUNT NODE ALIAS (输入职场称呼 / 授权代号) ▼</div>", unsafe_allow_html=True)
-        st.text_input("", key="login_input", placeholder="例如：Compliance_Wu", label_visibility="collapsed")
+        st.text_input("", key="login_input", placeholder="例如：合规部_吴总监", label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
         st.form_submit_button("▶ 授予系统权限并执行深度扫描", on_click=start_assessment_callback, type="primary", use_container_width=True)
     
@@ -325,7 +325,6 @@ else:
     safe_alias_final = st.session_state.user_alias.upper()
     role_name = data['role']
     
-    # 获取绝对安全的数值范围 (0-100)
     def get_intensity(score): return int(max(15, min(100, 50 + (score / (len(questions)/4) * 50))))
     val_E, val_I = get_intensity(res["E"]), 100 - get_intensity(res["E"])
     val_S, val_N = get_intensity(res["S"]), 100 - get_intensity(res["S"])
@@ -344,14 +343,13 @@ else:
     hash_code = hashlib.sha256(f"{safe_alias_final}{mbti}{time_taken}".encode()).hexdigest()[:16].upper()
 
     # =========================================================================
-    # ✨✨✨ 终极黑科技：引入 Tabs 将功能分为“图片海报”与“文本复制” ✨✨✨
+    # ✨ 终极黑科技：引入 Tabs 将功能分为“图片海报”与“文本复制”
     # =========================================================================
     st.markdown("<br><h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>💠 身份密钥与海报提取中心</h4>", unsafe_allow_html=True)
     
     tab1, tab2 = st.tabs(["📸 生成全息图文海报 (推荐朋友圈)", "📝 提取纯文本格式 (适合群聊)"])
 
     with tab1:
-        # ---- 构造防伪条形码 (用纯 CSS 重复线性渐变生成，保证截图不丢失) ----
         random.seed(hash_code)
         gradient_stops = []
         current_pos = 0
@@ -374,19 +372,16 @@ else:
             <style>
                 body {{ margin: 0; display: flex; flex-direction: column; align-items: center; background-color: transparent; font-family: 'Noto Sans SC', sans-serif; user-select: none; padding: 10px 0;}}
                 
-                /* 被隐藏的高清渲染母版 */
                 #capture-box {{
                     width: 340px; background-color: #030712; padding: 30px 25px; border-radius: 16px;
                     border: 1px solid rgba(0, 243, 255, 0.4); box-shadow: 0 0 30px rgba(0, 243, 255, 0.2);
                     position: relative; overflow: hidden; color: #fff; box-sizing: border-box;
                 }}
-                /* 赛博网格底纹：改用独立的层以完美兼容 Html2Canvas */
                 .cyber-grid {{
                     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
                     background-image: linear-gradient(0deg, rgba(0,243,255,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.04) 1px, transparent 1px);
                     background-size: 20px 20px; z-index: 0; pointer-events: none;
                 }}
-                /* 顶部流光边缘 */
                 .top-glow {{ position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: linear-gradient(90deg, transparent, #00f3ff, transparent); z-index: 1; }}
                 
                 .content {{ position: relative; z-index: 2; }}
@@ -414,7 +409,6 @@ else:
                 .footer {{ text-align: center; color: #64748b; font-family: 'Orbitron', monospace; font-size: 9px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }}
                 .barcode {{ width: 85%; height: 25px; margin: 0 auto 10px auto; background: {barcode_css}; }}
 
-                /* 渲染过程动画与真实图片 */
                 #loading-ui {{ font-family: 'Orbitron', sans-serif; color: #00f3ff; font-size: 13px; text-align: center; padding: 40px; animation: pulse 1s infinite alternate; letter-spacing: 2px; }}
                 @keyframes pulse {{ 0% {{ opacity: 1; text-shadow: 0 0 10px #00f3ff; }} 100% {{ opacity: 0.4; text-shadow: none; }} }}
                 
@@ -465,32 +459,38 @@ else:
             <div id="hint" class="hint-box">✅ 海报压制成功！<br><span style="color:#fff;">👆 手机端请 <b>长按上方图片</b><br>即可「发送给朋友」或「保存到相册」</span></div>
 
             <script>
-                // 确保自定义字体加载完毕后，再进行 Canvas 截图
-                document.fonts.ready.then(() => {{
-                    setTimeout(() => {{
+                // ✨ 核心移动端修复：废弃不稳定的 document.fonts.ready，采用强力延时渲染
+                window.onload = function() {{
+                    setTimeout(function() {{
                         const target = document.getElementById('capture-box');
                         html2canvas(target, {{
-                            scale: 3, // 输出3倍高清视网膜图
+                            scale: 2, // 降维至2倍图，彻底杜绝手机 Canvas 内存溢出导致白屏
                             backgroundColor: '#030712',
-                            useCORS: true
+                            useCORS: true,
+                            allowTaint: true
                         }}).then(canvas => {{
-                            document.getElementById('result-img').src = canvas.toDataURL('image/png');
-                            document.getElementById('loading-ui').style.display = 'none';
-                            document.getElementById('result-img').style.display = 'block';
-                            document.getElementById('hint').style.display = 'block';
-                            document.getElementById('render-target').remove();
+                            try {{
+                                document.getElementById('result-img').src = canvas.toDataURL('image/png');
+                                document.getElementById('loading-ui').style.display = 'none';
+                                document.getElementById('result-img').style.display = 'block';
+                                document.getElementById('hint').style.display = 'block';
+                                document.getElementById('render-target').style.display = 'none';
+                            }} catch(e) {{
+                                document.getElementById('loading-ui').innerHTML = '⚠️ 渲染异常，请直接系统截图保存';
+                            }}
+                        }}).catch(err => {{
+                            document.getElementById('loading-ui').innerHTML = '⚠️ 渲染超时，请直接系统截图保存';
                         }});
-                    }}, 1200);
-                }});
+                    }}, 1500); // 预留1.5秒充足时间加载字体
+                }};
             </script>
         </body>
         </html>
         """
-        # 挂载隐形渲染沙盒
         components.html(html_to_image_script, height=750)
 
     with tab2:
-        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 备选方案：点击下方代码框右上角的 <b style='color:#00f3ff;'>Copy</b> 图标，复制纯文字版供群聊使用：</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 点击下方代码框右上角的 <b style='color:#00f3ff;'>Copy</b> 图标提取纯文本格式：</div>", unsafe_allow_html=True)
         share_card = f"""【上海数据交易所 · 人才全息图谱】
 =================================
 👤 授权节点：{safe_alias_final}
@@ -502,7 +502,6 @@ else:
 🔗 [全息链路校验哈希: 0x{hash_code}]"""
         st.code(share_card, language="plaintext")
 
-    # ✨ 雷达图与仪表盘绘制之前，重新定义 categories 与 values，解决 NameError！
     categories = ['生态拓展(E)', '实务风控(S)', '逻辑共识(T)', '秩序合规(J)', '节点深潜(I)', '宏观架构(N)', '价值共情(F)', '敏捷演化(P)']
     values = [val_E, val_S, val_T, val_J, val_I, val_N, val_F, val_P]
 
