@@ -15,7 +15,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 2. 赛博科技级 UI 引擎 (沉浸式去白边，屏蔽默认UI) ---
+# --- 2. 赛博科技级 UI 引擎 ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&display=swap');
@@ -35,8 +35,7 @@ st.markdown("""
     
     /* 全局 CRT 扫描线与科技网格背景 */
     [data-testid="stAppViewContainer"]::after {
-        content: "";
-        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
         background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
                     linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
         background-size: 100% 3px, 3px 100%;
@@ -57,8 +56,7 @@ st.markdown("""
     
     /* Glitch 故障风主标题 */
     .hero-title { 
-        font-size: 38px !important;
-        font-weight: 900 !important; text-align: center; 
+        font-size: 38px !important; font-weight: 900 !important; text-align: center; 
         color: #ffffff !important; letter-spacing: 4px; margin-bottom: 5px;
         text-shadow: 0 0 20px rgba(0,243,255,0.7), 0 0 40px rgba(0,243,255,0.3);
         position: relative; display: inline-block;
@@ -96,6 +94,10 @@ st.markdown("""
     div.stButton > button[data-testid="baseButton-primary"]:hover { transform: translateY(-2px) !important; box-shadow: 0 0 30px rgba(0,243,255,0.6) !important; }
     
     .cli-box { background: #000000; border: 1px solid #334155; border-left: 4px solid #00f3ff; padding: 20px; border-radius: 6px; font-family: 'Orbitron', monospace; font-size: 13px; color: #4ade80; box-shadow: inset 0 0 20px rgba(0,243,255,0.1); margin-top: 50px; text-transform: uppercase; }
+
+    /* 原生网页端酷炫结果大金卡 (已回归) */
+    .result-card { padding: 35px 20px; border-radius: 12px; background: rgba(11, 17, 32, 0.95) !important; border: 1px solid rgba(255,215,0,0.3); border-top: 5px solid #ffd700; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.6); margin-bottom: 30px; }
+    .mbti-code { font-family: 'Orbitron', sans-serif !important; font-size: 72px; font-weight: 900; color: #ffd700 !important; line-height: 1.1; letter-spacing: 4px; text-shadow: 0 0 25px rgba(255,215,0,0.5); margin: 0;}
 
     /* 专属 Tabs 标签页 UI 穿透 */
     [data-testid="stTabs"] button { color: #94a3b8 !important; font-family: 'Noto Sans SC', sans-serif !important; font-weight: bold !important; font-size: 15px !important; padding-bottom: 10px !important; }
@@ -226,7 +228,7 @@ if not st.session_state.started:
         <div style="text-align: center; margin-bottom: 20px;">
             <h1 class="hero-title" data-text="上海数据交易所">上海数据交易所</h1><br>
             <h1 class="hero-title" data-text="核心人才全息引擎" style="font-size:32px !important;">核心人才全息引擎</h1>
-            <div class="hero-subtitle">▶ SDE MATRIX V1.0_SECURE</div>
+            <div class="hero-subtitle">▶ SDE MATRIX V26.0_SECURE</div>
         </div>
     """, unsafe_allow_html=True)
     
@@ -247,7 +249,7 @@ if not st.session_state.started:
     
     with st.form(key="login_form", border=False):
         st.markdown("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:8px; text-align:center;'>▼ MOUNT NODE ALIAS (输入职场称呼 / 授权代号) ▼</div>", unsafe_allow_html=True)
-        st.text_input("", key="login_input", placeholder="例如：Compliance_Wu", label_visibility="collapsed")
+        st.text_input("", key="login_input", placeholder="例如：合规部_吴总监", label_visibility="collapsed")
         st.markdown("<br>", unsafe_allow_html=True)
         st.form_submit_button("▶ 授予系统权限并执行深度扫描", on_click=start_assessment_callback, type="primary", use_container_width=True)
     
@@ -315,6 +317,7 @@ elif st.session_state.current_q < len(questions):
         st.button(text, type="secondary", key=f"q_{st.session_state.current_q}_{val}", on_click=answer_callback, args=(val, q_data['dim']))
 
 else:
+    # 💥 播放高潮烟花
     if not st.session_state.firework_played:
         trigger_supernova()
         st.session_state.firework_played = True
@@ -325,11 +328,16 @@ else:
     safe_alias_final = st.session_state.user_alias.upper()
     role_name = data['role']
     
+    # ==== 核心数值计算与雷达图变量定义 (🚨 修复 NameError 的关键) ====
     def get_intensity(score): return int(max(15, min(100, 50 + (score / (len(questions)/4) * 50))))
     val_E, val_I = get_intensity(res["E"]), 100 - get_intensity(res["E"])
     val_S, val_N = get_intensity(res["S"]), 100 - get_intensity(res["S"])
     val_T, val_F = get_intensity(res["T"]), 100 - get_intensity(res["T"])
     val_J, val_P = get_intensity(res["J"]), 100 - get_intensity(res["J"])
+
+    # 🚨 重新补回雷达图所需要的类别与数值数组
+    categories = ['生态协同(E)', '颗粒实勘(S)', '量化风控(T)', '架构秩序(J)', '底层深潜(I)', '战略前瞻(N)', '生态共情(F)', '敏捷演进(P)']
+    values = [val_E, val_S, val_T, val_J, val_I, val_N, val_F, val_P]
 
     p_score = -res.get("J", 0)
     s_score = res.get("S", 0)
@@ -343,13 +351,64 @@ else:
     hash_code = hashlib.sha256(f"{safe_alias_final}{mbti}{time_taken}".encode()).hexdigest()[:16].upper()
 
     # =========================================================================
-    # ✨ 终极黑科技：引入 Tabs 将功能分为“图片海报”与“文本复制”
+    # ✨✨✨ 1. 恢复：动态沉浸式的原生 UI 数据卡片区 ✨✨✨
     # =========================================================================
-    st.markdown("<br><h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>💠 身份密钥与海报提取中心</h4>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="result-card">
+        <div class="orbitron-font" style="font-size:13px; color:#94a3b8; letter-spacing:4px; margin-bottom:15px;">MATRIX DECODED SUCCESSFULLY</div>
+        <div style="color:#00f3ff; font-family:'Orbitron', monospace; font-size:13px; margin-bottom:5px; border-bottom:1px dashed #334155; padding-bottom:10px; display:inline-block;">AUTH_NODE: {safe_alias_final}</div>
+        <div class="mbti-code" style="margin-top:10px;">{mbti}</div>
+        <div style="font-size: 20px; font-weight: 900; color: #00f3ff !important; margin: 15px 0; letter-spacing: 1px;">【 {role_name} 】</div>
+        <div style="color:#e2e8f0 !important; font-size:14px; line-height:1.8; margin-bottom:25px; font-weight:400; text-align:left; padding:0 10px;">{data['desc']}</div>
+        <div>
+            {" ".join([f'<span style="background:rgba(0, 243, 255, 0.1); color:#00f3ff !important; border:1px solid rgba(0,243,255,0.4); padding:5px 12px; border-radius:4px; font-size:12px; font-weight:700; margin:4px; display:inline-block; font-family:\'Noto Sans SC\', sans-serif;">{t}</span>' for t in data['tags']])}
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # 1.1 恢复：Plotly 雷达图
+    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🕸️ 核心算力拓扑矩阵</h4>", unsafe_allow_html=True)
+    
+    fig = go.Figure()
+    fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.1)', line=dict(color='rgba(0, 243, 255, 0.2)', width=8), hoverinfo='none'))
+    fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.25)', line=dict(color='#00f3ff', width=2.5), marker=dict(color='#ff003c', size=6, symbol='diamond')))
+    fig.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=12), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=55, r=55, t=30, b=30), height=350)
+    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
+
+    # 1.2 恢复：Plotly 风险仪表盘
+    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🎛️ 风险过载阈值仪</h4>", unsafe_allow_html=True)
+    st.markdown(f"<div style='text-align:center; font-size:16px; font-weight:bold; color:{r_color}; font-family:Noto Sans SC; margin-top: 15px;'>{r_tag}</div>", unsafe_allow_html=True)
+
+    fig_gauge = go.Figure(go.Indicator(
+        mode="gauge+number", value=risk_score, 
+        number={'suffix': "%", 'font': {'family': 'Orbitron, sans-serif', 'color': r_color, 'size': 42}}, 
+        gauge={'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#334155"}, 'bar': {'color': r_color}, 'bgcolor': "rgba(255,255,255,0.05)", 'steps': [{'range': [0, 35], 'color': "rgba(16, 185, 129, 0.15)"}, {'range': [35, 65], 'color': "rgba(255, 215, 0, 0.15)"}, {'range': [65, 100], 'color': "rgba(244, 63, 94, 0.15)"}]}
+    ))
+    fig_gauge.update_layout(paper_bgcolor='rgba(0,0,0,0)', font={'color': "#94a3b8"}, height=240, margin=dict(l=30, r=30, t=10, b=20))
+    st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False})
+    
+    st.markdown(f"<div style='background: rgba(2,6,23,0.5); border-radius:6px; padding:15px; color:#cbd5e1 !important; font-size:13px; text-align:center; margin-top:-10px; margin-bottom:25px; line-height:1.6; border: 1px solid rgba(255,255,255,0.05);'>{r_desc}</div>", unsafe_allow_html=True)
+
+    # 1.3 恢复：生态协同网络指引
+    st.markdown("<h4 style='color:#10b981 !important; border-left:4px solid #10b981; padding-left:10px; font-weight:900;'>💡 生态网络协同指引</h4>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div style='background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(0,0,0,0)); border-left: 4px solid #10b981; padding: 20px; border-radius: 4px; font-size: 14px; line-height: 1.7; color: #e2e8f0 !important; border-top: 1px solid rgba(16, 185, 129, 0.3); border-bottom: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 5px 20px rgba(0,0,0,0.5); margin: 15px 0 30px 0;'>
+        <div style='color: #10b981 !important; font-weight: 900; font-size: 13px; margin-bottom: 8px; font-family: "Orbitron", sans-serif !important; letter-spacing: 2px;'>[ 黄金并网节点 ]</div>
+        <div style='margin-bottom:15px; color:#ffffff !important; font-weight:900; font-size:15px;'>{data['partner']}</div>
+        <div style='color: #10b981 !important; font-weight: 900; font-size: 13px; margin-bottom: 8px; font-family: "Orbitron", sans-serif !important; letter-spacing: 2px;'>[ 算力超频建议 ]</div>
+        <div>{data['advice']}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # =========================================================================
+    # ✨✨✨ 2. 保留：一键生成朋友圈高逼格分享海报与名片区 ✨✨✨
+    # =========================================================================
+    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>💠 身份密钥与海报提取中心</h4>", unsafe_allow_html=True)
     
     tab1, tab2 = st.tabs(["📸 生成全息图文海报 (推荐朋友圈)", "📝 提取纯文本格式 (适合群聊)"])
 
     with tab1:
+        # 构造专属防伪赛博条形码
         random.seed(hash_code)
         gradient_stops = []
         current_pos = 0
@@ -359,7 +418,6 @@ else:
             gradient_stops.append(f"rgba(0,243,255,0.6) {current_pos}%, rgba(0,243,255,0.6) {current_pos + width}%, transparent {current_pos + width}%, transparent {current_pos + width + space}%")
             current_pos += width + space
         barcode_css = "linear-gradient(90deg, " + ", ".join(gradient_stops) + ")"
-
         tags_html = "".join([f'<div style="background:rgba(0,243,255,0.1); border:1px solid rgba(0,243,255,0.4); padding:4px 8px; border-radius:4px; font-size:12px; color:#00f3ff; font-weight:bold;">{t}</div>' for t in data['tags']])
 
         html_to_image_script = f"""
@@ -459,38 +517,32 @@ else:
             <div id="hint" class="hint-box">✅ 海报压制成功！<br><span style="color:#fff;">👆 手机端请 <b>长按上方图片</b><br>即可「发送给朋友」或「保存到相册」</span></div>
 
             <script>
-                // ✨ 核心移动端修复：废弃不稳定的 document.fonts.ready，采用强力延时渲染
-                window.onload = function() {{
-                    setTimeout(function() {{
+                // 确保自定义字体加载完毕后，再进行 Canvas 截图
+                document.fonts.ready.then(() => {{
+                    setTimeout(() => {{
                         const target = document.getElementById('capture-box');
                         html2canvas(target, {{
-                            scale: 2, // 降维至2倍图，彻底杜绝手机 Canvas 内存溢出导致白屏
+                            scale: 3, // 输出3倍高清视网膜图
                             backgroundColor: '#030712',
-                            useCORS: true,
-                            allowTaint: true
+                            useCORS: true
                         }}).then(canvas => {{
-                            try {{
-                                document.getElementById('result-img').src = canvas.toDataURL('image/png');
-                                document.getElementById('loading-ui').style.display = 'none';
-                                document.getElementById('result-img').style.display = 'block';
-                                document.getElementById('hint').style.display = 'block';
-                                document.getElementById('render-target').style.display = 'none';
-                            }} catch(e) {{
-                                document.getElementById('loading-ui').innerHTML = '⚠️ 渲染异常，请直接系统截图保存';
-                            }}
-                        }}).catch(err => {{
-                            document.getElementById('loading-ui').innerHTML = '⚠️ 渲染超时，请直接系统截图保存';
+                            document.getElementById('result-img').src = canvas.toDataURL('image/png');
+                            document.getElementById('loading-ui').style.display = 'none';
+                            document.getElementById('result-img').style.display = 'block';
+                            document.getElementById('hint').style.display = 'block';
+                            document.getElementById('render-target').remove();
                         }});
-                    }}, 1500); // 预留1.5秒充足时间加载字体
-                }};
+                    }}, 1200); 
+                }});
             </script>
         </body>
         </html>
         """
+        # 挂载这个隐形渲染沙盒
         components.html(html_to_image_script, height=750)
 
     with tab2:
-        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 点击下方代码框右上角的 <b style='color:#00f3ff;'>Copy</b> 图标提取纯文本格式：</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 点击下方黑框右上角的 <b style='color:#00f3ff;'>Copy</b> 图标，复制纯文字版供群聊使用：</div>", unsafe_allow_html=True)
         share_card = f"""【上海数据交易所 · 人才全息图谱】
 =================================
 👤 授权节点：{safe_alias_final}
@@ -501,30 +553,6 @@ else:
 🌐 2026 数据要素突破之年，寻找你的协同节点！
 🔗 [全息链路校验哈希: 0x{hash_code}]"""
         st.code(share_card, language="plaintext")
-
-    categories = ['生态拓展(E)', '实务风控(S)', '逻辑共识(T)', '秩序合规(J)', '节点深潜(I)', '宏观架构(N)', '价值共情(F)', '敏捷演化(P)']
-    values = [val_E, val_S, val_T, val_J, val_I, val_N, val_F, val_P]
-
-    st.markdown("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🕸️ 核心算力拓扑矩阵</h4>", unsafe_allow_html=True)
-    
-    fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.1)', line=dict(color='rgba(0, 243, 255, 0.2)', width=8), hoverinfo='none'))
-    fig.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.25)', line=dict(color='#00f3ff', width=2.5), marker=dict(color='#ff003c', size=6, symbol='diamond')))
-    fig.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=12), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=55, r=55, t=30, b=30), height=350)
-    st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
-
-    st.markdown("<h4 style='color:#10b981 !important; border-left:4px solid #10b981; padding-left:10px; font-weight:900;'>💡 生态网络协同指引</h4>", unsafe_allow_html=True)
-    st.markdown(f"""
-    <div style='background: linear-gradient(145deg, rgba(16, 185, 129, 0.08), rgba(0,0,0,0)); border-left: 4px solid #10b981; padding: 20px; border-radius: 4px; font-size: 14px; line-height: 1.7; color: #e2e8f0 !important; border-top: 1px solid rgba(16, 185, 129, 0.3); border-bottom: 1px solid rgba(16, 185, 129, 0.3); box-shadow: 0 5px 20px rgba(0,0,0,0.5); margin: 15px 0 30px 0;'>
-        <div style='color: #10b981 !important; font-weight: 900; font-size: 13px; margin-bottom: 8px; font-family: "Orbitron", sans-serif !important; letter-spacing: 2px;'>[ 黄金并网节点 ]</div>
-        <div style='margin-bottom:15px; color:#ffffff !important; font-weight:900; font-size:15px;'>{data['partner']}</div>
-        <div style='color: #10b981 !important; font-weight: 900; font-size: 13px; margin-bottom: 8px; font-family: "Orbitron", sans-serif !important; letter-spacing: 2px;'>[ 算力超频建议 ]</div>
-        <div>{data['advice']}</div>
-        <div style='margin-top:15px; border-top:1px dashed rgba(16,185,129,0.3); padding-top:15px; color:#94a3b8; font-size:12px;'>
-            {r_desc}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
 
     def reset_system():
         st.session_state.started = False
@@ -549,5 +577,3 @@ st.markdown("""
         </div>
     </div>
 """, unsafe_allow_html=True)
-
-
