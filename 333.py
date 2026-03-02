@@ -493,8 +493,9 @@ if not st.session_state.started:
                 <div class="term-line"><span style="color:#94a3b8;">[KERNEL]</span> Loading 40-Node Matrix Algorithm V1.0... <span style="color:#00f3ff;">[LOADED]</span></div>
                 <div class="term-line-main">
                     <span style="color:#ffffff; font-size: 15px; font-family: 'Noto Sans SC', sans-serif; line-height: 1.8;">
-                    <br><b>警告：系统将对您的职场大脑进行物理级拆解与链上确权。</b><br><br>
-                    您的决策本能、风控阈值与业务嗅觉将被全面数据化。一旦 40 维扫描完成，系统将为您生成不可篡改的<b>高阶职场算力凭证与智能合约面板</b>。</span>
+                    <br><b>2026年是数据要素价值释放的突破之年。</b><br><br>
+                    在“数据乘数”加速赋能实体经济的当下，本终端将全方位扫描您的职场决策链路与风控模型。
+                    您的物理能力将被「全息要素化」，系统将为您生成独一无二的高阶数字凭证与上链算力估值。</b>。</span>
                     <span class="cursor-blink"></span>
                 </div>
             </div>
