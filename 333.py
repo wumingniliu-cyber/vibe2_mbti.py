@@ -495,7 +495,7 @@ if not st.session_state.started:
                     <span style="color:#ffffff; font-size: 15px; font-family: 'Noto Sans SC', sans-serif; line-height: 1.8;">
                     <br><b>2026年是数据要素价值释放的突破之年。</b><br><br>
                     在“数据乘数”加速赋能实体经济的当下，本终端将全方位扫描您的职场决策链路与风控模型。
-                    您的物理能力将被「全息要素化」，系统将为您生成独一无二的高阶数字凭证与上链算力估值。</b>。</span>
+                    您的物理能力将被「全息要素化」，系统将为您生成独一无二的高阶数字凭证与上链算力估值。</b></span>
                     <span class="cursor-blink"></span>
                 </div>
             </div>
