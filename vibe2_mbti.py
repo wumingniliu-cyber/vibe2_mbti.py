@@ -15,7 +15,7 @@ import numpy as np
 # ==============================================================================
 VERSION = "1.0_PRO_MAX_FINAL"
 COPYRIGHT = "无名逆流"
-SYS_NAME = "SDE 核心人才算力引擎 | V 1.0"
+SYS_NAME = "SDE 核心算力引擎 | V 1.0"
 
 # 🚨 宽屏布局：承载塔台级彭博社双栏大屏，且完美兼容手机端微信瀑布流
 st.set_page_config(page_title=SYS_NAME, page_icon="💠", layout="wide", initial_sidebar_state="collapsed")
@@ -1064,3 +1064,4 @@ render_html(f"""
 <div class="copyright-niliu">© 2026 版权归属 · <b style="font-family:'Orbitron', sans-serif; letter-spacing: 4px;">{COPYRIGHT}</b></div>
 </div>
 """)
+
