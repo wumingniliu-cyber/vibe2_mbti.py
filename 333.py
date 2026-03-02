@@ -17,66 +17,60 @@ VERSION = "1.0_PRO_MAX_FINAL"
 COPYRIGHT = "无名逆流"
 SYS_NAME = "SDE 核心人才算力引擎 | V 1.0"
 
-# 宽屏布局，为响应式瀑布流提供足够空间
+# 宽屏布局，为响应式瀑布流提供极致空间
 st.set_page_config(page_title=SYS_NAME, page_icon="💠", layout="wide", initial_sidebar_state="collapsed")
 
-# 🚨 终极防爆工具：强行剥离所有前置空格，杜绝 Streamlit 错误识别为代码块！
+# 🚨 终极防爆工具：强行剥离所有前置特殊空格，杜绝 Streamlit 错误识别为代码块
 def render_html(html_str):
     cleaned = '\n'.join([line.lstrip() for line in html_str.split('\n') if line.strip() != ''])
     st.markdown(cleaned, unsafe_allow_html=True)
 
 # ==============================================================================
-# 🎨 [ CORE 02 ] 赛博全息 UI 渲染底座 (安全隔离与响应式优化)
+# 🎨 [ CORE 02 ] 赛博全息 UI 渲染底座 (深度适配手机端排版)
 # ==============================================================================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&family=Fira+Code:wght@400;600&display=swap');
-:root { color-scheme: dark; }
-[data-testid="stHeader"] { background: transparent !important; }
-[data-testid="stToolbar"], footer { display: none !important; }
-.block-container { padding-top: 2rem !important; padding-bottom: 4rem !important; max-width: 1200px !important; }
-html, body, .stApp { background-color: #030712 !important; font-family: 'Noto Sans SC', sans-serif !important; color: #f8fafc !important; overflow-x: hidden; }
+
+/* 隐藏 Streamlit 默认UI */
+[data-testid="stHeader"], [data-testid="stToolbar"], footer { display: none !important; }
+.block-container { padding-top: 3rem !important; padding-bottom: 4rem !important; max-width: 1200px !important; overflow-x: hidden; }
+html, body, .stApp { background-color: #030712 !important; font-family: 'Noto Sans SC', sans-serif !important; color: #f8fafc !important; }
 
 /* 视差背景网格 */
 [data-testid="stAppViewContainer"]::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.05) 0%, rgba(3, 7, 18, 1) 70%); pointer-events: none; z-index: 0; }
 [data-testid="stAppViewContainer"]::after { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02)); background-size: 100% 3px, 3px 100%; z-index: 99999; pointer-events: none; opacity: 0.5; }
-[data-testid="stSidebar"] { background-color: rgba(2, 6, 23, 0.95) !important; border-right: 1px solid rgba(0,243,255,0.2) !important; }
 
-/* 保护原生组件字色 */
-.stMarkdown, p, span, h2, h3, h4, li, label, div[data-testid="stMetricValue"], div[data-testid="stMetricLabel"] { color: #f8fafc !important; }
+.stMarkdown, p, span, h2, h3, h4, li, div { color: #f8fafc !important; z-index: 2; position: relative; }
 [data-testid="stProgress"] > div > div > div { background: linear-gradient(90deg, #00f3ff, #3b82f6) !important; box-shadow: 0 0 15px rgba(0,243,255,0.8); }
 
-/* 暴力接管下拉框，防浅色模式反转 */
-div[data-baseweb="select"] > div { background-color: rgba(4, 9, 20, 0.95) !important; border: 1px solid rgba(168, 85, 247, 0.5) !important; color: #a855f7 !important; font-weight: bold;}
-div[data-baseweb="popover"] > div, div[data-baseweb="popover"] ul { background-color: #0f172a !important; border: 1px solid rgba(168, 85, 247, 0.4) !important; border-radius: 6px !important; }
-div[data-baseweb="popover"] li { color: #ffffff !important; background-color: transparent !important; transition: all 0.2s ease;}
-div[data-baseweb="popover"] li:hover, div[data-baseweb="popover"] li[aria-selected="true"] { background-color: rgba(168, 85, 247, 0.4) !important; color: #00f3ff !important; font-weight: bold !important; }
-
-/* 硬件加速大盘流 */
-.ticker-wrap { width: 100%; overflow: hidden; height: 32px; background-color: rgba(2, 6, 23, 0.98); border-bottom: 1px solid rgba(0,243,255,0.4); position: fixed; top: 0; left: 0; z-index: 99990; box-shadow: 0 2px 15px rgba(0,243,255,0.15); }
-.ticker { display: inline-block; white-space: nowrap; padding-right: 100%; box-sizing: content-box; animation: ticker 40s linear infinite; font-family: 'Orbitron', monospace; font-size: 12px; color: #00f3ff; line-height: 32px; letter-spacing: 1px; will-change: transform; transform: translateZ(0); }
+/* 硬件加速顶部大盘流 */
+.ticker-wrap { width: 100vw; overflow: hidden; height: 32px; background-color: rgba(2, 6, 23, 0.98); border-bottom: 1px solid rgba(0,243,255,0.4); position: fixed; top: 0; left: 0; z-index: 99990; box-shadow: 0 2px 15px rgba(0,243,255,0.15); }
+.ticker { display: inline-block; white-space: nowrap; padding-right: 100%; box-sizing: content-box; animation: ticker 40s linear infinite; font-family: 'Orbitron', monospace; font-size: 12px; color: #00f3ff; line-height: 32px; letter-spacing: 1px; will-change: transform; }
 .ticker span { margin-right: 50px; } .ticker .up { color: #10b981; text-shadow: 0 0 5px rgba(16,185,129,0.5); } .ticker .down { color: #f43f5e; text-shadow: 0 0 5px rgba(244,63,94,0.5); }
 @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-/* 骇客主标题与终端 */
-.hero-title { font-size: clamp(28px, 5vw, 42px) !important; font-weight: 900 !important; text-align: center; color: #ffffff !important; letter-spacing: 4px; margin-bottom: 5px; margin-top: 15px; text-shadow: 0 0 20px rgba(0,243,255,0.7), 0 0 40px rgba(0,243,255,0.3); position: relative; display: inline-block; text-transform: uppercase; }
+/* 骇客主标题 */
+.hero-title { font-size: clamp(32px, 5vw, 42px) !important; font-weight: 900 !important; text-align: center; color: #ffffff !important; letter-spacing: 4px; margin-bottom: 5px; text-shadow: 0 0 20px rgba(0,243,255,0.7), 0 0 40px rgba(0,243,255,0.3); position: relative; display: inline-block; }
 .hero-title::before, .hero-title::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; }
 .hero-title::before { left: 2px; text-shadow: -2px 0 #f43f5e; animation: glitch-anim-1 2.5s infinite linear alternate-reverse; }
 .hero-title::after { left: -2px; text-shadow: 2px 0 #00f3ff; animation: glitch-anim-2 3.5s infinite linear alternate-reverse; }
 @keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); } 20% { clip-path: inset(60% 0 10% 0); } 40% { clip-path: inset(40% 0 50% 0); } 60% { clip-path: inset(80% 0 5% 0); } 80% { clip-path: inset(10% 0 70% 0); } 100% { clip-path: inset(30% 0 20% 0); } }
 @keyframes glitch-anim-2 { 0% { clip-path: inset(10% 0 60% 0); } 20% { clip-path: inset(30% 0 20% 0); } 40% { clip-path: inset(70% 0 10% 0); } 60% { clip-path: inset(20% 0 50% 0); } 80% { clip-path: inset(90% 0 5% 0); } 100% { clip-path: inset(50% 0 30% 0); } }
 
-/* 📱 手机端排版特化与模块大标题 */
-.module-title { color: #00f3ff; border-left: 5px solid #00f3ff; padding-left: 12px; font-weight: 900; margin-top: 40px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; font-family: 'Noto Sans SC', sans-serif; text-shadow: 0 0 10px rgba(0,243,255,0.4); background: linear-gradient(90deg, rgba(0,243,255,0.1), transparent); padding-top: 8px; padding-bottom: 8px; }
-
+/* 📱 手机端排版特化 */
 @media (max-width: 768px) {
     .hero-title { font-size: 26px !important; letter-spacing: 2px !important; }
-    .mbti-code { font-size: 55px !important; }
-    .block-container { padding-top: 1.5rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
+    .mbti-code { font-size: 50px !important; }
+    .block-container { padding-top: 2rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
     .terminal-container { padding: 15px !important; }
-    .module-title { font-size: 15px !important; margin-top: 25px !important; }
+    .module-title { font-size: 15px !important; margin-top: 25px !important; padding-top: 10px !important;}
     div[data-testid="stColumns"] > div { margin-bottom: 20px; } 
+    .synergy-score { font-size: 45px !important; }
 }
+
+/* 模块大标题 (逻辑分割线) */
+.module-title { color: #00f3ff; border-left: 5px solid #00f3ff; padding-left: 12px; font-weight: 900; margin-top: 45px; margin-bottom: 20px; letter-spacing: 1px; font-family: 'Noto Sans SC', sans-serif; text-shadow: 0 0 10px rgba(0,243,255,0.4); background: linear-gradient(90deg, rgba(0,243,255,0.1), transparent); padding-top: 8px; padding-bottom: 8px; border-radius: 4px; }
 
 .terminal-container { background: rgba(8, 15, 30, 0.85); border: 1px solid rgba(0,243,255,0.4); padding: 25px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 14px; color: #e2e8f0; box-shadow: inset 0 0 20px rgba(0,243,255,0.1), 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 30px; }
 .cursor-blink { display: inline-block; width: 10px; height: 18px; background: #00f3ff; animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px; }
@@ -87,33 +81,26 @@ div[data-testid="stForm"] { max-width: 600px; margin: 0 auto; border: none !impo
 div[data-testid="stTextInput"] > div > div > input { background-color: rgba(4, 9, 20, 0.9) !important; color: #00f3ff !important; font-family: 'Orbitron', monospace !important; border: 1px solid rgba(0,243,255,0.5) !important; border-radius: 6px !important; text-align: center; font-size: 18px !important; font-weight: bold !important; letter-spacing: 2px; box-shadow: inset 0 0 20px rgba(0,243,255,0.1) !important; transition: all 0.3s ease; height: 50px; }
 div[data-testid="stTextInput"] > div > div > input:focus { border-color: #ffd700 !important; box-shadow: 0 0 25px rgba(255,215,0,0.4), inset 0 0 15px rgba(255,215,0,0.1) !important; }
 
-div.stButton > button { background: linear-gradient(135deg, #0f172a 0%, #040914 100%) !important; border: 1px solid rgba(0, 243, 255, 0.3) !important; border-left: 4px solid rgba(0, 243, 255, 0.6) !important; border-radius: 6px !important; min-height: 60px !important; width: 100% !important; padding: 10px 15px !important; text-align: left !important; box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important; transition: all 0.2s ease !important; position: relative; overflow: hidden; }
-div.stButton > button::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,243,255,0.15), transparent); transition: left 0.5s ease; }
-div.stButton > button:hover::before { left: 150%; }
-div.stButton > button p { color: #ffffff !important; font-size: 15px !important; font-weight: bold !important; }
+div.stButton > button { background: linear-gradient(135deg, #0f172a 0%, #040914 100%) !important; border: 1px solid rgba(0, 243, 255, 0.3) !important; border-left: 4px solid rgba(0, 243, 255, 0.6) !important; border-radius: 6px !important; min-height: 60px !important; width: 100% !important; text-align: left !important; box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important; transition: all 0.2s ease !important; }
+div.stButton > button p { color: #ffffff !important; font-size: 14px !important; font-weight: 500 !important; }
 div.stButton > button:hover { border-color: #00f3ff !important; border-left: 6px solid #00f3ff !important; box-shadow: 0 0 20px rgba(0,243,255,0.3) !important; transform: translateX(4px) !important; }
 
 div.stButton > button[data-testid="baseButton-primary"] { background: linear-gradient(90deg, #00f3ff, #0088ff) !important; border-left: none !important; text-align: center !important; }
-div.stButton > button[data-testid="baseButton-primary"] p { color: #010308 !important; font-weight: 900 !important; font-size: 18px !important; letter-spacing: 2px !important; }
-div.stButton > button[data-testid="baseButton-primary"]:hover { transform: translateY(-3px) !important; box-shadow: 0 10px 30px rgba(0,243,255,0.6) !important; }
+div.stButton > button[data-testid="baseButton-primary"] p { color: #010308 !important; font-weight: 900 !important; letter-spacing: 2px !important; }
 
 /* 大屏卡片与面板 */
 .result-card { padding: 40px 30px; border-radius: 12px; background: rgba(8, 15, 30, 0.95) !important; border: 1px solid rgba(255,215,0,0.3); border-top: 6px solid #ffd700; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(255,215,0,0.05); margin-bottom: 20px; position:relative; overflow:hidden;}
-.mbti-code { font-family: 'Orbitron', sans-serif !important; font-size: clamp(60px, 8vw, 80px); font-weight: 900; color: #ffd700 !important; line-height: 1.1; letter-spacing: 6px; text-shadow: 0 0 35px rgba(255,215,0,0.6); margin: 5px 0;}
+.mbti-code { font-family: 'Orbitron', sans-serif !important; font-size: clamp(55px, 8vw, 80px); font-weight: 900; color: #ffd700 !important; line-height: 1.1; letter-spacing: 6px; text-shadow: 0 0 35px rgba(255,215,0,0.6); margin: 5px 0;}
 .tier-badge { position: absolute; top: 20px; right: -45px; background: #ffd700; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 13px; padding: 5px 50px; transform: rotate(45deg); z-index: 10; letter-spacing: 2px; box-shadow: 0 0 20px rgba(255,215,0,0.8);}
 
-.panel-box { background: rgba(10, 17, 32, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 25px; box-shadow: inset 0 0 20px rgba(0,0,0,0.4); margin-bottom: 20px; height: 100%;}
-.panel-title { color: #94a3b8; font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: bold; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px; letter-spacing: 1px; }
-
 /* Tabs 全息导航坞 */
-[data-testid="stTabs"] button { color: #64748b !important; font-family: 'Noto Sans SC', sans-serif !important; font-weight: 900 !important; font-size: clamp(14px, 2vw, 16px) !important; padding-bottom: 15px !important; transition: all 0.3s ease; }
+[data-testid="stTabs"] button { color: #64748b !important; font-family: 'Noto Sans SC', sans-serif !important; font-weight: 900 !important; font-size: clamp(13px, 2vw, 15px) !important; padding-bottom: 12px !important; transition: all 0.3s ease; }
 [data-testid="stTabs"] button[aria-selected="true"] { color: #00f3ff !important; border-bottom-color: #00f3ff !important; border-bottom-width: 3px !important; text-shadow: 0 0 15px rgba(0,243,255,0.6); background: rgba(0,243,255,0.05); }
 
-/* 🚨 彻底锁死代码块深色极客风，杜绝浅色模式灰底污染！ */
-div[data-testid="stCodeBlock"], div[data-testid="stCodeBlock"] > div, div[data-testid="stCodeBlock"] pre, div[data-testid="stCodeBlock"] code { background-color: #050505 !important; border-color: #333 !important; color: #10b981 !important; }
-div[data-testid="stCodeBlock"] pre, div[data-testid="stCodeBlock"] code { font-family: 'Fira Code', monospace !important; font-size: 12px !important; line-height: 1.5 !important;}
+/* 代码块保护 */
+div[data-testid="stCodeBlock"], div[data-testid="stCodeBlock"] > div { background-color: #050505 !important; border-color: #333 !important; }
+div[data-testid="stCodeBlock"] pre, div[data-testid="stCodeBlock"] code { font-family: 'Fira Code', monospace !important; font-size: 12px !important; color: #10b981 !important; line-height: 1.5 !important;}
 div[data-testid="stCodeBlock"] { border-left: 4px solid #10b981 !important; border-radius: 6px !important; margin-top: 10px; }
-
 .cli-box { background: #000000; border: 1px solid #334155; border-left: 4px solid #00f3ff; padding: 20px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 13px; color: #4ade80; box-shadow: inset 0 0 30px rgba(0,243,255,0.15); margin-top: 20px; word-break: break-all; line-height: 1.6;}
 
 /* 折叠框与任务板 */
@@ -123,22 +110,22 @@ div[data-testid="stCodeBlock"] { border-left: 4px solid #10b981 !important; bord
 
 /* 专属下载按钮 */
 div[data-testid="stDownloadButton"] > button { background: rgba(5, 12, 25, 0.95) !important; border: 1px dashed rgba(16, 185, 129, 0.8) !important; border-left: 6px solid #10b981 !important; margin-top: 20px; border-radius: 6px !important; height: 55px; text-align: center !important; width: 100% !important;}
-div[data-testid="stDownloadButton"] > button p { color: #10b981 !important; font-family: 'Orbitron', monospace !important; font-weight: bold !important; letter-spacing: 2px !important; font-size: 15px !important;}
+div[data-testid="stDownloadButton"] > button p { color: #10b981 !important; font-family: 'Orbitron', monospace !important; font-weight: bold !important; letter-spacing: 2px !important; font-size: 14px !important;}
 div[data-testid="stDownloadButton"] > button:hover { background: rgba(16, 185, 129, 0.15) !important; box-shadow: 0 0 30px rgba(16,185,129,0.5) !important; transform: scale(1.02) !important; }
 
-/* 版权呼吸灯 */
+/* 版权呼吸灯 (要求 1 完全落实) */
 .copyright-niliu { display: inline-block; padding: 12px 35px; border-radius: 50px; font-size: 13px; font-family: "Noto Sans SC", sans-serif; letter-spacing: 2px; color: #00f3ff; font-weight: 900; background: rgba(0,243,255,0.05); border: 1px solid rgba(0,243,255,0.3); animation: neon-breathe 2.5s infinite alternate; box-shadow: 0 0 20px rgba(0,243,255,0.2); transition: all 0.3s ease; }
 .copyright-niliu:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0,243,255,0.8), inset 0 0 15px rgba(0,243,255,0.5); border-color: #00f3ff; }
 @keyframes neon-breathe { 0% { box-shadow: 0 0 10px rgba(0,243,255,0.1), inset 0 0 5px rgba(0,243,255,0.1); border-color: rgba(0,243,255,0.2); text-shadow: none; } 100% { box-shadow: 0 0 25px rgba(0,243,255,0.6), inset 0 0 15px rgba(0,243,255,0.2); border-color: rgba(0,243,255,0.7); text-shadow: 0 0 10px #00f3ff; } }
 
 /* 结算烟花 */
-.firework-center { position: fixed; top: 50%; left: 50%; z-index: 99998; pointer-events: none; font-weight: 900; font-family: 'Orbitron', sans-serif; color: #00f3ff; text-shadow: 0 0 20px #00f3ff, 0 0 30px #ffffff; animation: supernova 1.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;}
+.firework-center { position: fixed; top: 50%; left: 50%; z-index: 99998; pointer-events: none; font-weight: 900; font-family: 'Orbitron', monospace; color: #00f3ff; text-shadow: 0 0 20px #00f3ff, 0 0 30px #ffffff; animation: supernova 1.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;}
 @keyframes supernova { 0% { transform: translate(-50%, -50%) scale(0.1) rotate(0deg); opacity: 1; } 100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--s)) rotate(var(--rot)); opacity: 0; filter: blur(2px);} }
 </style>
-""")
+""", unsafe_allow_html=True)
 
 # ==============================================================================
-# 📊 [ CORE 03 ] 顶部跑马灯与动效算法
+# 📊 [ CORE 03 ] 顶部跑马灯与动效算法 (要求 5 完全落实)
 # ==============================================================================
 render_html("""
 <div class="ticker-wrap"><div class="ticker">
@@ -154,7 +141,7 @@ render_html("""
 
 def trigger_supernova():
     html_str = ""
-    # 替换666为赛博科技词汇
+    # 要求 2 落实：替换为极客科技词汇
     vocab = ["DATA", "NODE", "HASH", "ASSET", "SYNC", "SDE", "MINT"]
     for _ in range(35): 
         tx = random.uniform(200, 800) * math.cos(random.uniform(0, 2 * math.pi))
@@ -171,7 +158,7 @@ def generate_alpha_curve(base_roi, volatility, seed):
     return days, roi
 
 # ==============================================================================
-# 🧠 [ CORE 04 ] 题库满血版：40 道极客业务题
+# 🧠 [ CORE 04 ] 题库满血版：40 道极客业务题 (要求 8 完全落实，一字未删)
 # ==============================================================================
 questions = [
     {"q": "推动数商入场时，我倾向于亲自拜访机构进行面对面沟通，而非仅在线上发送标准入驻指引。", "dim": "E"},
@@ -219,7 +206,7 @@ questions = [
     {"q": "面对多线并行的复杂任务（如同时筹备路演与审核规则），我必须先确认优先级并排好序才能安心执行。", "dim": "J"}
 ]
 
-# 🚨 18 维满血防爆字典：彻底补齐所有字典键值对
+# 🚨 18 维满血防爆字典：彻底补齐所有字典键值对 (要求 8 完全落实，一字未删)
 mbti_details = {
     "INTJ": {"role": "首席数据架构师", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.2%", "base_hash": 9850, "base_roi": 1.45, "volatility": 0.20, "market_style": "宏观架构对冲与长期趋势跟踪策略", "desc": "数据要素底座的“造物主”，致力于为错综复杂的数字经济构建严密的底层制度与逻辑规则。", "tags": ["顶层设计", "逻辑闭环", "制度自信"], "skills": ["全局视野(Lv.Max)", "数据解构", "生态共振"], "evolution_path": ["L1 架构规划官", "L2 核心规则主理人", "L3 绝对算力主宰"], "ultimate_evolution": "【绝对算力主宰】掌控数据产品的终极业务定价权", "partner": "ENTJ (高效执行统筹)", "partner_advice": "将战略落地交由 ENTJ 推进，您只需稳控全局架构不跑偏。", "tasks": ["主导 SDE 核心确权底层逻辑架构设计", "重构下一代高并发撮合交易引擎逻辑"], "black_swan": "过度追求底层架构完美闭环。面临突发政策转向时，系统极易因过于重型而无法敏捷掉头。", "patch": "在构建宏大的交易规则体系时，请适当为前台业务预留“沙盒容错”空间。"},
     "INTP": {"role": "量化风控专家", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.1%", "base_hash": 9620, "base_roi": 1.60, "volatility": 0.45, "market_style": "高频统计套利与多因子量化模型", "desc": "穿透数据迷雾，寻找复杂业务表象下的底层逻辑漏洞与确权定价模型的最优解。", "tags": ["深度解构", "模型驱动", "极客思维"], "skills": ["特征抽取(Lv.Max)", "漏洞侦测", "异动推演"], "evolution_path": ["L1 风控分析师", "L2 模型主理人", "L3 全知算法先知"], "ultimate_evolution": "【全知算法先知】构建百分百无损的跨网底层风控引擎", "partner": "ENTP (模式发散节点)", "partner_advice": "借助 ENTP 的发散思维寻找商业变现出口，避免陷入纯理论。", "tasks": ["研发基于特征因子的数据资产动态定价算法", "建立实时数据异常交易嗅探与阻断模型"], "black_swan": "陷入“分析瘫痪”。在需要极速拍板的确权灰度地带，过度追求最优解往往导致商机流失。", "patch": "尝试将极其高维的理论模型降维封装，形成非技术人员也能看懂的《操作指南》。"},
@@ -282,9 +269,9 @@ if not st.session_state.started:
         
         <div class="terminal-container">
             <div style="font-family:'Orbitron', monospace; color:#00f3ff; margin-bottom:15px; font-weight:bold;">> SYSTEM BOOT SEQUENCE...</div>
-            <div style="margin-bottom:5px;"><span style="color:#94a3b8;">[OK]</span> Securing root connection to SDE Ledger.</div>
-            <div style="margin-bottom:5px;"><span style="color:#94a3b8;">[OK]</span> Loading 40-Node Matrix Algorithm V1.0.</div>
-            <div>
+            <div class="term-line"><span style="color:#94a3b8;">[OK]</span> Securing root connection to SDE Ledger.</div>
+            <div class="term-line"><span style="color:#94a3b8;">[OK]</span> Loading 40-Node Matrix Algorithm V1.0.</div>
+            <div class="term-line-main">
                 <br><span style="color:#ffffff; font-size: 15px; font-family: 'Noto Sans SC', sans-serif; line-height: 1.8;"><b>2026年是数据要素价值释放的突破之年。</b><br><br>
                 在“数据乘数”加速赋能实体经济的当下，本终端将全方位扫描您的职场决策链路与风控模型。<br>
                 您的物理能力将被<b>「全息要素化」</b>，系统将为您生成不可篡改的<b>高阶职场算力凭证与智能合约面板</b>。</span>
@@ -339,7 +326,7 @@ elif st.session_state.current_q < len(questions):
             st.button(text, type="secondary", key=f"q_{st.session_state.current_q}_{val}", on_click=answer_callback, args=(val, q_data['dim']))
 
 else:
-    # 💥 全息结算与 GPU 动画
+    # 💥 全息结算与代码粒子烟花 (要求 2 落实)
     if not st.session_state.anim_played: 
         trigger_supernova()
         st.session_state.anim_played = True
@@ -398,7 +385,7 @@ else:
     pct_beat = round(min(99.9, max(50.0, 60 + (decisiveness * 0.3) + (extremity_score * 20))), 1)
 
     # =========================================================================
-    # 📱【核心重排】瀑布流式大模块划分 UX 布局 
+    # 📱【核心重排】瀑布流式大模块划分 UX 布局 (要求 6 完全落实)
     # =========================================================================
     
     # 💠 [模块 I]：链上确权凭证 (SBT) 
@@ -415,11 +402,11 @@ else:
     </div>
     """)
 
-    # 🧬 [模块 II]：核心架构与协同沙盘
-    render_html("<div class='module-title'>🧬 模块 II：核心架构与协同沙盘</div>")
-    col_top_l, col_top_r = st.columns([1.1, 1], gap="large")
+    # 🧬 [模块 II]：核心图谱大卡
+    render_html("<div class='module-title'>🧬 模块 II：核心资产图谱</div>")
+    col_card_l, col_card_r, col_card_pad = st.columns([1.5, 1, 0.1], gap="large")
 
-    with col_top_l:
+    with col_card_l:
         tags_html_web = " ".join([f"<span style='background:rgba(0, 243, 255, 0.1); color:#00f3ff !important; border:1px solid rgba(0,243,255,0.4); padding:6px 14px; border-radius:6px; font-size:13px; font-weight:900; margin:4px; display:inline-block;'>{t}</span>" for t in data['tags']])
         skills_html_web = " ".join([f"<span style='background:linear-gradient(90deg, rgba(168,85,247,0.3), rgba(168,85,247,0.1)); border:1px solid rgba(168,85,247,0.6); border-left:3px solid #a855f7; padding:4px 10px; border-radius:4px; font-size:12px; color:#e9d5ff; font-weight:bold; display:inline-block; margin:4px; box-shadow: 0 0 10px rgba(168,85,247,0.2);'>{s}</span>" for s in data['skills']])
         
@@ -452,29 +439,31 @@ else:
         </div>
         """)
 
-    with col_top_r:
-        render_html("<div style='font-size:14px; color:#94a3b8; margin-bottom:15px; line-height:1.6;'>输入团队成员或领导的核心架构代码，系统将立刻测算你们的协同匹配度：</div>")
+    with col_card_r:
+        # 🤝 [模块 III]：跨域算力协同沙盘 (要求 3 完全落实)
+        render_html("<div class='module-title' style='margin-top: 0;'>🤝 模块 III：跨域协同沙盘</div>")
+        render_html("<div style='font-size:14px; color:#94a3b8; margin-bottom:15px; line-height:1.6;'>输入团队成员或领导的架构代码，测算协同匹配度：</div>")
         pmbti = st.selectbox("🎯 挂载目标协作节点 (选择对方代码):", options=list(mbti_details.keys()), index=list(mbti_details.keys()).index("ESTJ"), label_visibility="collapsed")
         sc, sd = calculate_synergy(mbti, pmbti)
         
         render_html(f"""
         <div style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.5); padding: 30px; border-radius: 12px; margin-top:10px; text-align:center; box-shadow: 0 0 30px rgba(59,130,246,0.15);">
             <div style="font-family:'Orbitron', sans-serif; color:#3b82f6; font-size:14px; font-weight:bold; margin-bottom:15px; letter-spacing: 3px;">[ SYNERGY MATCH RATE ]</div>
-            <div class="synergy-score" style="font-family:'Orbitron', sans-serif; font-size:65px; font-weight:900; color:#fff; text-shadow:0 0 35px rgba(59,130,246,0.8); margin-bottom:20px;">{sc}%</div>
-            <div style="color:#e2e8f0; font-size:15px; font-weight:bold; line-height:1.7;">{sd}</div>
+            <div class="synergy-score" style="font-family:'Orbitron', sans-serif; font-size:55px; font-weight:900; color:#fff; text-shadow:0 0 35px rgba(59,130,246,0.8); margin-bottom:20px;">{sc}%</div>
+            <div style="color:#e2e8f0; font-size:14px; font-weight:bold; line-height:1.7;">{sd}</div>
         </div>
         """)
         
         render_html("<h5 style='color:#10b981; margin-top:25px; margin-bottom:10px;'>💡 黄金搭档建议：</h5>")
         render_html(f"""
         <div style='background: rgba(16,185,129,0.1); border-left:4px solid #10b981; padding:20px; border-radius:4px; font-size:14px; color:#e2e8f0; line-height: 1.6;'>
-            您目前的最佳生态拍档为：<br><b style='color:#10b981; font-size:18px;'>{data['partner']}</b><br><br>{data['partner_advice']}
+            您的最佳生态拍档为：<br><b style='color:#10b981; font-size:18px;'>{data['partner']}</b><br><br>{data['partner_advice']}
         </div>
         """)
 
-    # 🗄️ [模块 III]：多维算力深潜控制台
-    render_html("<div class='module-title'>🗄️ 模块 III：多维算力深潜控制台</div>")
-    col_mid_l, col_mid_r = st.columns([1, 1.1], gap="large")
+    # 🕸️ [模块 IV]：雷达矩阵与风控仪
+    render_html("<div class='module-title'>🕸️ 模块 IV：算力雷达与风控仪</div>")
+    col_mid_l, col_mid_r = st.columns([1, 1], gap="large")
     
     with col_mid_l:
         render_html("<div style='text-align:center; color:#00f3ff; font-weight:bold; margin-bottom:10px; font-family:Orbitron;'>/// RADAR MATRIX</div>")
@@ -508,68 +497,70 @@ else:
         st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False})
         render_html(f"<div style='text-align:center; font-size:14px; color:#e2e8f0; line-height:1.6; padding: 0 15px; margin-bottom:20px;'>{r_desc}</div>")
 
-        render_html("<div style='text-align:right; font-size:12px; color:#94a3b8; margin-bottom:10px; opacity:0.8;'>👉 手机端可左右滑动切换 Tabs 面板</div>")
-        
-        t_evo, t_mkt, t_3d, t_sol = st.tabs(["🔮 终极演进路线", "📉 市场 Alpha 压测", "🌌 3D 认知星图", "💻 智能合约底座"])
-        
-        with t_evo:
+    # 🗄️ [模块 V]：算力深潜控制台 (要求 4 完全落实)
+    render_html("<div class='module-title'>🗄️ 模块 V：算力深潜控制台 (DEEP DIVE)</div>")
+    render_html("<div style='text-align:right; font-size:12px; color:#94a3b8; margin-bottom:10px; opacity:0.8;'>👉 手机端可左右滑动切换 Tabs 面板</div>")
+    
+    t_evo, t_mkt, t_3d, t_sol = st.tabs(["🔮 终极演进路线", "📉 市场 Alpha 压测", "🌌 3D 认知星图", "💻 智能合约底座"])
+    
+    with t_evo:
+        render_html(f"""
+        <div style="margin-top:15px; margin-bottom:15px; border-left:3px solid #00f3ff; padding-left:15px; background:linear-gradient(90deg, rgba(0,243,255,0.1), transparent); padding-top:10px; padding-bottom:10px; border-radius: 0 6px 6px 0;">
+            <div style="color:#00f3ff; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;">PHASE 1 (CURRENT STATE)</div><div style="color:#fff; font-weight:bold; font-size:16px;">{data['evolution_path'][0]}</div>
+        </div>
+        <div style="margin-bottom:15px; border-left:3px solid #a855f7; padding-left:15px; background:linear-gradient(90deg, rgba(168,85,247,0.1), transparent); padding-top:10px; padding-bottom:10px; border-radius: 0 6px 6px 0; margin-left: 20px;">
+            <div style="color:#a855f7; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;">PHASE 2 (AWAKENING)</div><div style="color:#fff; font-weight:bold; font-size:16px;">{data['evolution_path'][1]}</div>
+        </div>
+        <div style="border-left:3px solid #ffd700; padding-left:15px; background:linear-gradient(90deg, rgba(255,215,0,0.15), transparent); padding-top:15px; padding-bottom:15px; border-radius: 0 6px 6px 0; margin-left: 40px; box-shadow: 0 0 20px rgba(255,215,0,0.1); margin-bottom:25px;">
+            <div style="color:#ffd700; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;">PHASE 3 (ULTIMATE DOMINANCE)</div><div style="color:#ffd700; font-weight:900; font-size:20px;">{data['ultimate_evolution']}</div>
+        </div>
+        """)
+        with st.expander("⚠️ 绝密防线：SDE 史诗级黑天鹅宕机推演"):
             render_html(f"""
-            <div style="margin-top:15px; margin-bottom:15px; border-left:3px solid #00f3ff; padding-left:15px; background:linear-gradient(90deg, rgba(0,243,255,0.1), transparent); padding-top:10px; padding-bottom:10px; border-radius: 0 6px 6px 0;">
-                <div style="color:#00f3ff; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;">PHASE 1 (CURRENT STATE)</div><div style="color:#fff; font-weight:bold; font-size:16px;">{data['evolution_path'][0]}</div>
-            </div>
-            <div style="margin-bottom:15px; border-left:3px solid #a855f7; padding-left:15px; background:linear-gradient(90deg, rgba(168,85,247,0.1), transparent); padding-top:10px; padding-bottom:10px; border-radius: 0 6px 6px 0; margin-left: 20px;">
-                <div style="color:#a855f7; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;">PHASE 2 (AWAKENING)</div><div style="color:#fff; font-weight:bold; font-size:16px;">{data['evolution_path'][1]}</div>
-            </div>
-            <div style="border-left:3px solid #ffd700; padding-left:15px; background:linear-gradient(90deg, rgba(255,215,0,0.15), transparent); padding-top:15px; padding-bottom:15px; border-radius: 0 6px 6px 0; margin-left: 40px; box-shadow: 0 0 20px rgba(255,215,0,0.1); margin-bottom:25px;">
-                <div style="color:#ffd700; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;">PHASE 3 (ULTIMATE DOMINANCE)</div><div style="color:#ffd700; font-weight:900; font-size:20px;">{data['ultimate_evolution']}</div>
+            <div style="padding: 5px 10px; font-size: 14px; color: #cbd5e1; line-height: 1.7;">
+                <div style="color: #f43f5e; font-weight: 900; margin-bottom: 5px; font-size:15px; letter-spacing:1px;">[ 致命崩溃盲点 ]</div>
+                <div style="margin-bottom: 15px;">{data['black_swan']}</div>
+                <div style="color: #10b981; font-weight: 900; margin-bottom: 5px; font-size:15px; letter-spacing:1px;">[ 官方热修复补丁 ]</div>
+                <div>{data['patch']}</div>
             </div>
             """)
-            with st.expander("⚠️ 绝密防线：SDE 史诗级黑天鹅宕机推演"):
-                render_html(f"""
-                <div style="padding: 5px 10px; font-size: 14px; color: #cbd5e1; line-height: 1.7;">
-                    <div style="color: #f43f5e; font-weight: 900; margin-bottom: 5px; font-size:15px; letter-spacing:1px;">[ 致命崩溃盲点 ]</div>
-                    <div style="margin-bottom: 15px;">{data['black_swan']}</div>
-                    <div style="color: #10b981; font-weight: 900; margin-bottom: 5px; font-size:15px; letter-spacing:1px;">[ 官方热修复补丁 ]</div>
-                    <div>{data['patch']}</div>
-                </div>
-                """)
 
-        with t_mkt:
-            render_html("<div class='panel-title' style='color:#ffd700; border-color:#ffd700; margin-top:15px;'>/// 30-DAY MARKET ROI SIMULATION (ALPHA)</div>")
-            render_html(f"<div style='font-size:14px; color:#e2e8f0; margin-bottom:10px;'>基于随机游走推演的交易风格：<br><span style='color:#ffd700; font-weight:bold; font-size:15px;'>【 {data['market_style']} 】</span></div>")
-            fig_roi = go.Figure()
-            lc = "#10b981" if roi_arr[-1] >= 100 else "#f43f5e"
-            fig_roi.add_trace(go.Scatter(x=d_arr, y=roi_arr, mode='lines', line=dict(color=lc, width=3), fill='tozeroy', fillcolor=f'rgba({16 if roi_arr[-1]>=100 else 244}, {185 if roi_arr[-1]>=100 else 63}, {129 if roi_arr[-1]>=100 else 94}, 0.15)'))
-            fig_roi.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=10, r=10, t=10, b=10), height=300, xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)'), yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', title='SDE Alpha Net Value'))
-            st.plotly_chart(fig_roi, use_container_width=True, config={'displayModeBar': False})
+    with t_mkt:
+        render_html("<div class='panel-title' style='color:#ffd700; border-color:#ffd700; margin-top:15px;'>/// 30-DAY MARKET ROI SIMULATION (ALPHA)</div>")
+        render_html(f"<div style='font-size:14px; color:#e2e8f0; margin-bottom:10px;'>基于随机游走推演的交易风格：<br><span style='color:#ffd700; font-weight:bold; font-size:15px;'>【 {data['market_style']} 】</span></div>")
+        fig_roi = go.Figure()
+        lc = "#10b981" if roi_arr[-1] >= 100 else "#f43f5e"
+        fig_roi.add_trace(go.Scatter(x=d_arr, y=roi_arr, mode='lines', line=dict(color=lc, width=3), fill='tozeroy', fillcolor=f'rgba({16 if roi_arr[-1]>=100 else 244}, {185 if roi_arr[-1]>=100 else 63}, {129 if roi_arr[-1]>=100 else 94}, 0.15)'))
+        fig_roi.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=10, r=10, t=10, b=10), height=300, xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)'), yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', title='SDE Alpha Net Value'))
+        st.plotly_chart(fig_roi, use_container_width=True, config={'displayModeBar': False})
 
-        with t_3d:
-            render_html("<div class='panel-title' style='color:#00f3ff; border-color:#00f3ff; margin-top:15px;'>/// 3D COGNITIVE TOPOLOGY MAP</div>")
-            render_html("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px;'>降维映射至三维空间 (支持鼠标/触控 360° 拖拽)。背景点阵为抽样全网节点。</div>")
-            np.random.seed(int(hash_code[:6], 16))
-            x_v = val_E if res['E'] >= 0 else -val_I
-            y_v = val_N if res['S'] <= 0 else -val_S
-            z_v = val_T if res['T'] >= 0 else -val_F
-            f3d = go.Figure()
-            f3d.add_trace(go.Scatter3d(x=np.random.randint(-100,100,size=100), y=np.random.randint(-100,100,size=100), z=np.random.randint(-100,100,size=100), mode='markers', marker=dict(size=4, color='#334155', opacity=0.6), name='全网抽样节点'))
-            f3d.add_trace(go.Scatter3d(x=[x_v], y=[y_v], z=[z_v], mode='markers+text', text=[mbti], textposition="top center", marker=dict(size=16, color=tier_color, symbol='diamond', line=dict(color='#fff', width=2)), textfont=dict(color=tier_color, size=18, family="Orbitron", weight="bold"), name='当前授权节点'))
-            f3d.update_layout(scene=dict(xaxis_title='执行↔深潜', yaxis_title='实务↔前瞻', zaxis_title='共情↔刚性', xaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b"), yaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b"), zaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b")), paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, t=0, b=0), height=400, showlegend=False)
-            st.plotly_chart(f3d, use_container_width=True, config={'displayModeBar': False})
+    with t_3d:
+        render_html("<div class='panel-title' style='color:#00f3ff; border-color:#00f3ff; margin-top:15px;'>/// 3D COGNITIVE TOPOLOGY MAP</div>")
+        render_html("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px;'>将多维指标降维映射至三维空间 (支持鼠标/触控 360° 拖拽)。背景点阵为抽样全网节点。</div>")
+        np.random.seed(int(hash_code[:6], 16))
+        x_v = val_E if res['E'] >= 0 else -val_I
+        y_v = val_N if res['S'] <= 0 else -val_S
+        z_v = val_T if res['T'] >= 0 else -val_F
+        f3d = go.Figure()
+        f3d.add_trace(go.Scatter3d(x=np.random.randint(-100,100,size=100), y=np.random.randint(-100,100,size=100), z=np.random.randint(-100,100,size=100), mode='markers', marker=dict(size=4, color='#334155', opacity=0.6), name='全网抽样节点'))
+        f3d.add_trace(go.Scatter3d(x=[x_v], y=[y_v], z=[z_v], mode='markers+text', text=[mbti], textposition="top center", marker=dict(size=16, color=tier_color, symbol='diamond', line=dict(color='#fff', width=2)), textfont=dict(color=tier_color, size=18, family="Orbitron", weight="bold"), name='当前授权节点'))
+        f3d.update_layout(scene=dict(xaxis_title='执行↔深潜', yaxis_title='实务↔前瞻', zaxis_title='共情↔刚性', xaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b"), yaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b"), zaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b")), paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, t=0, b=0), height=400, showlegend=False)
+        st.plotly_chart(f3d, use_container_width=True, config={'displayModeBar': False})
 
-        with t_sol:
-            render_html("<div class='panel-title' style='color:#10b981; border-color:#10b981; margin-top:15px;'>/// SOLIDITY SMART CONTRACT MINT LOG</div>")
-            render_html("<div style='font-size:12px; color:#94a3b8; margin-bottom:10px;'>系统已自动为您生成专属的以太坊 ERC721 确权智能合约源码。</div>")
-            code_block = f"""// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\nimport "@sde-network/contracts/token/ERC721.sol";\n\ncontract SDE_Talent_Registry_V1 is ERC721 {{\n    struct Profile {{\n        string matrix_id;\n        uint256 valuation_sde;\n        uint8 decisiveness;\n        string tier;\n    }}\n    \n    mapping(uint256 => Profile) public nodes;\n    \n    constructor() ERC721("SDE_NODE_V1", "SDEN") {{}}\n\n    // =====================================\n    // SYSTEM MINT LOG \n    // MINTED_TO: {safe_alias_final}\n    // BLOCK_HEIGHT: {block_height}\n    // CONTRACT_ADDR: {contract_addr}\n    // =====================================\n    \n    function executeMint() public {{\n        uint256 tokenId = {token_id};\n        nodes[tokenId] = Profile("{mbti}", {asset_valuation}, {decisiveness}, "{tier_level}");\n        _mint(msg.sender, tokenId);\n    }}\n}}"""
-            st.markdown('<div data-testid="stCodeBlock">', unsafe_allow_html=True)
-            st.code(code_block, language="solidity")
-            st.markdown('</div>', unsafe_allow_html=True)
-            
-            render_html("<div class='panel-title' style='color:#f43f5e; border-color:#f43f5e; margin-top:20px; border-bottom:none;'>/// TOP SECRET DIRECTIVES ///</div>")
-            tasks_html = "".join([f"<div class='mission-item'><span style='color:#e2e8f0; font-size:14px; font-weight:bold;'>{t}</span></div>" for t in data['tasks']])
-            render_html(f"<div style='margin-bottom: 10px;'>{tasks_html}</div>")
+    with t_sol:
+        render_html("<div class='panel-title' style='color:#10b981; border-color:#10b981; margin-top:15px;'>/// SOLIDITY SMART CONTRACT MINT LOG</div>")
+        render_html("<div style='font-size:12px; color:#94a3b8; margin-bottom:10px;'>系统已自动为您生成专属的以太坊 ERC721 确权智能合约源码。</div>")
+        code_block = f"""// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\nimport "@sde-network/contracts/token/ERC721.sol";\n\ncontract SDE_Talent_Registry_V1 is ERC721 {{\n    struct Profile {{\n        string matrix_id;\n        uint256 valuation_sde;\n        uint8 decisiveness;\n        string tier;\n    }}\n    \n    mapping(uint256 => Profile) public nodes;\n    \n    constructor() ERC721("SDE_NODE_V1", "SDEN") {{}}\n\n    // =====================================\n    // SYSTEM MINT LOG \n    // MINTED_TO: {safe_alias_final}\n    // BLOCK_HEIGHT: {block_height}\n    // CONTRACT_ADDR: {contract_addr}\n    // =====================================\n    \n    function executeMint() public {{\n        uint256 tokenId = {token_id};\n        nodes[tokenId] = Profile("{mbti}", {asset_valuation}, {decisiveness}, "{tier_level}");\n        _mint(msg.sender, tokenId);\n    }}\n}}"""
+        st.markdown('<div data-testid="stCodeBlock">', unsafe_allow_html=True)
+        st.code(code_block, language="solidity")
+        st.markdown('</div>', unsafe_allow_html=True)
+        
+        render_html("<div class='panel-title' style='color:#f43f5e; border-color:#f43f5e; margin-top:20px; border-bottom:none;'>/// TOP SECRET DIRECTIVES ///</div>")
+        tasks_html = "".join([f"<div class='mission-item'><span style='color:#e2e8f0; font-size:14px; font-weight:bold;'>{t}</span></div>" for t in data['tasks']])
+        render_html(f"<div style='margin-bottom: 10px;'>{tasks_html}</div>")
 
-    # 📥 [模块 IV]：资产提取与分享终端
-    render_html("<div class='module-title'>📥 模块 IV：数据要素资产提取终端</div>")
+    # 📥 [模块 VI]：资产提取与分享终端
+    render_html("<div class='module-title'>📥 模块 VI：资产全息提取终端</div>")
     t_img, t_txt, t_json = st.tabs(["📸 防白屏全息海报 (长按发圈)", "📝 纯文本通讯协议", "💾 极客 JSON 底包档案"])
 
     with t_img:
@@ -586,6 +577,7 @@ else:
         tags_html_poster = "".join([f"<span style='background:rgba(0,243,255,0.1); border:1px solid rgba(0,243,255,0.5); padding:4px 8px; border-radius:4px; font-size:11px; color:#00f3ff; font-weight:bold; margin:3px; display:inline-block;'>{t}</span>" for t in data['tags']])
         skills_html_poster = "".join([f"<span style='background:linear-gradient(90deg, rgba(168,85,247,0.3), rgba(168,85,247,0.1)); border:1px solid rgba(168,85,247,0.6); border-left:3px solid #a855f7; padding:4px 8px; border-radius:4px; font-size:11px; color:#e9d5ff; font-weight:bold; display:inline-block; margin:3px;'>{s}</span>" for s in data['skills']])
 
+        # 使用顶格 HTML 防止 Markdown 缩进污染
         html_to_image_script = f"""
 <!DOCTYPE html>
 <html>
@@ -766,7 +758,7 @@ executeRender();
         st.button("⏏ 强行切断连接并重启终端 (SYS_REBOOT)", on_click=reset_system, type="primary", use_container_width=True)
 
 # =========================================================================
-# 🛑 [ CORE 07 ] 赛博呼吸专属版权区
+# 🛑 [ CORE 07 ] 赛博呼吸专属版权区 (要求 1 完全落实)
 # =========================================================================
 render_html(f"""
 <div style="text-align:center; margin-top:80px; margin-bottom:40px; position:relative; z-index:10;">
