@@ -20,14 +20,10 @@ SYS_NAME = "SDE 核心人才算力引擎 | V 1.0"
 # 宽屏布局，为响应式瀑布流提供极致空间
 st.set_page_config(page_title=SYS_NAME, page_icon="💠", layout="wide", initial_sidebar_state="collapsed")
 
-# 🚨 终极防爆工具：强行剥离所有前置特殊空格，杜绝 Streamlit 错误识别为代码块
-def render_html(html_str):
-    cleaned = '\n'.join([line.lstrip() for line in html_str.split('\n') if line.strip() != ''])
-    st.markdown(cleaned, unsafe_allow_html=True)
-
 # ==============================================================================
-# 🎨 [ CORE 02 ] 赛博全息 UI 渲染底座 (深度适配手机端排版)
+# 🎨 [ CORE 02 ] 赛博全息 UI 渲染底座 (绝对防爆版)
 # ==============================================================================
+# 🚨 警告：此处的 CSS 必须顶格写，绝不能有任何 Markdown 缩进！
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&family=Fira+Code:wght@400;600&display=swap');
@@ -58,76 +54,69 @@ html, body, .stApp { background-color: #030712 !important; font-family: 'Noto Sa
 @keyframes glitch-anim-1 { 0% { clip-path: inset(20% 0 80% 0); } 20% { clip-path: inset(60% 0 10% 0); } 40% { clip-path: inset(40% 0 50% 0); } 60% { clip-path: inset(80% 0 5% 0); } 80% { clip-path: inset(10% 0 70% 0); } 100% { clip-path: inset(30% 0 20% 0); } }
 @keyframes glitch-anim-2 { 0% { clip-path: inset(10% 0 60% 0); } 20% { clip-path: inset(30% 0 20% 0); } 40% { clip-path: inset(70% 0 10% 0); } 60% { clip-path: inset(20% 0 50% 0); } 80% { clip-path: inset(90% 0 5% 0); } 100% { clip-path: inset(50% 0 30% 0); } }
 
-/* 📱 手机端排版特化 */
+/* 模块大标题 */
+.module-title { color: #00f3ff; border-left: 5px solid #00f3ff; padding-left: 12px; font-weight: 900; margin-top: 40px; margin-bottom: 20px; letter-spacing: 1px; font-family: 'Noto Sans SC', sans-serif; text-shadow: 0 0 10px rgba(0,243,255,0.4); background: linear-gradient(90deg, rgba(0,243,255,0.1), transparent); padding-top: 8px; padding-bottom: 8px; border-radius: 4px; }
+
+/* 📱 手机端弹性适配 (绝不撑爆) */
 @media (max-width: 768px) {
     .hero-title { font-size: 26px !important; letter-spacing: 2px !important; }
-    .mbti-code { font-size: 50px !important; }
-    .block-container { padding-top: 2rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
-    .terminal-container { padding: 15px !important; }
+    .mbti-code { font-size: 55px !important; }
+    .block-container { padding-top: 1.5rem !important; padding-left: 1rem !important; padding-right: 1rem !important; }
     .module-title { font-size: 15px !important; margin-top: 25px !important; padding-top: 10px !important;}
     div[data-testid="stColumns"] > div { margin-bottom: 20px; } 
-    .synergy-score { font-size: 45px !important; }
 }
 
-/* 模块大标题 (逻辑分割线) */
-.module-title { color: #00f3ff; border-left: 5px solid #00f3ff; padding-left: 12px; font-weight: 900; margin-top: 45px; margin-bottom: 20px; letter-spacing: 1px; font-family: 'Noto Sans SC', sans-serif; text-shadow: 0 0 10px rgba(0,243,255,0.4); background: linear-gradient(90deg, rgba(0,243,255,0.1), transparent); padding-top: 8px; padding-bottom: 8px; border-radius: 4px; }
-
+/* 终端容器 */
 .terminal-container { background: rgba(8, 15, 30, 0.85); border: 1px solid rgba(0,243,255,0.4); padding: 25px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 14px; color: #e2e8f0; box-shadow: inset 0 0 20px rgba(0,243,255,0.1), 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 30px; }
 .cursor-blink { display: inline-block; width: 10px; height: 18px; background: #00f3ff; animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-/* 表单与按钮 */
+/* 表单与按钮 (绝不漏代码) */
 div[data-testid="stForm"] { max-width: 600px; margin: 0 auto; border: none !important; background: transparent !important;}
-div[data-testid="stTextInput"] > div > div > input { background-color: rgba(4, 9, 20, 0.9) !important; color: #00f3ff !important; font-family: 'Orbitron', monospace !important; border: 1px solid rgba(0,243,255,0.5) !important; border-radius: 6px !important; text-align: center; font-size: 18px !important; font-weight: bold !important; letter-spacing: 2px; box-shadow: inset 0 0 20px rgba(0,243,255,0.1) !important; transition: all 0.3s ease; height: 50px; }
+div[data-testid="stTextInput"] > div > div > input { background-color: rgba(4, 9, 20, 0.9) !important; color: #00f3ff !important; font-family: 'Orbitron', monospace !important; border: 1px solid rgba(0,243,255,0.5) !important; border-radius: 6px !important; text-align: center; font-size: 18px !important; font-weight: bold !important; box-shadow: inset 0 0 20px rgba(0,243,255,0.1) !important; }
 div[data-testid="stTextInput"] > div > div > input:focus { border-color: #ffd700 !important; box-shadow: 0 0 25px rgba(255,215,0,0.4), inset 0 0 15px rgba(255,215,0,0.1) !important; }
 
 div.stButton > button { background: linear-gradient(135deg, #0f172a 0%, #040914 100%) !important; border: 1px solid rgba(0, 243, 255, 0.3) !important; border-left: 4px solid rgba(0, 243, 255, 0.6) !important; border-radius: 6px !important; min-height: 60px !important; width: 100% !important; text-align: left !important; box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important; transition: all 0.2s ease !important; }
 div.stButton > button p { color: #ffffff !important; font-size: 14px !important; font-weight: 500 !important; }
 div.stButton > button:hover { border-color: #00f3ff !important; border-left: 6px solid #00f3ff !important; box-shadow: 0 0 20px rgba(0,243,255,0.3) !important; transform: translateX(4px) !important; }
-
 div.stButton > button[data-testid="baseButton-primary"] { background: linear-gradient(90deg, #00f3ff, #0088ff) !important; border-left: none !important; text-align: center !important; }
 div.stButton > button[data-testid="baseButton-primary"] p { color: #010308 !important; font-weight: 900 !important; letter-spacing: 2px !important; }
 
-/* 大屏卡片与面板 */
+/* 大屏卡片 */
 .result-card { padding: 40px 30px; border-radius: 12px; background: rgba(8, 15, 30, 0.95) !important; border: 1px solid rgba(255,215,0,0.3); border-top: 6px solid #ffd700; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 30px rgba(255,215,0,0.05); margin-bottom: 20px; position:relative; overflow:hidden;}
 .mbti-code { font-family: 'Orbitron', sans-serif !important; font-size: clamp(55px, 8vw, 80px); font-weight: 900; color: #ffd700 !important; line-height: 1.1; letter-spacing: 6px; text-shadow: 0 0 35px rgba(255,215,0,0.6); margin: 5px 0;}
 .tier-badge { position: absolute; top: 20px; right: -45px; background: #ffd700; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 13px; padding: 5px 50px; transform: rotate(45deg); z-index: 10; letter-spacing: 2px; box-shadow: 0 0 20px rgba(255,215,0,0.8);}
 
-/* Tabs 全息导航坞 */
+/* Tabs 全息导航 */
 [data-testid="stTabs"] button { color: #64748b !important; font-family: 'Noto Sans SC', sans-serif !important; font-weight: 900 !important; font-size: clamp(13px, 2vw, 15px) !important; padding-bottom: 12px !important; transition: all 0.3s ease; }
 [data-testid="stTabs"] button[aria-selected="true"] { color: #00f3ff !important; border-bottom-color: #00f3ff !important; border-bottom-width: 3px !important; text-shadow: 0 0 15px rgba(0,243,255,0.6); background: rgba(0,243,255,0.05); }
 
-/* 代码块保护 */
-div[data-testid="stCodeBlock"], div[data-testid="stCodeBlock"] > div { background-color: #050505 !important; border-color: #333 !important; }
+/* 代码块深色保护 */
+div[data-testid="stCodeBlock"] > div { background-color: #050505 !important; border-color: #333 !important; }
 div[data-testid="stCodeBlock"] pre, div[data-testid="stCodeBlock"] code { font-family: 'Fira Code', monospace !important; font-size: 12px !important; color: #10b981 !important; line-height: 1.5 !important;}
 div[data-testid="stCodeBlock"] { border-left: 4px solid #10b981 !important; border-radius: 6px !important; margin-top: 10px; }
 .cli-box { background: #000000; border: 1px solid #334155; border-left: 4px solid #00f3ff; padding: 20px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 13px; color: #4ade80; box-shadow: inset 0 0 30px rgba(0,243,255,0.15); margin-top: 20px; word-break: break-all; line-height: 1.6;}
-
-/* 折叠框与任务板 */
-[data-testid="stExpander"] { background: rgba(5, 10, 21, 0.9) !important; border: 1px solid rgba(244, 63, 94, 0.5) !important; border-radius: 8px !important; overflow: hidden; margin-bottom: 20px;}
-[data-testid="stExpander"] summary { background: rgba(244, 63, 94, 0.1); color: #f43f5e !important; font-weight: 900 !important; font-size: 15px !important; padding: 15px !important; }
-.mission-item { border-left: 3px solid #f43f5e; padding-left: 15px; margin-bottom: 12px; background: rgba(244,63,94,0.05); padding-top: 10px; padding-bottom: 10px; border-radius: 0 4px 4px 0; }
 
 /* 专属下载按钮 */
 div[data-testid="stDownloadButton"] > button { background: rgba(5, 12, 25, 0.95) !important; border: 1px dashed rgba(16, 185, 129, 0.8) !important; border-left: 6px solid #10b981 !important; margin-top: 20px; border-radius: 6px !important; height: 55px; text-align: center !important; width: 100% !important;}
 div[data-testid="stDownloadButton"] > button p { color: #10b981 !important; font-family: 'Orbitron', monospace !important; font-weight: bold !important; letter-spacing: 2px !important; font-size: 14px !important;}
 div[data-testid="stDownloadButton"] > button:hover { background: rgba(16, 185, 129, 0.15) !important; box-shadow: 0 0 30px rgba(16,185,129,0.5) !important; transform: scale(1.02) !important; }
 
-/* 版权呼吸灯 (要求 1 完全落实) */
-.copyright-niliu { display: inline-block; padding: 12px 35px; border-radius: 50px; font-size: 13px; font-family: "Noto Sans SC", sans-serif; letter-spacing: 2px; color: #00f3ff; font-weight: 900; background: rgba(0,243,255,0.05); border: 1px solid rgba(0,243,255,0.3); animation: neon-breathe 2.5s infinite alternate; box-shadow: 0 0 20px rgba(0,243,255,0.2); transition: all 0.3s ease; }
-.copyright-niliu:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0,243,255,0.8), inset 0 0 15px rgba(0,243,255,0.5); border-color: #00f3ff; }
+/* 🌟 版权呼吸灯 (要求1：无名逆流专属特效) */
+.copyright-niliu { display: inline-block; padding: 12px 35px; border-radius: 50px; font-size: 13px; font-family: "Noto Sans SC", sans-serif; letter-spacing: 2px; color: #00f3ff; font-weight: 900; background: rgba(0,243,255,0.05); border: 1px solid rgba(0,243,255,0.3); animation: neon-breathe 2.5s infinite alternate; transition: all 0.3s ease; box-shadow: 0 0 20px rgba(0,243,255,0.2); }
+.copyright-niliu:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0,243,255,0.8), inset 0 0 15px rgba(0,243,255,0.5); border-color: #00f3ff; text-shadow: 0 0 10px #00f3ff; }
 @keyframes neon-breathe { 0% { box-shadow: 0 0 10px rgba(0,243,255,0.1), inset 0 0 5px rgba(0,243,255,0.1); border-color: rgba(0,243,255,0.2); text-shadow: none; } 100% { box-shadow: 0 0 25px rgba(0,243,255,0.6), inset 0 0 15px rgba(0,243,255,0.2); border-color: rgba(0,243,255,0.7); text-shadow: 0 0 10px #00f3ff; } }
 
-/* 结算烟花 */
+/* 🎆 结算科技烟花 (要求2：代码科技词汇) */
 .firework-center { position: fixed; top: 50%; left: 50%; z-index: 99998; pointer-events: none; font-weight: 900; font-family: 'Orbitron', monospace; color: #00f3ff; text-shadow: 0 0 20px #00f3ff, 0 0 30px #ffffff; animation: supernova 1.8s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;}
 @keyframes supernova { 0% { transform: translate(-50%, -50%) scale(0.1) rotate(0deg); opacity: 1; } 100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(var(--s)) rotate(var(--rot)); opacity: 0; filter: blur(2px);} }
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================================================================
-# 📊 [ CORE 03 ] 顶部跑马灯与动效算法 (要求 5 完全落实)
+# 📊 [ CORE 03 ] 顶部跑马灯与动效算法 (要求 5)
 # ==============================================================================
-render_html("""
+st.markdown("""
 <div class="ticker-wrap"><div class="ticker">
     <span>SDE-CORE: V1.0 SECURE <b class="up">▲ONLINE</b></span>
     <span>NODE: IMMUTABLE STATE <b class="up">▲LOCKED</b></span>
@@ -137,11 +126,10 @@ render_html("""
     <span>CROSS-BORDER: PROTOCOL SYNC <b class="up">▲ESTABLISHED</b></span>
     <span>SDE-CORE: V1.0 SECURE <b class="up">▲ONLINE</b></span>
 </div></div>
-""")
+""", unsafe_allow_html=True)
 
 def trigger_supernova():
     html_str = ""
-    # 要求 2 落实：替换为极客科技词汇
     vocab = ["DATA", "NODE", "HASH", "ASSET", "SYNC", "SDE", "MINT"]
     for _ in range(35): 
         tx = random.uniform(200, 800) * math.cos(random.uniform(0, 2 * math.pi))
@@ -158,7 +146,7 @@ def generate_alpha_curve(base_roi, volatility, seed):
     return days, roi
 
 # ==============================================================================
-# 🧠 [ CORE 04 ] 题库满血版：40 道极客业务题 (要求 8 完全落实，一字未删)
+# 🧠 [ CORE 04 ] 题库满血版：40 道极客业务题 (要求 8)
 # ==============================================================================
 questions = [
     {"q": "推动数商入场时，我倾向于亲自拜访机构进行面对面沟通，而非仅在线上发送标准入驻指引。", "dim": "E"},
@@ -206,7 +194,7 @@ questions = [
     {"q": "面对多线并行的复杂任务（如同时筹备路演与审核规则），我必须先确认优先级并排好序才能安心执行。", "dim": "J"}
 ]
 
-# 🚨 18 维满血防爆字典：彻底补齐所有字典键值对 (要求 8 完全落实，一字未删)
+# 🚨 18 维满血防爆字典：彻底补齐所有字典键值对，保证 0 报错！
 mbti_details = {
     "INTJ": {"role": "首席数据架构师", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.2%", "base_hash": 9850, "base_roi": 1.45, "volatility": 0.20, "market_style": "宏观架构对冲与长期趋势跟踪策略", "desc": "数据要素底座的“造物主”，致力于为错综复杂的数字经济构建严密的底层制度与逻辑规则。", "tags": ["顶层设计", "逻辑闭环", "制度自信"], "skills": ["全局视野(Lv.Max)", "数据解构", "生态共振"], "evolution_path": ["L1 架构规划官", "L2 核心规则主理人", "L3 绝对算力主宰"], "ultimate_evolution": "【绝对算力主宰】掌控数据产品的终极业务定价权", "partner": "ENTJ (高效执行统筹)", "partner_advice": "将战略落地交由 ENTJ 推进，您只需稳控全局架构不跑偏。", "tasks": ["主导 SDE 核心确权底层逻辑架构设计", "重构下一代高并发撮合交易引擎逻辑"], "black_swan": "过度追求底层架构完美闭环。面临突发政策转向时，系统极易因过于重型而无法敏捷掉头。", "patch": "在构建宏大的交易规则体系时，请适当为前台业务预留“沙盒容错”空间。"},
     "INTP": {"role": "量化风控专家", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.1%", "base_hash": 9620, "base_roi": 1.60, "volatility": 0.45, "market_style": "高频统计套利与多因子量化模型", "desc": "穿透数据迷雾，寻找复杂业务表象下的底层逻辑漏洞与确权定价模型的最优解。", "tags": ["深度解构", "模型驱动", "极客思维"], "skills": ["特征抽取(Lv.Max)", "漏洞侦测", "异动推演"], "evolution_path": ["L1 风控分析师", "L2 模型主理人", "L3 全知算法先知"], "ultimate_evolution": "【全知算法先知】构建百分百无损的跨网底层风控引擎", "partner": "ENTP (模式发散节点)", "partner_advice": "借助 ENTP 的发散思维寻找商业变现出口，避免陷入纯理论。", "tasks": ["研发基于特征因子的数据资产动态定价算法", "建立实时数据异常交易嗅探与阻断模型"], "black_swan": "陷入“分析瘫痪”。在需要极速拍板的确权灰度地带，过度追求最优解往往导致商机流失。", "patch": "尝试将极其高维的理论模型降维封装，形成非技术人员也能看懂的《操作指南》。"},
@@ -260,7 +248,7 @@ if not st.session_state.started:
     st.markdown("<div style='margin-top:80px;'></div>", unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        render_html(f"""
+        st.markdown(f"""
         <div style="text-align: center; margin-bottom: 20px;">
             <div style="color:#00f3ff; font-family:'Orbitron', monospace; font-size:14px; letter-spacing:8px; margin-bottom:10px;">SHANGHAI DATA EXCHANGE</div>
             <h1 class="hero-title" data-text="职场算力终端 V 1.0">职场算力终端 V 1.0</h1><br>
@@ -269,26 +257,26 @@ if not st.session_state.started:
         
         <div class="terminal-container">
             <div style="font-family:'Orbitron', monospace; color:#00f3ff; margin-bottom:15px; font-weight:bold;">> SYSTEM BOOT SEQUENCE...</div>
-            <div class="term-line"><span style="color:#94a3b8;">[OK]</span> Securing root connection to SDE Ledger.</div>
-            <div class="term-line"><span style="color:#94a3b8;">[OK]</span> Loading 40-Node Matrix Algorithm V1.0.</div>
-            <div class="term-line-main">
+            <div style="margin-bottom:5px;"><span style="color:#94a3b8;">[OK]</span> Securing root connection to SDE Ledger.</div>
+            <div style="margin-bottom:5px;"><span style="color:#94a3b8;">[OK]</span> Loading 40-Node Matrix Algorithm V1.0.</div>
+            <div>
                 <br><span style="color:#ffffff; font-size: 15px; font-family: 'Noto Sans SC', sans-serif; line-height: 1.8;"><b>2026年是数据要素价值释放的突破之年。</b><br><br>
                 在“数据乘数”加速赋能实体经济的当下，本终端将全方位扫描您的职场决策链路与风控模型。<br>
                 您的物理能力将被<b>「全息要素化」</b>，系统将为您生成不可篡改的<b>高阶职场算力凭证与智能合约面板</b>。</span>
                 <span class="cursor-blink"></span>
             </div>
         </div>
-        """)
+        """, unsafe_allow_html=True)
         with st.form(key="login_form", border=False):
-            render_html("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:8px; text-align:center;'>▼ MOUNT NODE IDENTIFIER (输入职场称呼 / 授权代号) ▼</div>")
+            st.markdown("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:8px; text-align:center;'>▼ MOUNT NODE IDENTIFIER (输入职场称呼 / 授权代号) ▼</div>", unsafe_allow_html=True)
             st.text_input("", key="login_input", placeholder="例如：合规部_吴总监", label_visibility="collapsed")
-            render_html("<br>")
+            st.markdown("<br>", unsafe_allow_html=True)
             st.form_submit_button("▶ 授予系统权限并提取算力资产", on_click=start_assessment_callback, type="primary", use_container_width=True)
 
 elif st.session_state.calculating:
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        render_html("<h2 class='hero-title' data-text='[ HASHING NEURAL NETWORK ]' style='font-size:28px !important; margin-top:50px; text-align:center; display:block;'>[ HASHING NEURAL NETWORK ]</h2>")
+        st.markdown("<h2 class='hero-title' data-text='[ HASHING NEURAL NETWORK ]' style='font-size:28px !important; margin-top:50px; text-align:center; display:block;'>[ HASHING NEURAL NETWORK ]</h2>", unsafe_allow_html=True)
         mint_box = st.empty()
         h_logs = ""
         for _ in range(12):
@@ -306,12 +294,12 @@ elif st.session_state.current_q < len(questions):
         module_name = dim_map.get(q_data['dim'])
         dynamic_hash = hashlib.sha256(f"BLOCK_{st.session_state.current_q}_{q_data['q']}".encode()).hexdigest()[:10].upper()
         
-        render_html("<div style='padding-top:10px;'></div>")
+        st.markdown("<div style='padding-top:10px;'></div>", unsafe_allow_html=True)
         progress_val = (st.session_state.current_q + 1) / len(questions)
         st.progress(progress_val)
-        render_html(f"<div style='text-align:right; font-family:Orbitron, monospace; color:#00f3ff; font-size:12px; margin-top:5px;'>MINTING PROCESS: {int(progress_val*100)}%</div>")
+        st.markdown(f"<div style='text-align:right; font-family:Orbitron, monospace; color:#00f3ff; font-size:12px; margin-top:5px;'>MINTING PROCESS: {int(progress_val*100)}%</div>", unsafe_allow_html=True)
         
-        render_html(f"""
+        st.markdown(f"""
         <div style="background: rgba(10, 15, 25, 0.9); border: 1px solid rgba(0, 243, 255, 0.4); border-radius: 8px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 243, 255, 0.05); margin-top: 20px; margin-bottom: 30px; border-left: 5px solid #00f3ff;">
             <div style="display:flex; justify-content:space-between; font-family:monospace; color:#00f3ff; font-size:12px; margin-bottom:15px; border-bottom: 1px dashed rgba(0,243,255,0.3); padding-bottom:10px;">
                 <span style="font-family:'Orbitron', sans-serif; font-weight:bold;">SYS_MOD: {module_name}</span>
@@ -319,8 +307,9 @@ elif st.session_state.current_q < len(questions):
             </div>
             <div style="font-size: 18px; color: #ffffff !important; line-height: 1.8; font-weight: 700;">{q_data['q']}</div>
         </div>
-        """)
+        """, unsafe_allow_html=True)
         
+        # 绝不能有 HTML 标签
         opts = [("🚫 [ 强制阻断 ] 危险：完全背离我的直觉", 1), ("⚠️ [ 弱态耦合 ] 降级：仅在极端场景才用", 2), ("⚖️ [ 视境判定 ] 悬空：视具体业务环境而定", 3), ("🤝 [ 逻辑握手 ] 安全：常用的标准决策流", 4), ("🔒 [ 绝对锁定 ] 同步：完美复刻底层思维", 5)]
         for text, val in opts: 
             st.button(text, type="secondary", key=f"q_{st.session_state.current_q}_{val}", on_click=answer_callback, args=(val, q_data['dim']))
@@ -348,9 +337,9 @@ else:
 
     p_score, s_score = -res.get("J", 0), res.get("S", 0)
     risk_score = int(max(5, min(95, 50 + (p_score * 1.5) - (s_score * 1.5))))
-    if risk_score < 35: r_tag, r_color = "绝对合规与防线兜底", "#10b981"
-    elif risk_score < 65: r_tag, r_color = "动态演进与灰度平衡", "#ffd700"
-    else: r_tag, r_color = "无界扩张与极限破局", "#f43f5e"
+    if risk_score < 35: r_tag, r_color, r_desc = "底线合规与安全防线", "#10b981", "对合规红线有天然敬畏，极其适合把守数据存证大门。"
+    elif risk_score < 65: r_tag, r_color, r_desc = "动态演进与边界平衡", "#ffd700", "能够在监管锁死与商业吞吐间寻求黄金平衡接口。"
+    else: r_tag, r_color, r_desc = "无界扩张与极限破局", "#f43f5e", "拥有极高爆发性的业务创新能力，能极速抢占新兴赛道。"
 
     time_taken = max(1, st.session_state.end_time - st.session_state.start_time)
     
@@ -374,7 +363,6 @@ else:
     hash_code, block_height, current_time_str = asset["hash_code"], asset["block_height"], asset["time_str"]
     token_id, contract_addr = asset["token_id"], asset["contract_addr"]
     d_arr, roi_arr = asset["d_arr"], asset["roi_arr"]
-    syn_tech, syn_biz, syn_comp = asset.get("syn_tech", 85), asset.get("syn_biz", 80), asset.get("syn_comp", 90)
 
     avg_q_time = time_taken / len(questions)
     decisiveness = int(min(99, max(35, 100 - (max(0, avg_q_time - 2.5) * 5))))
@@ -389,8 +377,8 @@ else:
     # =========================================================================
     
     # 💠 [模块 I]：链上确权凭证 (SBT) 
-    render_html("<div class='module-title'>💠 模块 I：链上确权状态</div>")
-    render_html(f"""
+    st.markdown("<div class='module-title'>💠 模块 I：链上确权状态</div>", unsafe_allow_html=True)
+    st.markdown(f"""
     <div style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(10,10,30,0.9)); border: 1px solid #10b981; border-radius: 8px; padding: 15px 25px; margin-bottom: 25px; font-family: 'Orbitron', monospace; box-shadow: 0 0 20px rgba(16,185,129,0.2);">
         <div style="color: #10b981; font-size: 14px; font-weight: bold; border-bottom: 1px dashed #10b981; padding-bottom: 10px; margin-bottom: 12px; display:flex; align-items:center;">
             <span style="font-size:20px; margin-right:10px;">🏅</span> <span>SDE SOULBOUND TOKEN (SBT) MINTED [ V 1.0 ]</span>
@@ -400,17 +388,17 @@ else:
             <div style="text-align: left;"><div><span style="color:#e2e8f0;">TOKEN ID:</span> #{token_id}</div><div><span style="color:#e2e8f0;">TIMESTAMP:</span> {current_time_str}</div></div>
         </div>
     </div>
-    """)
+    """, unsafe_allow_html=True)
 
     # 🧬 [模块 II]：核心图谱大卡
-    render_html("<div class='module-title'>🧬 模块 II：核心资产图谱</div>")
-    col_card_l, col_card_r, col_card_pad = st.columns([1.5, 1, 0.1], gap="large")
+    st.markdown("<div class='module-title'>🧬 模块 II：核心资产图谱</div>", unsafe_allow_html=True)
+    col_card_l, col_card_r = st.columns([1.2, 1], gap="large")
 
     with col_card_l:
         tags_html_web = " ".join([f"<span style='background:rgba(0, 243, 255, 0.1); color:#00f3ff !important; border:1px solid rgba(0,243,255,0.4); padding:6px 14px; border-radius:6px; font-size:13px; font-weight:900; margin:4px; display:inline-block;'>{t}</span>" for t in data['tags']])
         skills_html_web = " ".join([f"<span style='background:linear-gradient(90deg, rgba(168,85,247,0.3), rgba(168,85,247,0.1)); border:1px solid rgba(168,85,247,0.6); border-left:3px solid #a855f7; padding:4px 10px; border-radius:4px; font-size:12px; color:#e9d5ff; font-weight:bold; display:inline-block; margin:4px; box-shadow: 0 0 10px rgba(168,85,247,0.2);'>{s}</span>" for s in data['skills']])
         
-        render_html(f"""
+        st.markdown(f"""
         <div class="result-card">
             <div class="tier-badge" style="background:{tier_color}; box-shadow:0 0 25px {tier_color}99;">{tier_level}</div>
             <div style="font-family:'Orbitron', sans-serif; font-weight:bold; font-size:12px; color:#94a3b8; letter-spacing:6px; margin-bottom:15px;">SDE NEURAL DECODING</div>
@@ -437,43 +425,43 @@ else:
             <div style="margin-bottom:25px;">{tags_html_web}</div>
             <div style="color:#e2e8f0 !important; font-size:14px; line-height:1.8; margin-bottom:10px; font-weight:400; text-align:justify; background:rgba(255,255,255,0.03); padding: 15px; border-radius: 8px;">{data['desc']}</div>
         </div>
-        """)
+        """, unsafe_allow_html=True)
 
     with col_card_r:
         # 🤝 [模块 III]：跨域算力协同沙盘 (要求 3 完全落实)
-        render_html("<div class='module-title' style='margin-top: 0;'>🤝 模块 III：跨域协同沙盘</div>")
-        render_html("<div style='font-size:14px; color:#94a3b8; margin-bottom:15px; line-height:1.6;'>输入团队成员或领导的架构代码，测算协同匹配度：</div>")
+        st.markdown("<div class='module-title' style='margin-top: 0;'>🤝 模块 III：跨域协同沙盘</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:14px; color:#94a3b8; margin-bottom:15px; line-height:1.6;'>输入团队成员或领导的架构代码，系统将进行底层匹配：</div>", unsafe_allow_html=True)
         pmbti = st.selectbox("🎯 挂载目标协作节点 (选择对方代码):", options=list(mbti_details.keys()), index=list(mbti_details.keys()).index("ESTJ"), label_visibility="collapsed")
         sc, sd = calculate_synergy(mbti, pmbti)
         
-        render_html(f"""
+        st.markdown(f"""
         <div style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.5); padding: 30px; border-radius: 12px; margin-top:10px; text-align:center; box-shadow: 0 0 30px rgba(59,130,246,0.15);">
             <div style="font-family:'Orbitron', sans-serif; color:#3b82f6; font-size:14px; font-weight:bold; margin-bottom:15px; letter-spacing: 3px;">[ SYNERGY MATCH RATE ]</div>
-            <div class="synergy-score" style="font-family:'Orbitron', sans-serif; font-size:55px; font-weight:900; color:#fff; text-shadow:0 0 35px rgba(59,130,246,0.8); margin-bottom:20px;">{sc}%</div>
-            <div style="color:#e2e8f0; font-size:14px; font-weight:bold; line-height:1.7;">{sd}</div>
+            <div class="synergy-score" style="font-family:'Orbitron', sans-serif; font-size:65px; font-weight:900; color:#fff; text-shadow:0 0 35px rgba(59,130,246,0.8); margin-bottom:20px;">{sc}%</div>
+            <div style="color:#e2e8f0; font-size:15px; font-weight:bold; line-height:1.7;">{sd}</div>
         </div>
-        """)
+        """, unsafe_allow_html=True)
         
-        render_html("<h5 style='color:#10b981; margin-top:25px; margin-bottom:10px;'>💡 黄金搭档建议：</h5>")
-        render_html(f"""
+        st.markdown("<h5 style='color:#10b981; margin-top:25px; margin-bottom:10px;'>💡 黄金搭档建议：</h5>", unsafe_allow_html=True)
+        st.markdown(f"""
         <div style='background: rgba(16,185,129,0.1); border-left:4px solid #10b981; padding:20px; border-radius:4px; font-size:14px; color:#e2e8f0; line-height: 1.6;'>
-            您的最佳生态拍档为：<br><b style='color:#10b981; font-size:18px;'>{data['partner']}</b><br><br>{data['partner_advice']}
+            您目前的最佳生态拍档为：<br><b style='color:#10b981; font-size:18px;'>{data['partner']}</b><br><br>{data['partner_advice']}
         </div>
-        """)
+        """, unsafe_allow_html=True)
 
     # 🕸️ [模块 IV]：雷达矩阵与风控仪
-    render_html("<div class='module-title'>🕸️ 模块 IV：算力雷达与风控仪</div>")
+    st.markdown("<div class='module-title'>🕸️ 模块 IV：算力雷达与风控仪</div>", unsafe_allow_html=True)
     col_mid_l, col_mid_r = st.columns([1, 1], gap="large")
     
     with col_mid_l:
-        render_html("<div style='text-align:center; color:#00f3ff; font-weight:bold; margin-bottom:10px; font-family:Orbitron;'>/// RADAR MATRIX</div>")
+        st.markdown("<div style='text-align:center; color:#00f3ff; font-weight:bold; margin-bottom:10px; font-family:Orbitron;'>/// RADAR MATRIX</div>", unsafe_allow_html=True)
         fig_radar = go.Figure()
         fig_radar.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.1)', line=dict(color='rgba(0, 243, 255, 0.2)', width=8), hoverinfo='none'))
         fig_radar.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.25)', line=dict(color='#00f3ff', width=2.5), marker=dict(color='#ff003c', size=6, symbol='diamond')))
         fig_radar.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=11), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=35, r=35, t=20, b=20), height=320)
         st.plotly_chart(fig_radar, use_container_width=True, config={'displayModeBar': False})
         
-        render_html(f"""
+        st.markdown(f"""
         <div style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:25px 20px; margin-top:-10px; margin-bottom: 20px;">
             <div style="font-size:12px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; font-weight:bold;"><span>生态联结 (E) {val_E}%</span><span style="color:#94a3b8;">深潜独立 (I) {val_I}%</span></div>
             <div style="background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:6px 0 15px 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"><div style="position:absolute; top:0; left:0; height:100%; border-radius:4px; width:{val_E}%; background:#00f3ff; box-shadow:0 0 10px #00f3ff;"></div></div>
@@ -487,24 +475,24 @@ else:
             <div style="font-size:12px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; margin-top:15px; font-weight:bold;"><span>秩序架构 (J) {val_J}%</span><span style="color:#94a3b8;">敏捷演进 (P) {val_P}%</span></div>
             <div style="background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:6px 0 0 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"><div style="position:absolute; top:0; left:0; height:100%; border-radius:4px; width:{val_J}%; background:#10b981; box-shadow:0 0 10px #10b981;"></div></div>
         </div>
-        """)
+        """, unsafe_allow_html=True)
 
     with col_mid_r:
-        render_html("<div style='text-align:center; color:#f43f5e; font-weight:bold; margin-bottom:10px; font-family:Orbitron;'>/// RISK THRESHOLD GAUGE</div>")
-        render_html(f"<div style='text-align:center; font-size:18px; font-weight:900; color:{r_color}; font-family:Noto Sans SC; margin-top: 15px; margin-bottom: 10px;'>【 {r_tag} 】</div>")
+        st.markdown("<div style='text-align:center; color:#f43f5e; font-weight:bold; margin-bottom:10px; font-family:Orbitron;'>/// RISK THRESHOLD GAUGE</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align:center; font-size:18px; font-weight:900; color:{r_color}; font-family:Noto Sans SC; margin-top: 15px; margin-bottom: 10px;'>【 {r_tag} 】</div>", unsafe_allow_html=True)
         fig_gauge = go.Figure(go.Indicator(mode="gauge+number", value=risk_score, number={'suffix': "%", 'font': {'family': 'Orbitron, sans-serif', 'color': r_color, 'size': 50}}, gauge={'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#334155"}, 'bar': {'color': r_color}, 'bgcolor': "rgba(255,255,255,0.05)", 'steps': [{'range': [0, 35], 'color': "rgba(16, 185, 129, 0.15)"}, {'range': [35, 65], 'color': "rgba(255, 215, 0, 0.15)"}, {'range': [65, 100], 'color': "rgba(244, 63, 94, 0.15)"}]}))
         fig_gauge.update_layout(paper_bgcolor='rgba(0,0,0,0)', font={'color': "#94a3b8"}, height=240, margin=dict(l=30, r=30, t=10, b=10))
         st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False})
-        render_html(f"<div style='text-align:center; font-size:14px; color:#e2e8f0; line-height:1.6; padding: 0 15px; margin-bottom:20px;'>{r_desc}</div>")
+        st.markdown(f"<div style='text-align:center; font-size:14px; color:#e2e8f0; line-height:1.6; padding: 0 15px; margin-bottom:20px;'>{r_desc}</div>", unsafe_allow_html=True)
 
     # 🗄️ [模块 V]：算力深潜控制台 (要求 4 完全落实)
-    render_html("<div class='module-title'>🗄️ 模块 V：算力深潜控制台 (DEEP DIVE)</div>")
-    render_html("<div style='text-align:right; font-size:12px; color:#94a3b8; margin-bottom:10px; opacity:0.8;'>👉 手机端可左右滑动切换 Tabs 面板</div>")
+    st.markdown("<div class='module-title'>🗄️ 模块 V：算力深潜控制台 (DEEP DIVE)</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align:right; font-size:12px; color:#94a3b8; margin-bottom:10px; opacity:0.8;'>👉 手机端可左右滑动切换 Tabs 面板</div>", unsafe_allow_html=True)
     
     t_evo, t_mkt, t_3d, t_sol = st.tabs(["🔮 终极演进路线", "📉 市场 Alpha 压测", "🌌 3D 认知星图", "💻 智能合约底座"])
     
     with t_evo:
-        render_html(f"""
+        st.markdown(f"""
         <div style="margin-top:15px; margin-bottom:15px; border-left:3px solid #00f3ff; padding-left:15px; background:linear-gradient(90deg, rgba(0,243,255,0.1), transparent); padding-top:10px; padding-bottom:10px; border-radius: 0 6px 6px 0;">
             <div style="color:#00f3ff; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;">PHASE 1 (CURRENT STATE)</div><div style="color:#fff; font-weight:bold; font-size:16px;">{data['evolution_path'][0]}</div>
         </div>
@@ -514,20 +502,20 @@ else:
         <div style="border-left:3px solid #ffd700; padding-left:15px; background:linear-gradient(90deg, rgba(255,215,0,0.15), transparent); padding-top:15px; padding-bottom:15px; border-radius: 0 6px 6px 0; margin-left: 40px; box-shadow: 0 0 20px rgba(255,215,0,0.1); margin-bottom:25px;">
             <div style="color:#ffd700; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;">PHASE 3 (ULTIMATE DOMINANCE)</div><div style="color:#ffd700; font-weight:900; font-size:20px;">{data['ultimate_evolution']}</div>
         </div>
-        """)
+        """, unsafe_allow_html=True)
         with st.expander("⚠️ 绝密防线：SDE 史诗级黑天鹅宕机推演"):
-            render_html(f"""
+            st.markdown(f"""
             <div style="padding: 5px 10px; font-size: 14px; color: #cbd5e1; line-height: 1.7;">
                 <div style="color: #f43f5e; font-weight: 900; margin-bottom: 5px; font-size:15px; letter-spacing:1px;">[ 致命崩溃盲点 ]</div>
                 <div style="margin-bottom: 15px;">{data['black_swan']}</div>
                 <div style="color: #10b981; font-weight: 900; margin-bottom: 5px; font-size:15px; letter-spacing:1px;">[ 官方热修复补丁 ]</div>
                 <div>{data['patch']}</div>
             </div>
-            """)
+            """, unsafe_allow_html=True)
 
     with t_mkt:
-        render_html("<div class='panel-title' style='color:#ffd700; border-color:#ffd700; margin-top:15px;'>/// 30-DAY MARKET ROI SIMULATION (ALPHA)</div>")
-        render_html(f"<div style='font-size:14px; color:#e2e8f0; margin-bottom:10px;'>基于随机游走推演的交易风格：<br><span style='color:#ffd700; font-weight:bold; font-size:15px;'>【 {data['market_style']} 】</span></div>")
+        st.markdown("<div style='text-align:center; color:#ffd700; font-weight:bold; margin-bottom:10px; margin-top:15px; font-family:Orbitron;'>/// 30-DAY MARKET ROI SIMULATION (ALPHA)</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='font-size:14px; color:#e2e8f0; margin-bottom:10px; text-align:center;'>基于随机游走推演的交易风格：<br><span style='color:#ffd700; font-weight:bold; font-size:15px;'>【 {data['market_style']} 】</span></div>", unsafe_allow_html=True)
         fig_roi = go.Figure()
         lc = "#10b981" if roi_arr[-1] >= 100 else "#f43f5e"
         fig_roi.add_trace(go.Scatter(x=d_arr, y=roi_arr, mode='lines', line=dict(color=lc, width=3), fill='tozeroy', fillcolor=f'rgba({16 if roi_arr[-1]>=100 else 244}, {185 if roi_arr[-1]>=100 else 63}, {129 if roi_arr[-1]>=100 else 94}, 0.15)'))
@@ -535,8 +523,8 @@ else:
         st.plotly_chart(fig_roi, use_container_width=True, config={'displayModeBar': False})
 
     with t_3d:
-        render_html("<div class='panel-title' style='color:#00f3ff; border-color:#00f3ff; margin-top:15px;'>/// 3D COGNITIVE TOPOLOGY MAP</div>")
-        render_html("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px;'>将多维指标降维映射至三维空间 (支持鼠标/触控 360° 拖拽)。背景点阵为抽样全网节点。</div>")
+        st.markdown("<div style='text-align:center; color:#00f3ff; font-weight:bold; margin-bottom:10px; margin-top:15px; font-family:Orbitron;'>/// 3D COGNITIVE TOPOLOGY MAP</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; text-align:center;'>降维映射至三维空间 (支持鼠标/触控 360° 拖拽)。背景点阵为抽样全网节点。</div>", unsafe_allow_html=True)
         np.random.seed(int(hash_code[:6], 16))
         x_v = val_E if res['E'] >= 0 else -val_I
         y_v = val_N if res['S'] <= 0 else -val_S
@@ -548,23 +536,23 @@ else:
         st.plotly_chart(f3d, use_container_width=True, config={'displayModeBar': False})
 
     with t_sol:
-        render_html("<div class='panel-title' style='color:#10b981; border-color:#10b981; margin-top:15px;'>/// SOLIDITY SMART CONTRACT MINT LOG</div>")
-        render_html("<div style='font-size:12px; color:#94a3b8; margin-bottom:10px;'>系统已自动为您生成专属的以太坊 ERC721 确权智能合约源码。</div>")
+        st.markdown("<div style='text-align:center; color:#10b981; font-weight:bold; margin-bottom:10px; margin-top:15px; font-family:Orbitron;'>/// SOLIDITY SMART CONTRACT MINT LOG</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:12px; color:#94a3b8; margin-bottom:10px; text-align:center;'>系统已自动为您生成专属的以太坊 ERC721 确权智能合约源码。</div>", unsafe_allow_html=True)
         code_block = f"""// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\nimport "@sde-network/contracts/token/ERC721.sol";\n\ncontract SDE_Talent_Registry_V1 is ERC721 {{\n    struct Profile {{\n        string matrix_id;\n        uint256 valuation_sde;\n        uint8 decisiveness;\n        string tier;\n    }}\n    \n    mapping(uint256 => Profile) public nodes;\n    \n    constructor() ERC721("SDE_NODE_V1", "SDEN") {{}}\n\n    // =====================================\n    // SYSTEM MINT LOG \n    // MINTED_TO: {safe_alias_final}\n    // BLOCK_HEIGHT: {block_height}\n    // CONTRACT_ADDR: {contract_addr}\n    // =====================================\n    \n    function executeMint() public {{\n        uint256 tokenId = {token_id};\n        nodes[tokenId] = Profile("{mbti}", {asset_valuation}, {decisiveness}, "{tier_level}");\n        _mint(msg.sender, tokenId);\n    }}\n}}"""
         st.markdown('<div data-testid="stCodeBlock">', unsafe_allow_html=True)
         st.code(code_block, language="solidity")
         st.markdown('</div>', unsafe_allow_html=True)
         
-        render_html("<div class='panel-title' style='color:#f43f5e; border-color:#f43f5e; margin-top:20px; border-bottom:none;'>/// TOP SECRET DIRECTIVES ///</div>")
+        st.markdown("<div style='text-align:center; color:#f43f5e; font-weight:bold; margin-bottom:10px; margin-top:20px; font-family:Orbitron;'>/// TOP SECRET DIRECTIVES ///</div>", unsafe_allow_html=True)
         tasks_html = "".join([f"<div class='mission-item'><span style='color:#e2e8f0; font-size:14px; font-weight:bold;'>{t}</span></div>" for t in data['tasks']])
-        render_html(f"<div style='margin-bottom: 10px;'>{tasks_html}</div>")
+        st.markdown(f"<div style='margin-bottom: 10px;'>{tasks_html}</div>", unsafe_allow_html=True)
 
     # 📥 [模块 VI]：资产提取与分享终端
-    render_html("<div class='module-title'>📥 模块 VI：资产全息提取终端</div>")
+    st.markdown("<div class='module-title'>📥 模块 VI：资产全息提取终端</div>", unsafe_allow_html=True)
     t_img, t_txt, t_json = st.tabs(["📸 防白屏全息海报 (长按发圈)", "📝 纯文本通讯协议", "💾 极客 JSON 底包档案"])
 
     with t_img:
-        render_html("<div style='font-size:13px; color:#10b981; margin-bottom:10px;'>系统已启用最高优先级【防显存溢出引擎】压制高清海报，请等待 2 秒...</div>")
+        st.markdown("<div style='font-size:13px; color:#10b981; margin-bottom:10px;'>系统已启用最高优先级【防显存溢出引擎】压制高清海报，请等待 2 秒...</div>", unsafe_allow_html=True)
         random.seed(hash_code)
         gradient_stops = []
         current_pos = 0
@@ -702,7 +690,7 @@ executeRender();
         components.html(html_to_image_script, height=1150)
 
     with t_txt:
-        render_html("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 点击下方代码框右上角的 <b style='color:#00f3ff;'>Copy</b> 图标，复制纯文字名片供群聊使用：</div>")
+        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 点击下方代码框右上角的 <b style='color:#00f3ff;'>Copy</b> 图标，复制纯文字名片供群聊使用：</div>", unsafe_allow_html=True)
         share_card = f"""【上海数据交易所 · 算力链上凭证 V1.0】
 =================================
 👤 确权节点：{safe_alias_final}
@@ -719,7 +707,7 @@ executeRender();
         st.code(share_card, language="plaintext")
 
     with t_json:
-        render_html("<div style='font-size:13px; color:#94a3b8; margin-bottom:15px; margin-top:10px;'>💾 高管/极客视角：导出您的原生底层 JSON 结构树归档：</div>")
+        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:15px; margin-top:10px;'>💾 高管/极客视角：导出您的原生底层 JSON 结构树归档：</div>", unsafe_allow_html=True)
         export_data = {
             "version": VERSION,
             "node_alias": safe_alias_final, 
@@ -752,7 +740,7 @@ executeRender();
         st.session_state.clear()
 
     # 底部重启按钮
-    render_html("<br><br>")
+    st.markdown("<br><br>", unsafe_allow_html=True)
     col_btm_l, col_btm_m, col_btm_r = st.columns([1, 2, 1])
     with col_btm_m:
         st.button("⏏ 强行切断连接并重启终端 (SYS_REBOOT)", on_click=reset_system, type="primary", use_container_width=True)
@@ -760,10 +748,10 @@ executeRender();
 # =========================================================================
 # 🛑 [ CORE 07 ] 赛博呼吸专属版权区 (要求 1 完全落实)
 # =========================================================================
-render_html(f"""
+st.markdown(f"""
 <div style="text-align:center; margin-top:80px; margin-bottom:40px; position:relative; z-index:10;">
     <div style="color:#00f3ff !important; font-family:'Orbitron', monospace; font-size:10px; opacity:0.3; letter-spacing:6px; margin-bottom:8px;">POWERED BY SDE DATA ELEMENT KERNEL</div>
     <div style="color:#00f3ff !important; font-family:'Orbitron', monospace; font-size:10px; opacity:0.2; letter-spacing:3px; margin-bottom:30px;">SYSTEM VERSION: {VERSION}</div>
     <div class="copyright-niliu">© 2026 版权归属 · <b style="font-family:'Orbitron', sans-serif; letter-spacing: 4px;">{COPYRIGHT}</b></div>
 </div>
-""")
+""", unsafe_allow_html=True)
