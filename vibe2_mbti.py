@@ -13,11 +13,11 @@ import plotly.graph_objects as go
 # ==============================================================================
 # 🌌 [ CORE 01 ] 系统内核与物理引擎配置
 # ==============================================================================
-VERSION = "1.0_PRO_MAX_FINAL" 
+VERSION = "1.0_PRO_MAX_FINAL"
 COPYRIGHT = "无名逆流"
-SYS_NAME = "SDE 核心人才算力引擎 | V 1.0"
+SYS_NAME = "SDE 核心算力引擎 | V 1.0"
 
-# 宽屏布局，承载塔台级彭博社双栏大屏，完美兼容手机端瀑布流
+# 宽屏布局，承载塔台级彭博社双栏大屏，完美兼容手机端微信瀑布流
 st.set_page_config(page_title=SYS_NAME, page_icon="💠", layout="wide", initial_sidebar_state="collapsed")
 
 # ==============================================================================
@@ -27,12 +27,13 @@ GLOBAL_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Orbitron:wght@400;500;700;900&family=Fira+Code:wght@400;600&display=swap');
 
-/* 强制设备内核进入暗黑模式，杜绝浅色主题 */
+/* 强制设备内核进入暗黑模式，杜绝任何浅色主题干扰 */
 :root { color-scheme: dark; }
 
+/* 隐藏 Streamlit 默认UI并放宽容器 */
 [data-testid="stHeader"] { background: transparent !important; }
 [data-testid="stToolbar"], footer { display: none !important; }
-.block-container { padding-top: 2.5rem !important; padding-bottom: 4rem !important; max-width: 1400px !important; margin: 0 auto; }
+.block-container { padding-top: 2.5rem !important; padding-bottom: 4rem !important; max-width: 1450px !important; }
 html, body, .stApp { background-color: #030712 !important; font-family: 'Noto Sans SC', sans-serif !important; color: #f8fafc !important; overflow-x: hidden; }
 
 /* 视差背景网格 */
@@ -41,7 +42,7 @@ html, body, .stApp { background-color: #030712 !important; font-family: 'Noto Sa
 
 [data-testid="stSidebar"] { background-color: rgba(2, 6, 23, 0.95) !important; border-right: 1px solid rgba(0,243,255,0.2) !important; }
 
-/* 文字颜色安全兜底 */
+/* 文字颜色安全兜底，保护第三方组件 */
 .stMarkdown, p, span, h2, h3, h4, li, label, div[data-testid="stMetricValue"], div[data-testid="stMetricLabel"] { color: #f8fafc !important; }
 [data-testid="stProgress"] > div > div > div { background: linear-gradient(90deg, #00f3ff, #3b82f6) !important; box-shadow: 0 0 15px rgba(0,243,255,0.8); }
 
@@ -58,7 +59,7 @@ div[data-baseweb="popover"] li:hover, div[data-baseweb="popover"] li[aria-select
 @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
 /* 骇客主标题 */
-.hero-title { font-size: clamp(26px, 5vw, 42px) !important; font-weight: 900 !important; text-align: center; color: #ffffff !important; letter-spacing: 4px; margin-bottom: 5px; margin-top: 15px; text-shadow: 0 0 20px rgba(0,243,255,0.7), 0 0 40px rgba(0,243,255,0.3); position: relative; display: inline-block; text-transform: uppercase; }
+.hero-title { font-size: clamp(28px, 5vw, 42px) !important; font-weight: 900 !important; text-align: center; color: #ffffff !important; letter-spacing: 4px; margin-bottom: 5px; margin-top: 15px; text-shadow: 0 0 20px rgba(0,243,255,0.7), 0 0 40px rgba(0,243,255,0.3); position: relative; display: inline-block; text-transform: uppercase; }
 .hero-title::before, .hero-title::after { content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: transparent; }
 .hero-title::before { left: 2px; text-shadow: -2px 0 #f43f5e; animation: glitch-anim-1 2.5s infinite linear alternate-reverse; }
 .hero-title::after { left: -2px; text-shadow: 2px 0 #00f3ff; animation: glitch-anim-2 3.5s infinite linear alternate-reverse; }
@@ -77,7 +78,7 @@ div[data-baseweb="popover"] li:hover, div[data-baseweb="popover"] li[aria-select
 
 /* 表单与按钮限制 */
 div[data-testid="stForm"] { max-width: 600px; margin: 0 auto; border: none !important; background: transparent !important;}
-div[data-testid="stTextInput"] > div > div > input { background-color: rgba(4, 9, 20, 0.9) !important; color: #00f3ff !important; font-family: 'Orbitron', monospace !important; border: 1px solid rgba(0,243,255,0.5) !important; border-radius: 6px !important; text-align: center; font-size: 18px !important; font-weight: bold !important; letter-spacing: 2px; box-shadow: inset 0 0 20px rgba(0,243,255,0.1) !important; transition: all 0.3s ease; padding: 12px 20px !important; line-height: 1.5 !important; }
+div[data-testid="stTextInput"] > div > div > input { background-color: rgba(4, 9, 20, 0.9) !important; color: #00f3ff !important; font-family: 'Orbitron', monospace !important; border: 1px solid rgba(0,243,255,0.5) !important; border-radius: 6px !important; text-align: center; font-size: 18px !important; font-weight: bold !important; letter-spacing: 2px; box-shadow: inset 0 0 20px rgba(0,243,255,0.1) !important; transition: all 0.3s ease; height: 50px; }
 div[data-testid="stTextInput"] > div > div > input:focus { border-color: #ffd700 !important; box-shadow: 0 0 25px rgba(255,215,0,0.4), inset 0 0 15px rgba(255,215,0,0.1) !important; }
 
 div.stButton > button { background: linear-gradient(135deg, #0f172a 0%, #040914 100%) !important; border: 1px solid rgba(0, 243, 255, 0.3) !important; border-left: 4px solid rgba(0, 243, 255, 0.6) !important; border-radius: 6px !important; min-height: 60px !important; width: 100% !important; padding: 10px 15px !important; text-align: left !important; box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important; transition: all 0.2s ease !important; position: relative; overflow: hidden; }
@@ -98,7 +99,7 @@ div.stButton > button[data-testid="baseButton-primary"]:hover { transform: trans
 .panel-box { background: rgba(10, 17, 32, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 25px; box-shadow: inset 0 0 20px rgba(0,0,0,0.4); margin-bottom: 20px;}
 .panel-title { color: #94a3b8; font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: bold; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px; letter-spacing: 1px; }
 
-/* Tabs 全息导航坞 */
+/* Tabs 导航坞 */
 [data-testid="stTabs"] button { color: #64748b !important; font-family: 'Noto Sans SC', sans-serif !important; font-weight: 900 !important; font-size: clamp(14px, 2vw, 16px) !important; padding-bottom: 15px !important; transition: all 0.3s ease; }
 [data-testid="stTabs"] button[aria-selected="true"] { color: #00f3ff !important; border-bottom-color: #00f3ff !important; border-bottom-width: 3px !important; text-shadow: 0 0 15px rgba(0,243,255,0.6); background: rgba(0,243,255,0.05); }
 
@@ -107,7 +108,7 @@ div.stButton > button[data-testid="baseButton-primary"]:hover { transform: trans
 [data-testid="stExpander"] summary { background: rgba(244, 63, 94, 0.1); color: #f43f5e !important; font-weight: 900 !important; font-size: 15px !important; padding: 15px !important; }
 .mission-item { border-left: 3px solid #f43f5e; padding-left: 15px; margin-bottom: 12px; background: rgba(244,63,94,0.05); padding-top: 10px; padding-bottom: 10px; border-radius: 0 4px 4px 0; }
 
-.cli-box { background: #000000; border: 1px solid #334155; border-left: 4px solid #00f3ff; padding: 20px; border-radius: 8px; font-family: 'Fira Code', monospace; font-size: 13px; color: #4ade80; box-shadow: inset 0 0 30px rgba(0,243,255,0.15); margin-top: 20px; word-break: break-all; line-height: 1.6;}
+.cli-box { background: #000000; border: 1px solid #334155; border-left: 4px solid #00f3ff; padding: 20px; border-radius: 8px; font-family: monospace; font-size: 13px; color: #4ade80; box-shadow: inset 0 0 30px rgba(0,243,255,0.15); margin-top: 20px; word-break: break-all; line-height: 1.6;}
 
 /* 专属下载按钮 */
 div[data-testid="stDownloadButton"] > button { background: rgba(5, 12, 25, 0.95) !important; border: 1px dashed rgba(16, 185, 129, 0.8) !important; border-left: 6px solid #10b981 !important; margin-top: 20px; border-radius: 6px !important; height: 55px; text-align: center !important; width: 100% !important;}
@@ -116,7 +117,7 @@ div[data-testid="stDownloadButton"] > button:hover { background: rgba(16, 185, 1
 
 /* 💎 无名逆流专属版权呼吸灯特效 */
 .copyright-niliu { display: inline-block; padding: 12px 35px; border-radius: 50px; font-size: 13px; font-family: "Noto Sans SC", sans-serif; letter-spacing: 2px; color: #00f3ff; font-weight: 900; background: rgba(0,243,255,0.05); border: 1px solid rgba(0,243,255,0.3); animation: neon-breathe 2.5s infinite alternate; box-shadow: 0 0 20px rgba(0,243,255,0.2); transition: all 0.3s ease; margin-top: 5px;}
-.copyright-niliu:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0,243,255,0.8), inset 0 0 15px rgba(0,243,255,0.5); border-color: #00f3ff; cursor: pointer; }
+.copyright-niliu:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(0,243,255,0.8), inset 0 0 15px rgba(0,243,255,0.5); border-color: #00f3ff; }
 @keyframes neon-breathe { 0% { box-shadow: 0 0 10px rgba(0,243,255,0.1), inset 0 0 5px rgba(0,243,255,0.1); border-color: rgba(0,243,255,0.2); text-shadow: none; } 100% { box-shadow: 0 0 25px rgba(0,243,255,0.6), inset 0 0 15px rgba(0,243,255,0.2); border-color: rgba(0,243,255,0.7); text-shadow: 0 0 10px #00f3ff; } }
 </style>
 """
@@ -147,10 +148,8 @@ with st.sidebar:
     st.metric("24H Data Tx Volume", f"¥ {random.uniform(12.5, 14.2):.2f} B", f"+{random.uniform(2.0, 8.0):.2f}%")
     
     st.markdown("<div style='font-size:11px; color:#94a3b8; font-family:Orbitron; border-bottom:1px solid #334155; padding-bottom:5px; margin-top:30px; margin-bottom:15px; font-weight:bold;'>/// LIVE TX LOGS</div>", unsafe_allow_html=True)
-    
-    if "sidebar_logs" not in st.session_state:
-        st.session_state.sidebar_logs = "".join([f"<div style='font-family:\"Fira Code\", monospace; font-size:10px; margin-bottom:12px; border-left:2px solid #10b981; padding-left:8px;'><span style='color:#10b981;'>[MINT]</span> <span style='color:#e2e8f0;'>{random.choice(['Gov_Public_Data', 'Med_Research_Set', 'Fin_Risk_API', 'Logistics_GPS', 'Retail_Behavior'])}</span><br><span style='color:#ffd700;'>GAS: {random.randint(12000,45000)} Gwei</span></div>" for _ in range(6)])
-    st.markdown(st.session_state.sidebar_logs, unsafe_allow_html=True)
+    ticker_logs = "".join([f"<div style='font-family:monospace; font-size:10px; margin-bottom:12px; border-left:2px solid #10b981; padding-left:8px;'><span style='color:#10b981;'>[MINT]</span> <span style='color:#e2e8f0;'>{random.choice(['Gov_Public_Data', 'Med_Research_Set', 'Fin_Risk_API', 'Logistics_GPS', 'Retail_Behavior'])}</span><br><span style='color:#ffd700;'>GAS: {random.randint(12000,45000)} Gwei</span></div>" for _ in range(6)])
+    st.markdown(ticker_logs, unsafe_allow_html=True)
 
 # ==============================================================================
 # 🧠 [ CORE 04 ] 题库全量防残缺归位：40 道极客业务题库 (绝无删减)
@@ -429,22 +428,20 @@ mbti_details = {
 # 🤝 协同与 K 线算法
 def calculate_synergy(m1, m2):
     diff = sum(1 for a, b in zip(m1, m2) if a != b)
-    if diff == 0: return 92, "【绝对镜像】决策回路高度一致，沟通0延迟，但需警惕盲区重叠。"
-    elif diff == 1: return 98, "【黄金并网】核心逻辑一致且具备极佳微调互补性，堪称最强推土机小队！"
-    elif diff == 2: return 85, "【灰度容错】视角存在差异，能通过激烈碰撞打磨出更抗风险的业务闭环。"
-    elif diff == 3: return 65, "【高频摩擦】存在极大的底层通信壁垒，协同作业必须强制引入第三方确立中间协议。"
-    else: return 99, "【阴阳反转】底层代码完全相反！日常沟通极度痛苦，但若各司其职，能实现无死角包抄！"
+    if diff == 0: return 92, "【绝对镜像】决策回路高度一致，沟通0延迟，但需警惕认知盲区重叠。"
+    elif diff == 1: return 98, "【黄金握手】核心逻辑一致且具备极佳微调互补性，堪称最强业务推土机小队！"
+    elif diff == 2: return 85, "【灰度平衡】思维角度存在差异，能通过激烈碰撞打磨出更抗风险的业务闭环。"
+    elif diff == 3: return 65, "【高频摩擦】存在极大的底层通信壁垒，协同作业时必须强制引入第三方确立中间协议。"
+    else: return 99, "【极致反转】代码完全相反！在日常沟通中极度痛苦，但若各司其职背靠背，能实现无死角包抄！"
 
 def generate_alpha_curve(base_roi, volatility, seed):
-    rng = np.random.RandomState(seed) 
+    np.random.seed(seed)
     days = [f"T+{i}" for i in range(1, 31)] 
     roi = [100.0]
-    for _ in range(29): roi.append(max(30.0, roi[-1] + (base_roi - 1.0) * 8 + rng.normal(0, volatility * 25)))
+    for _ in range(29): roi.append(max(30.0, roi[-1] + (base_roi - 1.0) * 8 + np.random.normal(0, volatility * 25)))
     return days, roi
 
-# ==============================================================================
-# ⚙️ [ CORE 05 ] 极速状态机管理 (🔐 核心不可篡改锁)
-# ==============================================================================
+# --- 5. 极速状态机 ---
 for key, init_val in [('started', False), ('current_q', 0), ('start_time', None), ('end_time', None), ('calculating', False), ('user_alias', "Compliance_Wu"), ('total_scores', {"E": 0, "S": 0, "T": 0, "J": 0}), ('anim_played', False), ('boot_played', False)]:
     if key not in st.session_state: st.session_state[key] = init_val
 
@@ -463,17 +460,15 @@ def answer_callback(val, dim):
 
 def center_container(): return st.columns([1, 2, 1])[1]
 
-# ==============================================================================
-# 🖥️ [ CORE 06 ] 塔台级路由与全息仪表盘渲染
-# ==============================================================================
+# --- 6. 核心渲染路由 ---
 if not st.session_state.started:
     st.markdown("<div style='margin-top:50px;'></div>", unsafe_allow_html=True)
     
-    # 🎬 满血开机动画 (纯顶格无缩进防截断)
+    # 🎬 满血开局动画：系统自检拉起 (仅执行一次)
     if not st.session_state.boot_played:
         HTML_BOOT = """
 <style>
-.sys-boot-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: #030712; z-index: 9999999; display: flex; justify-content: center; align-items: center; flex-direction: column; animation: sys-boot-fade 1.5s 1s cubic-bezier(0.8, 0, 0.2, 1) forwards; pointer-events: none; }
+.sys-boot-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030712; z-index: 9999999; display: flex; justify-content: center; align-items: center; flex-direction: column; animation: sys-boot-fade 1.5s 1s cubic-bezier(0.8, 0, 0.2, 1) forwards; pointer-events: none; }
 .sys-boot-logo { color: #00f3ff; font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900; letter-spacing: 4px; overflow: hidden; border-right: 3px solid #00f3ff; white-space: nowrap; animation: typing-boot 0.8s steps(20, end) forwards, blink-boot 0.4s step-end infinite; }
 .sys-boot-bar-bg { width: 260px; height: 2px; background: rgba(0,243,255,0.1); margin-top: 20px; position: relative; }
 .sys-boot-bar-fill { position: absolute; top: 0; left: 0; height: 100%; background: #00f3ff; box-shadow: 0 0 15px #00f3ff; animation: load-boot 1s ease-out forwards; }
@@ -561,7 +556,7 @@ else:
     if not st.session_state.anim_played: 
         HTML_EMP = """
 <style>
-.cyber-emp-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; background: rgba(3,7,18,0.95); z-index: 999999; display: flex; justify-content: center; align-items: center; flex-direction: column; animation: cyber-fadeout 2.8s cubic-bezier(0.8, 0, 0.2, 1) forwards; pointer-events: none; backdrop-filter: blur(5px); }
+.cyber-emp-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3,7,18,0.95); z-index: 999999; display: flex; justify-content: center; align-items: center; flex-direction: column; animation: cyber-fadeout 2.8s cubic-bezier(0.8, 0, 0.2, 1) forwards; pointer-events: none; backdrop-filter: blur(5px); }
 .matrix-code { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); color: #10b981; font-family: monospace; font-size: 16px; text-align: center; line-height: 1.8; opacity: 0; animation: matrix-glitch 2s forwards; white-space: pre; text-shadow: 0 0 10px #10b981; margin-bottom: 30px;}
 .cyber-text { font-family: 'Orbitron', sans-serif; font-size: clamp(24px, 5vw, 56px); font-weight: 900; color: #fff; letter-spacing: 10px; text-shadow: 0 0 30px #00f3ff, 0 0 60px #00f3ff; opacity: 0; animation: pop-in 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; position: relative; z-index: 2; margin-top: 60px;}
 @keyframes matrix-glitch { 0% { opacity: 0; } 10% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; filter: blur(5px);} }
@@ -598,7 +593,7 @@ else:
     elif risk_score < 65: r_tag, r_color = "动态演进与灰度平衡", "#ffd700"
     else: r_tag, r_color = "无界扩张与极限破局", "#f43f5e"
 
-    time_taken = max(1.0, st.session_state.end_time - st.session_state.start_time)
+    time_taken = max(1, st.session_state.end_time - st.session_state.start_time)
     
     # 🔐 资产防篡改物理锁：彻底闭环 JSON 导出 NameError Bug
     if "asset_minted" not in st.session_state:
@@ -688,13 +683,10 @@ else:
         st.markdown(HTML_CARD, unsafe_allow_html=True)
 
     with col_top_r:
-        # 👑 UX：将社交高频交互直接前置
-        options_list = list(mbti_details.keys())
-        format_func = lambda x: f"{x} - {mbti_details[x]['role']}"
-        
+        # 👑 UX：将社交高频交互直接前置，无需下拉到底！
         st.markdown("<h4 style='color:#3b82f6 !important; border-left:4px solid #3b82f6; padding-left:10px; font-weight:900;'>🤝 跨域算力协同沙盘</h4>", unsafe_allow_html=True)
         st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:15px;'>输入团队成员或领导的核心架构代码，系统将立刻测算你们的协同匹配度：</div>", unsafe_allow_html=True)
-        pmbti = st.selectbox("🎯 挂载目标协作节点 (选择对方代码):", options=options_list, index=options_list.index("ESTJ"), format_func=format_func, label_visibility="collapsed")
+        pmbti = st.selectbox("🎯 挂载目标协作节点 (选择对方代码):", options=list(mbti_details.keys()), index=list(mbti_details.keys()).index("ESTJ"), label_visibility="collapsed")
         sc, sd = calculate_synergy(mbti, pmbti)
         
         HTML_SYN = f"""
@@ -724,23 +716,22 @@ else:
         fig_radar = go.Figure()
         fig_radar.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.1)', line=dict(color='rgba(0, 243, 255, 0.2)', width=8), hoverinfo='none'))
         fig_radar.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.25)', line=dict(color='#00f3ff', width=2.5), marker=dict(color='#ff003c', size=6, symbol='diamond')))
-        # 🚨 theme=None 锁死暗黑背景
-        fig_radar.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=11), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=15, r=15, t=20, b=20), height=300)
-        st.plotly_chart(fig_radar, use_container_width=True, config={'displayModeBar': False}, theme=None)
+        fig_radar.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC, sans-serif", color='#e2e8f0', size=11), linecolor='rgba(0,243,255,0.2)', gridcolor='rgba(0,243,255,0.15)')), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=35, r=35, t=20, b=20), height=300)
+        st.plotly_chart(fig_radar, use_container_width=True, config={'displayModeBar': False})
         
         # 🚨 全新重构双向对抗能量条 (绝对免疫 Markdown 代码块污染！)
         HTML_BARS = f"""
 <div style="background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:25px 20px; margin-top:-10px; margin-bottom: 20px;">
-<div style="font-size:clamp(10px, 2.5vw, 12px); color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; font-weight:bold;"><span>生态联结 (E) {val_E}%</span><span style="color:#94a3b8;">深潜独立 (I) {val_I}%</span></div>
+<div style="font-size:12px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; font-weight:bold;"><span>生态联结 (E) {val_E}%</span><span style="color:#94a3b8;">深潜独立 (I) {val_I}%</span></div>
 <div style="background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:6px 0 15px 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"><div style="position:absolute; top:0; left:0; height:100%; border-radius:4px; width:{val_E}%; background:#00f3ff; box-shadow:0 0 10px #00f3ff;"></div></div>
 
-<div style="font-size:clamp(10px, 2.5vw, 12px); color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; margin-top:15px; font-weight:bold;"><span>实务颗粒 (S) {val_S}%</span><span style="color:#94a3b8;">宏观前瞻 (N) {val_N}%</span></div>
+<div style="font-size:12px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; margin-top:15px; font-weight:bold;"><span>实务颗粒 (S) {val_S}%</span><span style="color:#94a3b8;">宏观前瞻 (N) {val_N}%</span></div>
 <div style="background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:6px 0 15px 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"><div style="position:absolute; top:0; left:0; height:100%; border-radius:4px; width:{val_S}%; background:#a855f7; box-shadow:0 0 10px #a855f7;"></div></div>
 
-<div style="font-size:clamp(10px, 2.5vw, 12px); color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; margin-top:15px; font-weight:bold;"><span>量化风控 (T) {val_T}%</span><span style="color:#94a3b8;">生态共情 (F) {val_F}%</span></div>
+<div style="font-size:12px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; margin-top:15px; font-weight:bold;"><span>量化风控 (T) {val_T}%</span><span style="color:#94a3b8;">生态共情 (F) {val_F}%</span></div>
 <div style="background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:6px 0 15px 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"><div style="position:absolute; top:0; left:0; height:100%; border-radius:4px; width:{val_T}%; background:#3b82f6; box-shadow:0 0 10px #3b82f6;"></div></div>
 
-<div style="font-size:clamp(10px, 2.5vw, 12px); color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; margin-top:15px; font-weight:bold;"><span>秩序架构 (J) {val_J}%</span><span style="color:#94a3b8;">敏捷演进 (P) {val_P}%</span></div>
+<div style="font-size:12px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; margin-top:15px; font-weight:bold;"><span>秩序架构 (J) {val_J}%</span><span style="color:#94a3b8;">敏捷演进 (P) {val_P}%</span></div>
 <div style="background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:6px 0 0 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);"><div style="position:absolute; top:0; left:0; height:100%; border-radius:4px; width:{val_J}%; background:#10b981; box-shadow:0 0 10px #10b981;"></div></div>
 </div>
 """
@@ -751,9 +742,9 @@ else:
         st.markdown(f"<div style='text-align:center; font-size:16px; font-weight:bold; color:{r_color}; font-family:Noto Sans SC; margin-top: 5px;'>{r_tag}</div>", unsafe_allow_html=True)
         fig_gauge = go.Figure(go.Indicator(mode="gauge+number", value=risk_score, number={'suffix': "%", 'font': {'family': 'Orbitron, sans-serif', 'color': r_color, 'size': 40}}, gauge={'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#334155"}, 'bar': {'color': r_color}, 'bgcolor': "rgba(255,255,255,0.05)", 'steps': [{'range': [0, 35], 'color': "rgba(16, 185, 129, 0.15)"}, {'range': [35, 65], 'color': "rgba(255, 215, 0, 0.15)"}, {'range': [65, 100], 'color': "rgba(244, 63, 94, 0.15)"}]}))
         fig_gauge.update_layout(paper_bgcolor='rgba(0,0,0,0)', font={'color': "#94a3b8"}, height=200, margin=dict(l=30, r=30, t=10, b=10))
-        st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False}, theme=None)
+        st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False})
 
-        # 3. 极客拓展面板
+        # 3. 极客拓展面板 (用 Tabs 折叠，拯救竖屏长滚动)
         st.markdown("<h4 style='color:#a855f7 !important; border-left:4px solid #a855f7; padding-left:10px; font-weight:900; margin-top:20px; margin-bottom:15px;'>🗄️ 算力深潜控制台 (DEEP DIVE)</h4>", unsafe_allow_html=True)
         st.markdown("<div style='text-align:right; font-size:12px; color:#94a3b8; margin-bottom:10px; opacity:0.8;'>👉 手机端可左右滑动切换面板</div>", unsafe_allow_html=True)
         
@@ -791,20 +782,20 @@ else:
             lc = "#10b981" if roi_arr[-1] >= 100 else "#f43f5e"
             fig_roi.add_trace(go.Scatter(x=d_arr, y=roi_arr, mode='lines', line=dict(color=lc, width=3), fill='tozeroy', fillcolor=f'rgba({16 if roi_arr[-1]>=100 else 244}, {185 if roi_arr[-1]>=100 else 63}, {129 if roi_arr[-1]>=100 else 94}, 0.15)'))
             fig_roi.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=10, r=10, t=10, b=10), height=280, xaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)'), yaxis=dict(showgrid=True, gridcolor='rgba(255,255,255,0.05)', title='SDE Alpha Net Value'))
-            st.plotly_chart(fig_roi, use_container_width=True, config={'displayModeBar': False}, theme=None)
+            st.plotly_chart(fig_roi, use_container_width=True, config={'displayModeBar': False})
 
         with t_3d:
             st.markdown("<div class='panel-title' style='color:#00f3ff; border-color:#00f3ff; margin-top:15px;'>/// 3D COGNITIVE TOPOLOGY MAP</div>", unsafe_allow_html=True)
             st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px;'>将多维指标降维映射至三维空间 (支持鼠标 360° 拖拽)。背景点阵为抽样全网节点。</div>", unsafe_allow_html=True)
-            rng_3d = np.random.RandomState(int(hash_code[:6], 16))
+            np.random.seed(int(hash_code[:6], 16))
             x_v = val_E if res['E'] >= 0 else -val_I
             y_v = val_N if res['S'] <= 0 else -val_S
             z_v = val_T if res['T'] >= 0 else -val_F
             f3d = go.Figure()
-            f3d.add_trace(go.Scatter3d(x=rng_3d.randint(-100,100,size=100), y=rng_3d.randint(-100,100,size=100), z=rng_3d.randint(-100,100,size=100), mode='markers', marker=dict(size=4, color='#334155', opacity=0.6), name='全网抽样节点'))
+            f3d.add_trace(go.Scatter3d(x=np.random.randint(-100,100,size=100), y=np.random.randint(-100,100,size=100), z=np.random.randint(-100,100,size=100), mode='markers', marker=dict(size=4, color='#334155', opacity=0.6), name='全网抽样节点'))
             f3d.add_trace(go.Scatter3d(x=[x_v], y=[y_v], z=[z_v], mode='markers+text', text=[mbti], textposition="top center", marker=dict(size=16, color=tier_color, symbol='diamond', line=dict(color='#fff', width=2)), textfont=dict(color=tier_color, size=18, family="Orbitron", weight="bold"), name='当前授权节点'))
             f3d.update_layout(scene=dict(xaxis_title='执行↔深潜', yaxis_title='实务↔前瞻', zaxis_title='共情↔刚性', xaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b"), yaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b"), zaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b")), paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, t=0, b=0), height=400, showlegend=False)
-            st.plotly_chart(f3d, use_container_width=True, config={'displayModeBar': False}, theme=None)
+            st.plotly_chart(f3d, use_container_width=True, config={'displayModeBar': False})
 
         with t_sol:
             st.markdown("<div class='panel-title' style='color:#10b981; border-color:#10b981; margin-top:15px;'>/// SOLIDITY SMART CONTRACT MINT LOG</div>", unsafe_allow_html=True)
@@ -853,7 +844,7 @@ contract SDE_Talent_Registry_V1 is ERC721 {{
             st.markdown(f"<div style='margin-bottom: 10px;'>{tasks_html}</div>", unsafe_allow_html=True)
 
     # =========================================================================
-    # 💠 4. 【沉底提取中心】防白屏海报与 JSON 协议下发
+    # 💠 4. 【沉底提取中心】防白屏海报与 JSON 协议下发 (全宽展示)
     # =========================================================================
     st.markdown("<h4 style='color:#00f3ff !important; border-left:5px solid #00f3ff; padding-left:12px; font-weight:900; margin-top:40px; margin-bottom:20px;'>💠 数据要素大屏提取终端</h4>", unsafe_allow_html=True)
     t_img, t_txt, t_json = st.tabs(["📸 防白屏全息海报 (长按发圈)", "📝 纯文本通讯协议", "📥 极客 JSON 底包档案"])
@@ -869,7 +860,7 @@ contract SDE_Talent_Registry_V1 is ERC721 {{
         tags_html_poster = "".join([f"<span style='background:rgba(0,243,255,0.1); border:1px solid rgba(0,243,255,0.5); padding:4px 8px; border-radius:4px; font-size:11px; color:#00f3ff; font-weight:bold; margin:3px; display:inline-block;'>{t}</span>" for t in data.get('tags', [])])
         skills_html_poster = "".join([f"<span style='background:linear-gradient(90deg, rgba(168,85,247,0.3), rgba(168,85,247,0.1)); border:1px solid rgba(168,85,247,0.6); border-left:3px solid #a855f7; padding:4px 8px; border-radius:4px; font-size:11px; color:#e9d5ff; font-weight:bold; display:inline-block; margin:3px;'>{s}</span>" for s in data.get('skills', [])])
 
-        # 🚨 终极安全锁：将 capture-box 画板锁定 320px，完美兼容最老的 iPhone SE 且不裁切！不再监听会导致死锁的 document.fonts！
+        # 🚨 终极安全锁：将 capture-box 画板锁定 320px，完美兼容最老的 iPhone SE 且不裁切！
         HTML_POSTER = f"""
 <!DOCTYPE html>
 <html>
@@ -1058,9 +1049,7 @@ executeRender();
 
     with center_container():
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("⏏ 强行切断连接并重启终端 (SYS_REBOOT)", type="primary", use_container_width=True):
-            reset_system()
-            st.rerun()
+        st.button("⏏ 强行切断连接并重启终端 (SYS_REBOOT)", on_click=reset_system, type="primary", use_container_width=True)
 
 # =========================================================================
 # 🛑 [ CORE 07 ] 赛博呼吸专属版权区 (满血找回霓虹灯特效！)
@@ -1074,4 +1063,6 @@ HTML_FOOTER = f"""
 """
 st.markdown(HTML_FOOTER, unsafe_allow_html=True)
 
-# ================================= EOF ==================================
+# =========================================================================
+# ✨✨ EOF: 代码结束 (请确保全选复制到了此行) ✨✨
+# =========================================================================
