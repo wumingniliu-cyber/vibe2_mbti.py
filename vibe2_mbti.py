@@ -15,7 +15,7 @@ import plotly.graph_objects as go
 # ==============================================================================
 VERSION = "1.0_PRO_MAX_FINAL"
 COPYRIGHT = "无名逆流"
-SYS_NAME = "SDE 核心算力引擎 | V 1.0"
+SYS_NAME = "SDE 核心人才算力引擎 | V 1.0"
 
 # 宽屏布局，承载塔台级彭博社双栏大屏，完美兼容手机端微信瀑布流
 st.set_page_config(page_title=SYS_NAME, page_icon="💠", layout="wide", initial_sidebar_state="collapsed")
@@ -1066,3 +1066,4 @@ st.markdown(HTML_FOOTER, unsafe_allow_html=True)
 # =========================================================================
 # ✨✨ EOF: 代码结束 (请确保全选复制到了此行) ✨✨
 # =========================================================================
+
