@@ -764,7 +764,7 @@ else:
 </div>
 """
             st.markdown(HTML_EVO, unsafe_allow_html=True)
-            with st.expander("⚠️ 绝密防线：SDE 史诗级黑天鹅宕机推演"):
+            with st.expander("⚠️ 机密文档：仅本人可查看的宕机推演"):
                 HTML_SWAN = f"""
 <div style="padding: 5px 10px; font-size: 14px; color: #cbd5e1; line-height: 1.7;">
 <div style="color: #f43f5e; font-weight: 900; margin-bottom: 5px; font-size:15px;">[ 致命崩溃盲点 ]</div>
@@ -1066,5 +1066,6 @@ st.markdown(HTML_FOOTER, unsafe_allow_html=True)
 # =========================================================================
 # ✨✨ EOF: 代码结束 (请确保全选复制到了此行) ✨✨
 # =========================================================================
+
 
 
