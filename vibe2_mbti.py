@@ -850,7 +850,7 @@ contract SDE_Talent_Registry_V1 is ERC721 {{
     t_img, t_txt, t_json = st.tabs(["📸 防白屏全息海报 (长按发圈)", "📝 纯文本通讯协议", "📥 极客 JSON 底包档案"])
 
     with t_img:
-        st.markdown("<div style='font-size:13px; color:#10b981; margin-bottom:10px;'>系统已启用最高优先级【防显存溢出引擎】压制高清海报，请等待 2 秒...</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:13px; color:#10b981; margin-bottom:10px;'>系统已启用最高优先级【防显存溢出引擎】压制高清海报，请等待 5 秒，长按图片可复制导出...</div>", unsafe_allow_html=True)
         random.seed(hash_code)
         gradient_stops = []
         for p in range(0, 100, int(random.uniform(2, 6))): 
@@ -1066,4 +1066,5 @@ st.markdown(HTML_FOOTER, unsafe_allow_html=True)
 # =========================================================================
 # ✨✨ EOF: 代码结束 (请确保全选复制到了此行) ✨✨
 # =========================================================================
+
 
