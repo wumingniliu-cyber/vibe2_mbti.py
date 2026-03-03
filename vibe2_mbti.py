@@ -867,7 +867,7 @@ contract SDE_Talent_Registry_V1 is ERC721 {{
         tags_html_poster = "".join([f"<span style='background:rgba(0,243,255,0.1); border:1px solid rgba(0,243,255,0.5); padding:4px 8px; border-radius:4px; font-size:11px; color:#00f3ff; font-weight:bold; margin:3px; display:inline-block;'>{t}</span>" for t in data.get('tags', [])])
         skills_html_poster = "".join([f"<span style='background:linear-gradient(90deg, rgba(168,85,247,0.3), rgba(168,85,247,0.1)); border:1px solid rgba(168,85,247,0.6); border-left:3px solid #a855f7; padding:4px 8px; border-radius:4px; font-size:11px; color:#e9d5ff; font-weight:bold; display:inline-block; margin:3px;'>{s}</span>" for s in data.get('skills', [])])
 
-        # 🚨 终极安全锁：将 capture-box 画板锁定 320px，完美兼容最老的 iPhone SE 且不裁切！
+        # 🚨 终极安全锁：修复手机端一直卡在加载中的死锁问题
         HTML_POSTER = f"""
 <!DOCTYPE html>
 <html>
@@ -877,7 +877,129 @@ contract SDE_Talent_Registry_V1 is ERC721 {{
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 body {{ margin: 0; display: flex; flex-direction: column; align-items: center; background-color: #030712 !important; font-family: 'Noto Sans SC', sans-serif; user-select: none; padding: 10px 0; color: #ffffff; overflow-x: hidden; }}
-#render-target {{ position: absolute; top: 0; left: 50%; transform: translateX(-50%); opacity: 0.01; z-index: -100; pointer-events: none; }}
+/* 修改隐藏策略：不用透明度，而是直接移出视口，防止部分手机拒绝渲染隐藏DOM */
+#render-target {{ position: absolute; top: -9999px; left: -9999px; z-index: -100; pointer-events: none; }}
+#capture-box {{ width: 340px; background-color: #010308; padding: 30px 20px; border-radius: 12px; border: 1px solid rgba(0, 243, 255, 0.5); box-shadow: 0 0 40px rgba(0, 243, 255, 0.2); position: relative; overflow: hidden; color: #fff; box-sizing: border-box; margin: 0 auto; }}
+.cyber-grid {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(0deg, rgba(0,243,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.05) 1px, transparent 1px); background-size: 25px 25px; z-index: 0; pointer-events:none;}}
+.top-glow {{ position: absolute; top: 0; left: 0; width: 100%; height: 6px; background: linear-gradient(90deg, transparent, #00f3ff, transparent); z-index: 1; }}
+.bdg {{ position: absolute; top: 15px; right: -35px; background: {tier_color}; color: #000; font-family: 'Orbitron'; font-weight: 900; font-size: 10px; padding: 3px 35px; transform: rotate(45deg); z-index: 10; letter-spacing: 2px; box-shadow: 0 0 15px {tier_color}88; }}
+.ct {{ position: relative; z-index: 2; }}
+.hd {{ display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(0,243,255,0.3); padding-bottom: 15px; margin-bottom: 20px; }}
+.nm {{ text-align: center; font-size: 20px; font-weight: 900; letter-spacing: 2px; margin-bottom: 8px; color: #fff; text-transform: uppercase; }}
+.mb {{ font-family: 'Orbitron'; font-size: 58px; font-weight: 900; color: #ffd700; line-height: 1; text-align: center; text-shadow: 0 0 30px rgba(255,215,0,0.6); margin-bottom: 8px; letter-spacing: 4px; }}
+.rl {{ text-align: center; font-size: 14px; font-weight: 900; color: #00f3ff; margin-bottom: 20px; letter-spacing: 2px; }}
+.vb {{ display:flex; justify-content:space-between; text-align:center; background:rgba(0,0,0,0.8); border:1px solid rgba(255,215,0,0.4); padding:10px; border-radius:8px; margin-bottom: 20px; gap: 5px; }}
+.rb {{ border-left: 4px solid {r_color}; background: {r_color}1A; padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 20px; }}
+.ft {{ text-align: center; color: #64748b; font-family: 'Orbitron'; font-size: 9px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1); line-height: 1.6; }}
+.bc {{ width: 90%; height: 20px; margin: 0 auto 8px auto; background: {barcode_css}; }}
+#ui {{ font-family: 'Orbitron'; color: #00f3ff; font-size: 13px; text-align: center; padding: 50px; animation: p 1s infinite alternate; letter-spacing: 2px; font-weight:bold;}}
+@keyframes p {{ 0% {{ opacity: 1; text-shadow: 0 0 10px #00f3ff; }} 100% {{ opacity: 0.4; }} }}
+#img {{ display: none; width: 100%; max-width: 340px; height: auto; border-radius: 12px; border: 1px solid rgba(0,243,255,0.6); box-shadow: 0 20px 40px rgba(0,0,0,0.9); pointer-events: auto; margin: 10px auto; box-sizing: border-box;}}
+.ht {{ display: none; background: rgba(16,185,129,0.15); border: 1px solid #10b981; padding: 15px; border-radius: 8px; font-size: 14px; color: #fff; text-align: center; margin: 20px auto 0 auto; width: 100%; max-width: 340px; box-sizing: border-box; text-shadow: 0 0 5px rgba(0,0,0,0.8); line-height: 1.6;}}
+.stat-row {{ display: flex; align-items: center; margin-bottom: 8px; font-size: 10px; font-weight: bold; justify-content: space-between; }}
+.stat-row:last-child {{ margin-bottom: 0; }}
+.sbc {{ background: rgba(255,255,255,0.05); border-radius: 3px; height: 5px; width: 130px; position: relative; overflow: hidden; margin: 0 6px; }}
+.sbf {{ position: absolute; left: 0; top: 0; height: 100%; }}
+</style>
+</head>
+<body>
+<div id="render-target">
+<div id="capture-box">
+<div class="cyber-grid"></div><div class="top-glow"></div>
+<div class="bdg">{tier_level}</div>
+<div class="ct">
+<div class="hd">
+<div><div style="color:#00f3ff;font-family:Orbitron;font-size:14px;font-weight:900;">SDE MATRIX</div><div style="font-size:15px;font-weight:900;letter-spacing:4px;">上海数据交易所</div></div>
+<div style="text-align:right;"><div style="color:#94a3b8;font-family:Orbitron;font-size:9px;">V1.0 HASH</div><div style="color:#00f3ff;font-family:Orbitron;font-size:11px;font-weight:bold;">0x{hash_code[:8]}</div></div>
+</div>
+<div style="font-size:10px;color:#94a3b8;text-align:center;font-family:Orbitron;margin-bottom:5px;">AUTHORIZED NODE</div>
+<div class="nm">{safe_alias_final}</div><div class="mb">{mbti}</div>
+<div style="text-align:center;font-size:11px;color:#94a3b8;margin-bottom:15px;">GLOBAL RARITY: <span style="color:{tier_color};font-family:Orbitron;font-weight:bold;font-size:13px;">{data.get('rarity', 'Top 5%')}</span></div>
+<div class="rl">【 {role_name} 】</div>
+<div class="vb">
+<div style="flex:1;"><div style="font-size:9px;color:#94a3b8;font-family:Orbitron;margin-bottom:5px;">HASHRATE (SDE)</div><div style="font-size:17px;color:#ffd700;font-weight:900;font-family:Orbitron;">💎 {round(asset_valuation, -4):,}</div></div>
+<div style="border-left:1px dashed rgba(255,255,255,0.3);"></div>
+<div style="flex:1;"><div style="font-size:9px;color:#94a3b8;font-family:Orbitron;margin-bottom:5px;">PERCENTILE</div><div style="font-size:17px;color:#00f3ff;font-weight:900;font-family:Orbitron;">⚡ TOP {100-pct_beat:.1f}%</div></div>
+</div>
+<div style="text-align:center; margin-bottom:12px;"><div style="font-size:10px; color:#a855f7; margin-bottom:6px; font-family:Orbitron; font-weight:bold;">[ SKILL TREE ]</div>{skills_html_poster}</div>
+<div style="text-align:center; margin-bottom:20px;">{tags_html_poster}</div>
+
+<div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 10px; margin-bottom: 20px;">
+<div style="font-family: 'Orbitron', monospace; font-size: 9px; color: #00f3ff; text-align: center; margin-bottom: 10px;">/// HASH METRICS ///</div>
+<div class="stat-row"><span style="color:#e2e8f0; width:50px;">生态 {val_E}%</span><div class="sbc"><div class="sbf" style="width:{val_E}%; background:#00f3ff;"></div></div><span style="color:#94a3b8; width:50px; text-align:right;">深潜 {val_I}%</span></div>
+<div class="stat-row"><span style="color:#e2e8f0; width:50px;">实勘 {val_S}%</span><div class="sbc"><div class="sbf" style="width:{val_S}%; background:#a855f7;"></div></div><span style="color:#94a3b8; width:50px; text-align:right;">前瞻 {val_N}%</span></div>
+<div class="stat-row"><span style="color:#e2e8f0; width:50px;">量化 {val_T}%</span><div class="sbc"><div class="sbf" style="width:{val_T}%; background:#3b82f6;"></div></div><span style="color:#94a3b8; width:50px; text-align:right;">共情 {val_F}%</span></div>
+<div class="stat-row"><span style="color:#e2e8f0; width:50px;">秩序 {val_J}%</span><div class="sbc"><div class="sbf" style="width:{val_J}%; background:#10b981;"></div></div><span style="color:#94a3b8; width:50px; text-align:right;">敏捷 {val_P}%</span></div>
+</div>
+
+<div style="background: rgba(255,0,60,0.1); border-left: 4px solid #ff003c; padding: 10px; margin-bottom: 15px; border-radius: 0 6px 6px 0;">
+<div style="font-size:8px; color:#ff003c; font-family:'Orbitron'; margin-bottom:4px; letter-spacing:1px;">/// 2026 EVOLUTION ///</div>
+<div style="font-size:12px; font-weight:bold; color:#fff; text-shadow:0 0 10px rgba(255,0,60,0.6);">{data.get('ultimate_evolution', '')}</div>
+</div>
+
+<div class="rb"><div style="font-size:9px;color:#e2e8f0;margin-bottom:4px;font-weight:bold;">SYS_WARNING: 职场风控边界</div><div style="color:{r_color};font-size:13px;font-weight:900;">{r_tag}</div></div>
+<div class="ft"><div class="bc"></div><div style="margin-bottom:4px;font-weight:bold;">SDE DATA ELEMENT KERNEL V1.0</div><div style="color:#475569;">© {COPYRIGHT} | TOKEN: #{token_id}</div></div>
+</div>
+</div>
+</div>
+
+<div id="ui">[ MINTING V1.0 HIGH-RES POSTER... ]</div>
+<img id="result-img" alt="SDE Matrix V1.0" title="长按保存或分享" />
+<div id="hint" class="ht"><span style="font-size:18px;">✅</span> <b>全息海报强力渲染完成！</b><br><span style="color:#10b981;">👆 手机端请 <b>长按上方图片</b> 保存发圈</span></div>
+
+<script>
+// 极度精简的强制渲染引擎，不依赖任何外部条件
+const executeRender = () => {{
+    setTimeout(() => {{ 
+        if(typeof html2canvas === 'undefined') {{ 
+            document.getElementById('ui').innerHTML='<span style="color:#f43f5e;">❌ 渲染引擎资源被浏览器拦截。</span><br>请直接截屏当前手机网页。'; 
+            return; 
+        }} 
+        
+        const target = document.getElementById('capture-box');
+        // 🚨 强制修复参数：缩放比例为1.5防爆，启用allowTaint忽略跨域错误
+        html2canvas(target, {{
+            scale: 1.5, 
+            backgroundColor: '#010308', 
+            useCORS: true, 
+            allowTaint: true,
+            logging: false,
+            onclone: function(clonedDoc) {{
+                // 克隆时将移出屏幕的元素拉回可视区保证截图成功
+                var rt = clonedDoc.getElementById('render-target');
+                if (rt) {{
+                    rt.style.position = 'relative';
+                    rt.style.top = '0';
+                    rt.style.left = '0';
+                    rt.style.transform = 'none';
+                    rt.style.opacity = '1';
+                }}
+            }}
+        }}).then(canvas => {{ 
+            document.getElementById('result-img').src = canvas.toDataURL('image/png'); 
+            document.getElementById('ui').style.display = 'none'; 
+            document.getElementById('result-img').style.display = 'block'; 
+            document.getElementById('hint').style.display = 'block'; 
+            document.getElementById('render-target').style.display = 'none'; 
+        }}).catch(err => {{ 
+            console.error(err);
+            document.getElementById('ui').innerHTML='<span style="color:#ffd700;">⚠️ 您的手机内存受限，图片压制失败。</span><br>请直接滚动到上方进行手机系统截屏！'; 
+        }});
+    }}, 1500); // 绝对等待1.5秒，确保文字全部画完
+}};
+
+// 抛弃危险的 document.fonts.ready，强制通过 window.onload 触发
+if (document.readyState === 'complete') {{
+    executeRender();
+}} else {{
+    window.addEventListener('load', executeRender);
+    // 兜底：如果 load 事件被卡住，3秒后强行执行
+    setTimeout(executeRender, 3000);
+}}
+</script>
+</body>
+</html>
+"""
 /* 🚨 物理锁死海报画布为 320px */
 #capture-box {{ width: 320px; background-color: #010308; padding: 30px 15px; border-radius: 16px; border: 1px solid rgba(0, 243, 255, 0.5); box-shadow: 0 0 40px rgba(0, 243, 255, 0.2); position: relative; overflow: hidden; color: #fff; box-sizing: border-box; margin: 0 auto; }}
 .cyber-grid {{ position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(0deg, rgba(0,243,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.05) 1px, transparent 1px); background-size: 25px 25px; z-index: 0; pointer-events:none;}}
@@ -1067,3 +1189,4 @@ HTML_FOOTER = f"""
 st.markdown(HTML_FOOTER, unsafe_allow_html=True)
 
 # ================================= EOF ==================================
+
