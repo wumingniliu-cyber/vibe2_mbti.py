@@ -630,7 +630,7 @@ else:
     HTML_BANNER = f"""
 <div style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(10,10,30,0.9)); border: 1px solid #10b981; border-radius: 8px; padding: 15px 25px; margin-bottom: 25px; font-family: 'Orbitron', monospace; box-shadow: 0 0 20px rgba(16,185,129,0.2);">
 <div style="color: #10b981; font-size: 14px; font-weight: bold; border-bottom: 1px dashed #10b981; padding-bottom: 10px; margin-bottom: 12px; display:flex; align-items:center;">
-<span style="font-size:20px; margin-right:10px;">🏅</span> <span>SDE SOULBOUND TOKEN (SBT) MINTED [ V 3.0 ]</span>
+<span style="font-size:20px; margin-right:10px;">🏅</span> <span>SDE SOULBOUND TOKEN (SBT) MINTED [ V 1.0 ]</span>
 </div>
 <div style="font-size: 12px; color: #94a3b8; line-height: 1.8; display:flex; flex-wrap: wrap; justify-content: space-between; gap: 10px;">
 <div><div><span style="color:#e2e8f0;">BLOCK HEIGHT:</span> {block_height}</div><div><span style="color:#e2e8f0;">CONTRACT:</span> {contract_addr[:20]}...</div></div>
@@ -1112,5 +1112,6 @@ HTML_FOOTER = f"""
 st.markdown(HTML_FOOTER.replace('\n', ''), unsafe_allow_html=True)
 
 # ================================= EOF ==================================
+
 
 
