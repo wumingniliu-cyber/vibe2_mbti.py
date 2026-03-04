@@ -786,7 +786,7 @@ else:
 """
             st.markdown(HTML_ORACLE.replace('\n', ''), unsafe_allow_html=True)
 
-            with st.expander("⚠️ 绝密防线：SDE 史诗级黑天鹅宕机推演"):
+            with st.expander("⚠️ 绝密文档：仅个人可查看"):
                 HTML_SWAN = f"""
 <div style="padding: 5px 10px; font-size: 14px; color: #cbd5e1; line-height: 1.7;">
 <div style="color: #f43f5e; font-weight: 900; margin-bottom: 5px; font-size:15px;">[ 致命崩溃盲点 ]</div>
@@ -1112,4 +1112,5 @@ HTML_FOOTER = f"""
 st.markdown(HTML_FOOTER.replace('\n', ''), unsafe_allow_html=True)
 
 # ================================= EOF ==================================
+
 
