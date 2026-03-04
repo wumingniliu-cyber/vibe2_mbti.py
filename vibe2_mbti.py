@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 # ==============================================================================
 # 🌌 [ CORE 01 ] 系统内核与物理引擎配置
 # ==============================================================================
-VERSION = "4.0_ORACLE_MATRIX"
+VERSION = "1.0_ORACLE_MATRIX"
 COPYRIGHT = "无名逆流"
 SYS_NAME = "SDE 核心人才算力引擎 | V 1.0"
 
@@ -473,7 +473,7 @@ if not st.session_state.started:
         HTML_TITLE = """
 <div style="text-align: center; margin-bottom: 20px;">
 <div style="color:#00f3ff; font-family:'Orbitron', monospace; font-size:14px; letter-spacing:8px; margin-bottom:10px;">SHANGHAI DATA EXCHANGE</div>
-<h1 class="hero-title" data-text="职场算力终端 V 3.0">职场算力终端 V 3.0</h1><br>
+<h1 class="hero-title" data-text="核心人才算力终端 V 1.0">核心人才算力终端 V 1.0</h1><br>
 <div style="color:#00f3ff; font-family:'Orbitron', sans-serif; font-size:13px; font-weight:700; letter-spacing:6px; margin-bottom:30px;">ORACLE_MATRIX_EDITION</div>
 </div>
 """
@@ -1059,7 +1059,7 @@ window.onload = function() {{
         st.markdown(HTML_TXT.replace('\n', ''), unsafe_allow_html=True)
 
     with t_json:
-        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:15px; margin-top:10px;'>💾 高管/极客视角：导出您的原生底层 JSON 结构树归档：</div>", unsafe_allow_html=True)
+        st.markdown("<div style='font-size:13px; color:#94a3b8; margin-bottom:15px; margin-top:10px;'>💾 极客视角：导出您的原生底层 JSON 结构树归档：</div>", unsafe_allow_html=True)
         
         # 🚨 终极免疫 JSON 导出 NameError！全量闭环变量读取
         export_data = {
@@ -1112,3 +1112,4 @@ HTML_FOOTER = f"""
 st.markdown(HTML_FOOTER.replace('\n', ''), unsafe_allow_html=True)
 
 # ================================= EOF ==================================
+
