@@ -453,7 +453,7 @@ if not st.session_state.started:
 @keyframes log-scroll { 100% { transform: translateY(-100px); } }
 </style>
 <div class="sys-boot-overlay">
-<div class="sys-boot-logo">SDE_KERNEL_V3.0</div>
+<div class="sys-boot-logo">SDE_KERNEL_V1.0</div>
 <div class="sys-boot-bar-bg"><div class="sys-boot-bar-fill"></div></div>
 <div class="sys-boot-logs"><div class="log-line">
 [OK] Booting Neural Engine...<br>
@@ -1112,6 +1112,7 @@ HTML_FOOTER = f"""
 st.markdown(HTML_FOOTER.replace('\n', ''), unsafe_allow_html=True)
 
 # ================================= EOF ==================================
+
 
 
 
