@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import random
 import time
 import hashlib
@@ -11,90 +10,82 @@ import plotly.graph_objects as go
 import copy
 
 # ==============================================================================
-# 🌌 [ SDE METAVERSE 01 ] 宇宙级内核与安全沙盒
+# 🌌 [ WARFRAME 01 ] 寰宇引擎内核与绝对安全沙盒
 # ==============================================================================
-VERSION = "20.0_OMNIVERSE_TCG"
+VERSION = "35.0_OMNIVERSE_ENGINE"
 COPYRIGHT = "无名逆流"
-SYS_NAME = "SDE 职场元宇宙 | 卡牌觉醒 V20"
+SYS_NAME = "职场元宇宙 | 寰宇闭环 V35"
 
-st.set_page_config(page_title=SYS_NAME, page_icon="🃏", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title=SYS_NAME, page_icon="🩸", layout="wide", initial_sidebar_state="collapsed")
 
-# 🚨 物理级换行抹杀，防止 Markdown 绿块污染
+# 绝对物理隔离：纯静态拼接替换所有 f-string 以免疫 NameError/KeyError
 def safe_html(text):
     st.markdown(text.replace('\n', ''), unsafe_allow_html=True)
 
-# 🚨 绝对安全的初始化兜底 (从物理底层免疫 KeyError)
 def init_state():
     defaults = {
         'started': False, 'current_q': 0, 'start_time': None, 'end_time': None,
-        'calculating': False, 'user_alias': "SDE_PLAYER", 
-        'total_scores': {"E": 0, "S": 0, "T": 0, "J": 0},
+        'calculating': False, 'user_alias': "SURVIVOR", 
+        'total_scores': {"E": 0, "S": 0, "T": 0, "J": 0}, 
         'anim_played': False, 'boot_played': False,
-        'tokens': 0, 'stamina': 150, 'level': 1, 'exp': 0, 'ascension_stars': 0, 'ascended': False,
-        'boss_hp': 50000000, 'boss_level': 1, 'combat_logs': [], 'pvp_logs': [], 'dispatch_logs': [],
+        'tokens': 10000, 
+        'dark_matter': 0, 
+        'logic_shards': 0, 
+        'sanity': 150, 'max_sanity': 150, 'stamina': 150, 'level': 1, 'exp': 0, 
+        'ascension_stars': 0, 'ascended': False,
+        'boss_hp': 2000000, 'boss_level': 1, 'combat_logs': [], 'pvp_logs': [], 'dispatch_logs': [],
         'inventory': [], 'equipped_relics': [], 'pets': [], 'equipped_pet': None,
-        'joined_faction': None, 'equipped_title': "【见习节点】", 'titles_owned': ["【见习节点】"],
-        'gacha_msg': "消耗 1,000 SDE 召唤高维战利品",
-        'staked_tokens': 0, 'yield_pool': 0.0, 'talent_levels': {"E": 0, "S": 0, "T": 0, "J": 0},
-        'cyber_augments': [], 'final_cp_cache': 10000, 'turn_count': 0, 
-        'achievements': [], 'forge_msg': "将 3 件同星级未装备圣物融合升阶！",
-        'bounties_claimed': False, 'pity_counter': 0, 'weather': "🌞 算力平稳 (无特殊效果)",
-        'world_chat': ["<span style='color:#94a3b8;'>[SYS] SDE V20.0 服务器已开启。</span>"],
-        'gpus': 0, 'tarot_buff': "无"
+        'joined_faction': None, 'equipped_title': "【流浪炮灰】", 'titles_owned': ["【流浪炮灰】"],
+        'staked_tokens': 0, 'yield_pool': 0.0, 
+        'talent_levels': {"E": 0, "S": 0, "T": 0, "J": 0}, 
+        'cyber_augments': [], 'final_cp_cache': 10000, 'turn_count': 1, 
+        'achievements': [], 'bounties_claimed': False, 'pity_counter': 0, 
+        'weather': "🌑 废土死寂 (无特殊效果)",
+        'world_chat': ["<span style='color:#f43f5e;'>[SYS] 寰宇引擎 V35.0 已激活。齿轮开始转动。</span>"],
+        'gpus': 0, 'tarot_buff': "无", 'despair_level': 0,
+        'card_foil': "【标准拉丝工艺】", 'squad': [None, None], 'exchange_rate': 100
     }
     for k, v in defaults.items():
         if k not in st.session_state: st.session_state[k] = v
 init_state()
+
+# ==============================================================================
+# ⚙️ [ WARFRAME 02 ] 核心闭环生态计算系统
+# ==============================================================================
+def get_stat_multipliers():
+    base_res = st.session_state.total_scores
+    tl = st.session_state.talent_levels
+    val_E_raw = base_res.get("E", 0) + tl["E"] * 2
+    val_S_raw = base_res.get("S", 0) + tl["S"] * 2
+    val_T_raw = base_res.get("T", 0) + tl["T"] * 2
+    val_J_raw = base_res.get("J", 0) + tl["J"] * 2
+    
+    return {
+        "boss_dmg_mult": 1.0 + (max(0, val_E_raw) * 0.05), 
+        "pvp_def_mult": 1.0 + (max(0, val_T_raw) * 0.05),  
+        "drop_rate_mult": 1.0 + (max(0, val_S_raw) * 0.05),
+        "yield_mult": 1.0 + (max(0, val_J_raw) * 0.05),    
+        "sanity_resist": max(0, val_T_raw) 
+    }
 
 def add_chat(msg, color="#10b981"):
     ts = datetime.now().strftime('%H:%M:%S')
     st.session_state.world_chat.insert(0, "<span style='color:" + color + ";'>[" + ts + "] " + msg + "</span>")
     if len(st.session_state.world_chat) > 30: st.session_state.world_chat.pop()
 
-def tick_turn():
-    st.session_state.turn_count += 1
-    st.session_state.stamina = min(150, st.session_state.stamina + 3)
-    if st.session_state.staked_tokens > 0:
-        st.session_state.yield_pool += st.session_state.staked_tokens * random.uniform(0.01, 0.05)
-    
-    if st.session_state.gpus > 0:
-        mining_yield = st.session_state.gpus * random.randint(120, 250)
-        if "星币" in st.session_state.tarot_buff: mining_yield *= 2
-        st.session_state.tokens += mining_yield
-    
-    # 动态全服天象系统
-    if random.random() < 0.15:
-        weathers = [
-            "⛈️ 量子风暴 (量子阵营战力 +20%)", "🔥 熔毁热浪 (炎脉阵营战力 +20%)", 
-            "✨ 虚空回响 (灵能阵营战力 +20%)", "🛡️ 绝对领域 (钢核阵营战力 +20%)", 
-            "💀 数据干旱 (所有操作消耗体力激增)", "🌞 算力平稳 (无特殊效果)"
-        ]
-        new_w = random.choice(weathers)
-        st.session_state.weather = new_w
-        add_chat("[天象] 宇宙环境变更为：" + new_w, "#f43f5e")
-        
-    if random.random() < 0.2:
-        events = [
-            "黑市快报：有人高价收走了【中本聪的创世U盘】...",
-            "悬赏大厅：G-Cloud 集群正遭受 DDOS，急需支援！",
-            "竞技场：[Cyber_Ninja] 达成了 20 连胜！",
-            "深渊广播：数据利维坦的护盾正在快速衰减！"
-        ]
-        add_chat(random.choice(events), "#94a3b8")
-
 def unlock_title(title):
     if title not in st.session_state.titles_owned:
         st.session_state.titles_owned.append(title)
         st.session_state.tokens += 3000
-        add_chat("[全服] 恭喜 " + st.session_state.user_alias + " 荣获称号 " + title + "！", "#ffd700")
-        st.toast("🏆 获得新称号：" + title, icon="🏆")
+        add_chat("[全区广播] 幸存者 " + st.session_state.user_alias + " 夺得了军衔：" + title, "#ffd700")
+        st.toast("🏆 获得新军衔：" + title, icon="🏆")
 
 def unlock_achievement(title):
     if title not in st.session_state.achievements:
         st.session_state.achievements.append(title)
-        st.session_state.tokens += 8000
-        st.toast("🏆 解锁史诗成就：" + title + "！奖励 8,000 SDE！", icon="🏆")
-        add_chat("[全服] 节点 [" + st.session_state.user_alias + "] 解锁了史诗成就 " + title + "！", "#ffd700")
+        st.session_state.dark_matter += 100 
+        st.toast("🏆 解锁绝境成就：" + title + "！奖励 100 暗物质！", icon="🏆")
+        add_chat("[深渊快报] 节点 [" + st.session_state.user_alias + "] 达成了创举：" + title, "#ff003c")
 
 def gain_exp(amount):
     if "教皇" in st.session_state.tarot_buff: amount = int(amount * 1.5)
@@ -103,35 +94,63 @@ def gain_exp(amount):
     if st.session_state.exp >= req:
         st.session_state.exp -= req
         st.session_state.level += 1
-        st.toast("🌟 升级啦！当前等级 Lv." + str(st.session_state.level), icon="🌟")
-        add_chat("节点 [" + st.session_state.user_alias + "] 突破了战力边界，升至 Lv." + str(st.session_state.level) + "！", "#a855f7")
-        if st.session_state.level == 10: unlock_title("【十级觉醒者】")
-        if st.session_state.level == 50: unlock_title("【半神之躯】")
+        st.toast("🌟 阶级跃迁！当前等级 Lv." + str(st.session_state.level), icon="🌟")
+        if st.session_state.level == 10: unlock_title("【十级卷王】")
+        if st.session_state.level == 30: unlock_title("【无情收割机】")
+        if st.session_state.level == 50: unlock_title("【寰宇半神】")
+
+def consume_action_points(stam_cost, san_cost):
+    if st.session_state.equipped_pet and "机械哈士奇" in st.session_state.equipped_pet['name']:
+        stam_cost = max(1, int(stam_cost * 0.5))
+    if st.session_state.stamina < stam_cost: return False, "❌ 体力不足！"
+    
+    st.session_state.stamina -= stam_cost
+    t_lvl = st.session_state.talent_levels['T']
+    real_san_cost = max(1, san_cost - t_lvl)
+    st.session_state.sanity = max(0, st.session_state.sanity - real_san_cost)
+    return True, "OK"
+
+def tick_turn():
+    st.session_state.turn_count += 1
+    mults = get_stat_multipliers()
+    
+    st.session_state.stamina = min(150, st.session_state.stamina + 2)
+    
+    if st.session_state.sanity < 50:
+        st.session_state.despair_level = min(100, st.session_state.despair_level + random.randint(3, 8))
+    else:
+        st.session_state.despair_level = max(0, st.session_state.despair_level - 1)
+    
+    if st.session_state.staked_tokens > 0 and st.session_state.despair_level < 80:
+        base_yield = 0.0 if "降息浪潮" in st.session_state.weather else random.uniform(0.005, 0.02)
+        ascend_bonus = st.session_state.ascension_stars * 0.01
+        pet_bonus = 0.01 if st.session_state.equipped_pet and "游隼" in st.session_state.equipped_pet['name'] else 0.0
+        st.session_state.yield_pool += st.session_state.staked_tokens * (base_yield + ascend_bonus + pet_bonus) * mults["yield_mult"]
+        
+    if st.session_state.gpus > 0 and st.session_state.despair_level < 80:
+        mining_yield = st.session_state.gpus * random.randint(150, 300) * mults["yield_mult"]
+        if "星币" in st.session_state.tarot_buff: mining_yield *= 2
+        st.session_state.tokens += int(mining_yield)
+        
+    # 黑市汇率波动
+    st.session_state.exchange_rate = max(50, min(500, int(st.session_state.exchange_rate * random.uniform(0.9, 1.1))))
+    
+    if random.random() < 0.18:
+        weathers = ["⛈️ 量子风暴 (+30%量子系战力)", "🔥 焦土裁员 (+30%炎脉战力)", "✨ 幽灵协议 (+30%灵能战力)", "🛡️ 绝对堡垒 (+30%钢核战力)", "💀 死亡加班 (获取经验翻倍)", "🏦 降息浪潮 (质押利息归零)", "🌑 废土死寂 (无特殊效果)"]
+        new_w = random.choice(weathers)
+        st.session_state.weather = new_w
+        add_chat("[天象警告] 全域气候变更为：" + new_w, "#ff003c")
 
 def get_rank_tier(cp):
-    if cp < 50000: return "🥉 青铜游侠", "#cd7f32"
-    elif cp < 150000: return "🥈 白银黑客", "#c0c0c0"
-    elif cp < 500000: return "🥇 黄金先锋", "#ffd700"
-    elif cp < 1500000: return "💎 铂金领主", "#00f3ff"
-    elif cp < 5000000: return "🌌 钻石星神", "#a855f7"
-    else: return "👑 绝密超维者", "#ff003c"
-
-def start_assessment_callback():
-    alias = st.session_state.get("login_input", "").strip()
-    st.session_state.user_alias = html.escape(alias) if alias else "SDE_PLAYER"
-    st.session_state.started = True
-    st.session_state.start_time = time.time()
-    add_chat("新节点 [" + st.session_state.user_alias + "] 已接入数据之海。", "#00f3ff")
-
-def answer_callback(val, dim):
-    st.session_state.total_scores[dim] += (val - 3)
-    st.session_state.current_q += 1
-    if st.session_state.current_q >= len(questions):
-        st.session_state.end_time = time.time()
-        st.session_state.calculating = True
+    if cp < 50000: return "🥉 废土拾荒者", "#cd7f32"
+    elif cp < 200000: return "🥈 铁血雇佣兵", "#c0c0c0"
+    elif cp < 800000: return "🥇 黄金处决者", "#ffd700"
+    elif cp < 3000000: return "💎 铂金统治者", "#00f3ff"
+    elif cp < 10000000: return "🌌 深渊星神", "#a855f7"
+    else: return "👑 奇点超维者", "#ff003c"
 
 # ==============================================================================
-# 🎨 [ SDE METAVERSE 03 ] 史诗级卡游 UI 渲染底座 (原生拼接免疫 f-string 污染)
+# 🎨 [ WARFRAME 03 ] 史诗级UI渲染底座 (纯静态拼接)
 # ==============================================================================
 CSS_BLOCK = """
 <style>
@@ -139,32 +158,30 @@ CSS_BLOCK = """
 :root { color-scheme: dark; }
 [data-testid="stHeader"], [data-testid="stToolbar"], footer { display: none !important; }
 .block-container { padding-top: 1.5rem !important; padding-bottom: 4rem !important; max-width: 1400px !important; margin: 0 auto; overflow-x: hidden; }
-html, body, .stApp { background-color: #030712 !important; font-family: 'Noto Sans SC', sans-serif !important; color: #f8fafc !important; overflow-x: hidden; }
-[data-testid="stAppViewContainer"]::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.03) 0%, rgba(3, 7, 18, 1) 70%); pointer-events: none; z-index: 0; }
-[data-testid="stAppViewContainer"]::after { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02)); background-size: 100% 3px, 3px 100%; z-index: 99999; pointer-events: none; opacity: 0.3; }
-.stMarkdown, p, span, h2, h3, h4, li, label { color: #f8fafc !important; }
-[data-testid="stProgress"] > div > div > div { background: linear-gradient(90deg, #00f3ff, #a855f7) !important; box-shadow: 0 0 15px rgba(168,85,247,0.8); }
-.hero-title { font-size: clamp(26px, 5vw, 46px) !important; font-weight: 900 !important; text-align: center; color: #ffffff !important; letter-spacing: 4px; margin-bottom: 5px; margin-top: 15px; text-shadow: 0 0 20px rgba(0,243,255,0.7), 0 0 40px rgba(0,243,255,0.3); text-transform: uppercase; font-family: 'Orbitron', sans-serif;}
+html, body, .stApp { background-color: #030408 !important; font-family: 'Noto Sans SC', sans-serif !important; color: #e2e8f0 !important; overflow-x: hidden; }
+[data-testid="stAppViewContainer"]::before { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, rgba(255, 0, 60, 0.05) 0%, rgba(3, 4, 8, 1) 80%); pointer-events: none; z-index: 0; }
+[data-testid="stAppViewContainer"]::after { content: ""; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px); background-size: 100% 3px; z-index: 99999; pointer-events: none; opacity: 0.6; }
+.stMarkdown, p, span, h2, h3, h4, li, label { color: #e2e8f0 !important; }
+[data-testid="stProgress"] > div > div > div { background: linear-gradient(90deg, #ff003c, #ffd700) !important; box-shadow: 0 0 15px rgba(255,0,60,0.8); }
+.hero-title { font-size: clamp(26px, 5vw, 46px) !important; font-weight: 900 !important; text-align: center; color: #ffffff !important; letter-spacing: 4px; margin-bottom: 5px; margin-top: 15px; text-shadow: 0 0 20px rgba(255,0,60,0.7), 0 0 40px rgba(255,0,60,0.3); text-transform: uppercase; font-family: 'Orbitron', sans-serif;}
 div[data-testid="stForm"] { max-width: 600px; margin: 0 auto; border: none !important; background: transparent !important;}
-div[data-testid="stTextInput"] > div > div > input { background-color: rgba(4, 9, 20, 0.9) !important; color: #00f3ff !important; font-family: 'Orbitron', monospace !important; border: 1px solid rgba(0,243,255,0.5) !important; border-radius: 8px !important; text-align: center; font-size: clamp(16px, 4vw, 18px) !important; font-weight: bold !important; letter-spacing: 2px; box-shadow: inset 0 0 20px rgba(0,243,255,0.1) !important; height: 56px !important;}
-div.stButton > button { background: linear-gradient(135deg, #0f172a 0%, #040914 100%) !important; border: 1px solid rgba(0, 243, 255, 0.3) !important; border-left: 4px solid rgba(0, 243, 255, 0.6) !important; border-radius: 8px !important; min-height: 50px !important; width: 100% !important; box-shadow: 0 4px 15px rgba(0,0,0,0.6) !important; transition: all 0.2s ease !important; position: relative; overflow: hidden; }
+div[data-testid="stTextInput"] > div > div > input { background-color: rgba(4, 9, 20, 0.9) !important; color: #ff003c !important; font-family: 'Orbitron', monospace !important; border: 1px solid rgba(255,0,60,0.5) !important; border-radius: 8px !important; text-align: center; font-size: clamp(16px, 4vw, 18px) !important; font-weight: bold !important; letter-spacing: 2px; box-shadow: inset 0 0 20px rgba(255,0,60,0.2) !important; height: 56px !important;}
+div.stButton > button { background: linear-gradient(135deg, #1f050a 0%, #0a0205 100%) !important; border: 1px solid rgba(255, 0, 60, 0.4) !important; border-left: 4px solid rgba(255, 0, 60, 0.8) !important; border-radius: 8px !important; min-height: 50px !important; width: 100% !important; box-shadow: 0 4px 15px rgba(0,0,0,0.8) !important; transition: all 0.2s ease !important; position: relative; overflow: hidden; }
 div.stButton > button p { color: #ffffff !important; font-weight: bold !important; white-space: normal !important;}
-div.stButton > button:hover { border-color: #00f3ff !important; box-shadow: 0 0 25px rgba(0,243,255,0.4) !important; transform: translateX(3px) !important; }
-div.stButton > button[data-testid="baseButton-primary"] { background: linear-gradient(90deg, #00f3ff, #a855f7) !important; border: none !important; text-align: center !important; }
+div.stButton > button:hover { border-color: #ff003c !important; box-shadow: 0 0 25px rgba(255,0,60,0.5) !important; transform: translateX(3px) !important; }
+div.stButton > button[data-testid="baseButton-primary"] { background: linear-gradient(90deg, #ff003c, #ff8c00) !important; border: none !important; text-align: center !important; }
 div.stButton > button[data-testid="baseButton-primary"] p { color: #010308 !important; font-weight: 900 !important; letter-spacing: 2px !important; font-family: 'Orbitron', sans-serif !important;}
 [data-testid="stTabs"] button { color: #64748b !important; font-family: 'Noto Sans SC', sans-serif !important; font-weight: 900 !important; font-size: clamp(12px, 1.8vw, 14px) !important; padding: 8px 12px !important;}
-[data-testid="stTabs"] button[aria-selected="true"] { color: #ffd700 !important; border-bottom-color: #ffd700 !important; border-bottom-width: 4px !important; text-shadow: 0 0 20px rgba(255,215,0,0.6); }
-[data-testid="stExpander"] { background: rgba(5, 10, 20, 0.9) !important; border: 1px solid rgba(244, 63, 94, 0.5) !important; border-radius: 8px !important; }
+[data-testid="stTabs"] button[aria-selected="true"] { color: #ff003c !important; border-bottom-color: #ff003c !important; border-bottom-width: 4px !important; text-shadow: 0 0 20px rgba(255,0,60,0.6); }
+[data-testid="stExpander"] { background: rgba(5, 10, 20, 0.9) !important; border: 1px solid rgba(255, 0, 60, 0.5) !important; border-radius: 8px !important; }
 .tcg-card-container { perspective: 1500px; width: 100%; margin-bottom: 30px; display: flex; justify-content: center; z-index: 50; position: relative; }
-.tcg-card { width: 100%; max-width: 480px; position: relative; transform-style: preserve-3d; transition: transform 0.5s; border-radius: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); background: #0b1120; overflow: hidden; }
+.tcg-card { width: 100%; max-width: 480px; position: relative; transform-style: preserve-3d; transition: transform 0.5s; border-radius: 12px; box-shadow: 0 30px 60px rgba(0,0,0,0.9); background: #020408; overflow: hidden; }
 .tcg-card:hover { transform: rotateY(8deg) rotateX(-5deg) translateY(-10px) scale(1.02); }
-.tcg-card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(125deg, transparent 20%, rgba(255,255,255,0.4) 40%, rgba(255,215,0,0.5) 50%, rgba(0,243,255,0.4) 60%, transparent 80%); background-size: 250% 250%; background-position: 100% 100%; mix-blend-mode: color-dodge; pointer-events: none; transition: background-position 0.8s ease; z-index: 20; opacity: 0; }
-.tcg-card:hover::after { background-position: 0% 0%; opacity: 1; }
-.tcg-mbti { font-family: 'Orbitron', sans-serif !important; font-size: clamp(65px, 12vw, 90px); font-weight: 900; color: #ffffff !important; line-height: 1; letter-spacing: 8px; margin: 10px 0; position: relative; z-index: 5; }
-.hud-box { background: rgba(5,10,20,0.8); border: 1px solid #334155; border-left: 4px solid #00f3ff; border-radius: 8px; padding: 15px; margin-bottom: 12px; font-family: 'Orbitron', monospace; font-size: 12px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+.hud-box { background: rgba(5,10,15,0.8); border: 1px solid #330011; border-left: 4px solid #ff003c; border-radius: 8px; padding: 15px; margin-bottom: 12px; font-family: 'Orbitron', monospace; font-size: 12px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); }
 .hud-title { color: #94a3b8; font-size: 10px; margin-bottom: 5px; font-weight: bold; letter-spacing: 1px;}
-.hud-val { color: #00f3ff; font-size: 18px; font-weight: bold; }
-.achieve-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; font-family: 'Noto Sans SC'; margin: 2px; background:rgba(255,215,0,0.2); border:1px solid #ffd700; color:#ffd700; }
+.hud-val { color: #ff003c; font-size: 18px; font-weight: bold; text-shadow: 0 0 10px rgba(255,0,60,0.5); }
+.achieve-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; font-family: 'Noto Sans SC'; margin: 2px; background:rgba(255,0,60,0.2); border:1px solid #ff003c; color:#ff003c; }
+.eco-glance { background: linear-gradient(180deg, rgba(20,5,10,0.9), rgba(5,2,5,0.9)); border: 1px solid rgba(255,0,60,0.4); border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: inset 0 0 30px rgba(255,0,60,0.1); }
 </style>
 """
 safe_html(CSS_BLOCK)
@@ -174,7 +191,7 @@ def get_identicon_html(hash_str, color):
     return "<div style='display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; width: 55px; height: 55px; background: rgba(0,0,0,0.8); padding: 5px; border-radius: 8px; border: 2px solid " + color + "; box-shadow: 0 0 20px " + color + "88;'>" + cells + "</div>"
 
 # ==============================================================================
-# 🧠 [ SDE METAVERSE 04 ] 数据基盘与题库 (全量无损还原)
+# 🧠 [ DATA 04 ] 题库与阵营生态图鉴
 # ==============================================================================
 questions = [
     {"q": "推动数商入场时，我倾向于亲自拜访机构进行面对面沟通，而非仅在线上发送标准入驻指引。", "dim": "E"},
@@ -219,54 +236,31 @@ questions = [
     {"q": "面对多线并行的复杂任务（如同时筹备路演与审核规则），我必须先向领导确认优先级并排好序，否则绝对无法安心执行。", "dim": "J"}
 ]
 
-# 核心架构字典 (全量文本无损保留)
 mbti_details = {
-    "INTJ": {"role": "首席数据架构师", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.2%", "base_hash": 9850, "desc": "数据要素底座的“造物主”，致力于为错综复杂的数字经济构建严密的底层制度与逻辑规则。", "tags": ["顶层设计", "逻辑闭环", "制度自信"], "partner": "ENTJ", "partner_advice": "将战略落地全权交由 ENTJ 推进，把 INTP 作为高维模型的逻辑验算机，您只需稳控全局架构不跑偏。", "tasks": ["主导 SDE 核心确权底层逻辑架构设计", "重构下一代高并发撮合交易引擎逻辑"], "black_swan": "过度追求底层架构完美闭环。面临突发政策转向时，系统极易因过于重型而无法敏捷掉头。", "patch": "在构建宏大的交易规则体系时，请适当为前台业务预留“沙盒容错”空间；捕获一线的非结构化反馈，能让制度更具生命力。"},
-    "INTP": {"role": "量化风控专家", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.1%", "base_hash": 9620, "desc": "穿透数据迷雾，寻找复杂业务表象下的底层逻辑漏洞与确权定价模型的最优解。", "tags": ["深度解构", "模型驱动", "极客思维"], "partner": "INTJ", "partner_advice": "依托 INTJ 将您的理论模型锚定在现实业务框架内，并借助 ENTP 的发散思维寻找商业变现出口。", "tasks": ["研发基于特征因子的数据资产动态定价算法", "建立实时数据异常交易嗅探与阻断模型"], "black_swan": "陷入“分析瘫痪”。在需要极速拍板的确权灰度地带，过度追求模型最优解往往导致商机流失。", "patch": "尝试将您极其高维的理论模型降维封装，形成非技术人员也能看懂的《操作指南》，让算法模型转化为生产力。"},
-    "ISTJ": {"role": "合规审查主理官", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 11.6%", "base_hash": 8850, "desc": "SDE 底层防线的守夜人，您的评估本身就是安全、严谨与业务零失误的代名词。", "tags": ["绝对合规", "程序正义", "风险兜底"], "partner": "ESTJ", "partner_advice": "配合 ESTJ 建立坚不可摧的业务推进流水线，由 ISFJ 负责兜底后勤细节，形成最硬核的交付闭环。", "tasks": ["主导头部数商“数据资源入表”全链路审计", "设计业务合同与智能合约的合规映射SOP"], "black_swan": "过度依赖既有 SOP。面临无先例创新业务时，容易因“无库可查”产生本能的排斥与误杀。", "patch": "在死守数据合规红线的同时，面对狂飙突进的创新产品，试着用“如何让它合规地上架”来指导业务。"},
-    "ESTJ": {"role": "核心业务统筹官", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 8.7%", "base_hash": 9500, "desc": "无可争议的推进器，擅长将国家宏观政策拆解为团队可绝对执行的 KPI 矩阵。", "tags": ["强效统帅", "结果导向", "流程大师"], "partner": "ISTJ", "partner_advice": "让 ISTJ 担任您的品控质检员，在突发高并发危机时，直接将排障指挥权临时移交给 ISTP。", "tasks": ["发起并统筹 SDE 年度交易额破局百亿攻坚战", "强力调度跨部门资源打通确权交易清算堵点"], "black_swan": "KPI压倒一切导致“团队算力过载”。强推项目时易忽视一线团队的情绪阈值，引发内耗。", "patch": "在下发高压任务指令时，适度向团队释放“情绪价值”。具备高信任感的团队往往比单纯的数字目标走得更稳健。"},
-    "INFJ": {"role": "产业生态智囊", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 0.9%", "base_hash": 9200, "desc": "具备极强的跨频段共情能力，能精准预判数据流转对未来实体经济产生的深远变革。", "tags": ["远见卓识", "使命驱动", "战略前瞻"], "partner": "ENFJ", "partner_advice": "将您的远见卓识交由 ENFJ 在核心圈层构建共识，让 ENFP 作为布道火种将您的理念扩散至全行业。", "tasks": ["规划 SDE 未来五年在实体经济的数据赋能版图", "发起“数据向善”及社会公益数据要素流通倡议"], "black_swan": "强烈的战略直觉若缺乏硬核量化数据支撑，向实干型领导汇报时极易被贴上“不切实际”标签。", "patch": "学会用精确的财务测算、合规条文来锚定您的宏大产业愿景。将“先知直觉”转化为具体的业务政策专报。"},
-    "INFP": {"role": "生态价值主张官", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 4.4%", "base_hash": 8650, "desc": "冷酷数据背后的灵魂捕捉者，擅长在机械的交易网络中注入引人共鸣的生态文化。", "tags": ["价值感召", "组织粘合", "品牌定调"], "partner": "ENFJ", "partner_advice": "依托 ENFJ 的手腕在跨部门博弈中为您护航，联合 ISFP 将抽象的文化主张具象化为绝美的视觉产品。", "tasks": ["重塑 SDE 在数据交易领域的全球品牌叙事", "实施内部文化与跨部门协作协同凝聚力工程"], "black_swan": "在跨部门冷酷的算力与预算博弈中，容易因厌恶冲突而退缩，导致核心价值观无法落地。", "patch": "在跨部门协同博弈中，学会熟练利用预算工具和业务导向来捍卫您的核心价值主张，将柔性文化转化为硬性资产。"},
-    "ENTJ": {"role": "战略开拓领军人", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.8%", "base_hash": 9900, "desc": "天生的矩阵建设者，在数据跨境、公共数据授权等探索区中展现极强的破局能力。", "tags": ["开疆拓土", "战略铁腕", "极致破局"], "partner": "INTJ", "partner_advice": "冲锋时将后背交给 INTJ 进行战略兜底，遇到底层技术阻击时，立刻呼叫 ISTP 进行定点爆破。", "tasks": ["主导“公共数据授权运营”省级破冰与资源抢占", "制定并执行跨链互认及全国数据大市场吞并战略"], "black_swan": "狂飙突进时的风控盲区。在极速吞并外部资源时极易因忽视底层合规红线而触发监管熔断。", "patch": "在极速开疆拓土时，请时刻保持与合规团队的数据同步。有时放慢半拍听听风控预警，能避开系统性风险。"},
-    "ENTP": {"role": "模式创新顾问", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.2%", "base_hash": 9400, "desc": "传统交易规则的敏锐挑战者，致力于通过跨界思维寻找下一代数据要素流转范式。", "tags": ["范式重构", "逻辑激辩", "思维跳跃"], "partner": "INTP", "partner_advice": "把您天马行空的狂野点子丢给 INTP 进行逻辑降维，并指挥 ESTP 去市场上快速收割第一波红利。", "tasks": ["研发首个基于 Web3 的新型数据要素凭证通证", "在监管沙盒内主导蓝海型数字产品变现测试"], "black_swan": "无限发散思维导致的交付烂尾。若缺乏强力的落地跟进节点，极易沦为纯粹的纸上谈兵。", "patch": "适当收敛发散思维，选择一个极具潜力的创新点（如特定行业数据凭证），深度闭环跟进至最终交付。"},
-    "ENFJ": {"role": "数商生态总监", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 2.5%", "base_hash": 9350, "desc": "数据交易所的枢纽中心，能通过卓越的共识构建能力将多方利益竞争者聚拢为盟友。", "tags": ["关系枢纽", "温情领导力", "利益协同"], "partner": "INFJ", "partner_advice": "汲取 INFJ 的深度产业洞察作为布道弹药，并由 ESFJ 将您的宏观共识转化为具体的客情跟进单。", "tasks": ["构建辐射全国的 SDE 头部数商与第三方服务联盟", "维稳数据要素多边市场，调解核心生态伙伴冲突"], "black_swan": "对生态伙伴过度包容。处理违规事件时容易被“人情”裹挟，从而损害交易所的绝对中立性。", "patch": "在协调多方利益分配时，大胆引入客观的量化算法与智能合约刚性指标，确保“生态和谐”建立在规则基石之上。"},
-    "ENFP": {"role": "平台资源布道大使", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 8.1%", "base_hash": 8900, "desc": "充满感染力的生态火苗，让每一场路演与推介都变成数据要素市场的狂热共识。", "tags": ["无限创意", "跨界纽带", "高频驱动"], "partner": "INFJ", "partner_advice": "在您的创意发散即将失控时，请务必听从 INFJ 的战略纠偏，并强迫自己遵循 INTJ 设定的节点框架。", "tasks": ["领衔 SDE 全国核心城市业务路演与生态宣发大循环", "策划并主持面向千家数商的“数据赋能创新工坊”"], "black_swan": "缺乏结构化数据追踪。路演现场火热但无法转化为 CRM 里的真实入驻率，商业核算价值打折。", "patch": "引入严密的商机日程表与里程碑管理。将您天马行空的生态创意转化为可追踪的业务转化漏斗。"},
-    "ISFJ": {"role": "清结算运营中枢", "tier": "R", "tier_color": "#3b82f6", "rarity": "Top 13.8%", "base_hash": 8200, "desc": "最坚韧的底层支点，通过极致纠错与细节控场支撑起整个平台的专业信誉与高吞吐。", "tags": ["极致支撑", "服务巅峰", "高可用节点"], "partner": "ESFJ", "partner_advice": "将对外的复杂客情交由 ESFJ 抵挡，您只需与 ISTJ 背靠背，打造坚不可摧的后方清结算堡垒。", "tasks": ["保障全天候撮合及大额资金清结算体系 0 宕机", "极速响应并闭环处理生态节点与数商的底层工单"], "black_swan": "默默承受过载的技术债。不善于向上抗议，可能在交易洪峰期因人工审核量爆表而面临崩溃。", "patch": "在完美支撑中后台运转之余，尝试主动提出冗余流程的优化提案。您的实操痛点极具价值。"},
-    "ESFJ": {"role": "政企商务枢纽", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 12.3%", "base_hash": 8750, "desc": "超级连接器，擅长经营多维度的外部政企生态关系，是前线业务部门的最强润滑剂。", "tags": ["协作典范", "客情控制", "社会化支撑"], "partner": "ISFJ", "partner_advice": "在前线维护八方客情时，把繁杂的合同流转放心抛给 ISFJ，遇到合规红线问题立刻请 ESTJ 强硬回绝。", "tasks": ["高频维护国家部委及地方大数据局的核心 G 端客情", "统筹落地具有全国影响力的年度数据要素高峰论坛"], "black_swan": "过度满足多方诉求导致的边界失守。极易因“谁都想讨好”而签下严重偏离平台底线的协议。", "patch": "在维护复杂商务生态时，建立更独立的合规风险过滤网。在照顾合作方诉求时保持底线清醒。"},
-    "ISTP": {"role": "平台风控与排障专家", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 5.4%", "base_hash": 8950, "desc": "数据底座的实干派，只对事实和逻辑代码负责，是系统面临大并发技术故障时的定海神针。", "tags": ["极简实干", "故障排查", "硬核运维"], "partner": "ESTP", "partner_advice": "当 ESTP 在前线疯狂接单导致系统过载时，由您负责底层扩容，并与 INTP 联手重构最优并发算法。", "tasks": ["执行 SDE 核心交易链路的灾备拉起与物理级排障", "在不影响前台撮合的前提下执行底层架构高危热更新"], "black_swan": "技术彻底黑盒化。过度依赖个人的“极客直觉”排障，一旦休假离线会导致整个系统应急瘫痪。", "patch": "尝试将您极度内隐的底层排查经验，沉淀为可视化的《应急响应标准手册》。打破沟通壁垒。"},
-    "ISFP": {"role": "资产交互体验官", "tier": "R", "tier_color": "#3b82f6", "rarity": "Top 8.8%", "base_hash": 8150, "desc": "赋予枯燥数据以美学权重，致力于提升数据产品在终端大屏展示时的绝对视觉专业质感。", "tags": ["审美溢价", "感官叙事", "体验极致"], "partner": "ESFP", "partner_advice": "将您的美学产出交由 ESFP 在各大峰会上高调发布，并从 INFP 构筑的生态故事中汲取设计灵感。", "tasks": ["重构 SDE 实时交易大盘的动态数据全息视觉渲染", "主导面向数商终端的 UI/UX 操作流敏捷体验升级"], "black_swan": "陷入纯粹形式主义。设计出极其炫酷的大屏，却完全脱离了“数据确权撮合”的核心商业逻辑。", "patch": "在追求终端展示的美学溢价时，适度增加对核心确权流转逻辑和底层交易协议的理解。"},
-    "ESTP": {"role": "前沿敏捷先锋", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 4.3%", "base_hash": 8800, "desc": "数据流通一线的敏锐猎手，能极快捕捉到瞬息万变的市场红利与应用空间的套利机会。", "tags": ["市场直觉", "敏捷收割", "实战专家"], "partner": "ISTP", "partner_advice": "尽情在市场前线厮杀套利，让 ISTP 为您搭建最稳固的技术跳板，遇到僵局迅速呼叫 ENTJ 支援。", "tasks": ["敏锐收割新政策出台后的第一波“短期数据流通红利”", "针对区域内竞所的市场抢夺发起极速实战反制突击"], "black_swan": "为了极速促成首单，倾向于利用捷径绕过繁琐的合规防火墙，一旦溯源出瑕疵将面临毁灭性反噬。", "patch": "在捕捉市场瞬时机遇、展现高效行动力促成交易时，务必将前置合规审查纳入操作流程中。"},
-    "ESFP": {"role": "官方品牌发声信标", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 9.9%", "base_hash": 8300, "desc": "交易所的前台形象窗口，天生具备将复杂的政策解码为大众传播话术的超级天赋。", "tags": ["全域表现", "舆情响应", "公关信标"], "partner": "ISFP", "partner_advice": "用您极具感染力的表现为 ISFP 的视觉产品带货，并与 ENFP 联手策划能掀起全网狂潮的顶级路演。", "tasks": ["在全网引爆 SDE 最新明星数据产品的展会级宣发流量", "冲在第一线对冲平台突发的负面市场舆情并进行柔性公关"], "black_swan": "由于对底层条款理解深度不够，对外宣发时极易出现“用词越界”，引发监管舆情风险。", "patch": "花时间深潜研究数据要素的底层逻辑与政策红头文件。将您的绝佳表现力建立在扎实的产业根基上。"}
+    "INTJ": {"role": "矩阵架构师", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.2%", "base_hash": 9850, "desc": "垄断核心规则的幕后操盘手，在绝境中重写了整个财团的底层代码。", "tags": ["绝对独裁", "逻辑绞肉机", "法则支配"], "partner": "ENTJ", "partner_advice": "将前线指挥权交给 ENTJ，你只需稳居幕后。", "tasks": ["渗透并篡改中心化交易引擎", "建立反追踪的高维逻辑壁垒"], "black_swan": "对完美闭环的执念。当战争规则突然改变时，容易因为僵化而被反噬。", "patch": "在致命逻辑中留下一道后门，允许一线节点的混沌容错。", "skills": ["【被动】全知视界", "【法术】底层规则解构", "【领域】绝对秩序统御"], "base_roi": 1.45, "volatility": 0.20, "market_style": "宏观架构对冲与冷酷收割", "evolution_path": ["L1 架构规划者", "L2 矩阵操盘手"], "ultimate_evolution": "【绝对算力主宰】剥夺一切节点定价权"},
+    "INTP": {"role": "深网风控骇客", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.1%", "base_hash": 9620, "desc": "穿透财团迷雾，在深网中寻找资本漏洞的极致黑客。", "tags": ["黑盒解构", "模型杀手", "极客暴徒"], "partner": "INTJ", "partner_advice": "依托 INTJ 将你的破坏性代码锚定，避免失控。", "tasks": ["研发针对核心财团的自动剥削算法", "部署实时异动嗅探木马"], "black_swan": "陷入无穷的算力演算中，在需要拔线的瞬间犹豫，导致机房被毁。", "patch": "别管模型优不优了，先拔电源！", "skills": ["【被动】多维特征抽取", "【法术】零日漏洞感染", "【秘技】量子坍缩推演"], "base_roi": 1.60, "volatility": 0.45, "market_style": "高频统计套利与嗜血量化模型", "evolution_path": ["L1 边缘骇客", "L2 深网潜行者"], "ultimate_evolution": "【全知算法先知】构建百分百无损的跨网风控引擎"},
+    "ISTJ": {"role": "铁血审查官", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 11.6%", "base_hash": 8850, "desc": "废土中的程序正义者，你的评估就是生与死的分界线。", "tags": ["绝对防线", "铁血程序", "风险斩杀"], "partner": "ESTJ", "partner_advice": "配合 ESTJ 建立最强硬的防线，绞杀一切越界行为。", "tasks": ["主导企业叛逃节点的肃清审计", "锁定一切违背智能合约的行径"], "black_swan": "过于依赖旧世界的SOP。当新神降临时，你手中的法典可能毫无用处。", "patch": "偶尔学会闭上一只眼睛。", "skills": ["【被动】绝对法典加护", "【护盾】重装正义壁垒", "【反击】致命风险处决"], "base_roi": 1.15, "volatility": 0.10, "market_style": "绝对风险厌恶与固收阵地战", "evolution_path": ["L1 审查哨兵", "L2 铁血执行官"], "ultimate_evolution": "【绝对防御堡垒】废土要素流转网络最终守门人"},
+    "ESTJ": {"role": "战区统帅", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 8.7%", "base_hash": 9500, "desc": "无可争议的镇压者，擅长将高层的残忍指令拆解为绝对执行的绞肉机。", "tags": ["铁血统帅", "结果导向", "战争机器"], "partner": "ISTJ", "partner_advice": "让 ISTJ 担任你的宪兵队长，在发生叛乱时迅速镇压。", "tasks": ["发起并统筹对敌对财团的百亿级歼灭战", "强力调度跨战区火力网"], "black_swan": "KPI压倒一切导致团队理智值崩溃引发哗变。", "patch": "下达送死指令前，适度释放廉价的情绪价值。", "skills": ["【被动】战略降维打击", "【战吼】全军狂暴冲锋", "【光环】铁腕意志压制"], "base_roi": 1.35, "volatility": 0.25, "market_style": "动量突破与重火力资产倾泻", "evolution_path": ["L1 战区指挥官", "L2 废土推进者"], "ultimate_evolution": "【战争心脏】宏观绞肉机推进的中枢"},
+    "INFJ": {"role": "灵能先知", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 0.9%", "base_hash": 9200, "desc": "在冰冷代码中觉醒了人类共情，能预判未来战争走向的隐秘引路人。", "tags": ["虚空远见", "信仰狂热", "灵魂操控"], "partner": "ENFJ", "partner_advice": "将你的救赎愿景交由 ENFJ 在废土中广播，凝聚反抗力量。", "tasks": ["规划废土重建版图", "发起数字向善的最后一次倡议"], "black_swan": "过度悲天悯人，在极度残酷的算力掠夺中容易成为首个被献祭的节点。", "patch": "将你的先知直觉转化为冰冷的财报测算。", "skills": ["【被动】未来因果洞视", "【光环】跨频灵魂尖啸", "【法术】精神信仰奴役"], "base_roi": 1.55, "volatility": 0.35, "market_style": "宏观周期收割与长线价值潜伏", "evolution_path": ["L1 边缘观察者", "L2 灵能布道师"], "ultimate_evolution": "【全域先知】主导数字末日时代的底层精神共识"},
+    "INFP": {"role": "游吟灵魂捕手", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 4.4%", "base_hash": 8650, "desc": "在这片被财团统治的废土上，你是唯一还记得“诗与远方”的幻灵。", "tags": ["价值感召", "组织凝胶", "异端定调"], "partner": "ENFJ", "partner_advice": "依托 ENFJ 的手腕在血腥博弈中为你护航。", "tasks": ["重塑反抗军的全球精神叙事", "实施废土营地的内部凝聚力工程"], "black_swan": "在冷酷的火力对决中因厌恶血腥而退缩。", "patch": "学会熟练利用预算与弹药来捍卫你的狂热信仰。", "skills": ["【被动】无形异端塑形", "【法术】直击灵魂低语", "【光环】隐性狂暴注入"], "base_roi": 1.25, "volatility": 0.30, "market_style": "另类信仰投资与利基长尾剥削", "evolution_path": ["L1 幻象叙事者", "L2 灵魂共振官"], "ultimate_evolution": "【灵魂共振核】赋予数据昂贵信仰溢价"},
+    "ENTJ": {"role": "军阀霸主", "tier": "UR", "tier_color": "#ff003c", "rarity": "Top 1.8%", "base_hash": 9900, "desc": "天生的帝国建设者，在数据丛林法则中展现极强的暴力吞并能力。", "tags": ["全图开疆", "战略暴君", "降维碾压"], "partner": "INTJ", "partner_advice": "冲锋时把后背交给 INTJ，遇到底层装甲呼叫 ISTP 爆破。", "tasks": ["主导省级资源抢占与大清洗", "执行跨链互认大统一吞并战"], "black_swan": "狂飙突进时无视红线，被超级财团的轨道炮锁定熔断。", "patch": "放慢半拍，听听风控官的哀嚎，留点活口。", "skills": ["【被动】绝对暴君破局", "【战技】全域版图吞并", "【奥义】维度降级风暴"], "base_roi": 1.70, "volatility": 0.55, "market_style": "极高杠杆并购与特殊机会强吃", "evolution_path": ["L1 开拓先锋", "L2 战区统帅"], "ultimate_evolution": "【无界帝国霸主】全国市场的唯一暴君"},
+    "ENTP": {"role": "混沌诡术师", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 3.2%", "base_hash": 9400, "desc": "旧秩序的践踏者，致力于通过跨界思维寻找资本漏洞的狂徒。", "tags": ["范式爆破", "诡辩狂人", "维度跳跃"], "partner": "INTP", "partner_advice": "把狂野的图纸丢给 INTP 降维，指挥 ESTP 去前线强拆。", "tasks": ["研发不可追溯的暗网凭证", "在监管盲区主导蓝海变现测试"], "black_swan": "无限发散导致交付烂尾，挖了坑不填直接跑路。", "patch": "收敛疯狂，选一个极具杀伤力的点深度引爆。", "skills": ["【被动】旧日秩序撕裂", "【法术】跨界降维骇入", "【光环】次元逻辑崩坏"], "base_roi": 1.65, "volatility": 0.60, "market_style": "高风险套利与颠覆性灾难做空", "evolution_path": ["L1 沙盒破坏者", "L2 跨界重组官"], "ultimate_evolution": "【秩序粉碎者】亲手书写下一个纪元"},
+    "ENFJ": {"role": "黑市大主教", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 2.5%", "base_hash": 9350, "desc": "地下黑市的无冕之王，能通过恐怖的共识构建能力将佣兵聚拢为敢死队。", "tags": ["关系毒枭", "温情洗脑", "利益操盘"], "partner": "INFJ", "partner_advice": "汲取 INFJ 的深渊洞察作为弹药，由 ESFJ 转化为血契跟进单。", "tasks": ["构建辐射全网的非法服务联盟", "调解核心黑帮冲突"], "black_swan": "对盟友过度包容，处理叛徒时容易被虚假人情裹挟。", "patch": "引入无情的智能合约刚性处决指标。", "skills": ["【被动】绝对狂热结盟", "【光环】极客温情统御", "【战技】利益杠杆操盘"], "base_roi": 1.40, "volatility": 0.25, "market_style": "庞大资产池宏观操控与网络挟持", "evolution_path": ["L1 渠道统筹", "L2 联盟主理人"], "ultimate_evolution": "【引力黑洞】垄断全国巨头的绝对心智"},
+    "ENFP": {"role": "废土布道者", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 8.1%", "base_hash": 8900, "desc": "充满感染力的暴乱火种，让每一场推介都变成市场崩溃的狂欢。", "tags": ["无限创意", "跨界煽动", "高频驱动"], "partner": "INFJ", "partner_advice": "在发散即将引发自爆时，务必听从 INFJ 的强行纠偏。", "tasks": ["领衔全网核心战区业务扫荡大循环", "主持面向千人的洗脑创新工坊"], "black_swan": "现场火热但无法转化为真实弹药，导致商业价值破产。", "patch": "引入严密的商机漏斗，把狂热变现为杀伤力。", "skills": ["【被动】群体狂热煽动", "【法术】全域流量吞噬", "【光环】异构资源强融"], "base_roi": 1.40, "volatility": 0.40, "market_style": "高波动狂热追逐与注意力收割", "evolution_path": ["L1 宣发先锋官", "L2 流量矩阵中枢"], "ultimate_evolution": "【无界基站】把控全域要素的流量高地"},
+    "ISFJ": {"role": "避难所铁壁", "tier": "R", "tier_color": "#3b82f6", "rarity": "Top 13.8%", "base_hash": 8200, "desc": "最坚韧的底层肉盾，通过极致的损管控制支撑起整个军团的存活。", "tags": ["极限损管", "绝对防线", "不死肉盾"], "partner": "ESFJ", "partner_advice": "将外部战火交由 ESFJ 抵挡，您只需与 ISTJ 铸造叹息之墙。", "tasks": ["保障高压大额资金清算 0 宕机", "极速处理前线濒死的救援工单"], "black_swan": "默默承受过载的火力。可能在交易洪峰期因装甲爆表而阵亡。", "patch": "学会主动抗命，抛弃不必要的冗余防御。", "skills": ["【被动】极限装甲并发", "【法术】毫米级断肢重生", "【护盾】最后叹息之墙"], "base_roi": 1.10, "volatility": 0.08, "market_style": "极低回撤避险与无风险倒把策略", "evolution_path": ["L1 营地卫士", "L2 堡垒主管"], "ultimate_evolution": "【永动核心】维持军团生命线的最终坚盾"},
+    "ESFJ": {"role": "八面玲珑掮客", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 12.3%", "base_hash": 8750, "desc": "超级连接器，游走在各大财团与反抗军之间，是阵地战的最强润滑剂。", "tags": ["协作掮客", "情报控制", "社会缓冲"], "partner": "ISFJ", "partner_advice": "在外长袖善舞时，把后勤安全交给 ISFJ。", "tasks": ["高频维护各方巨头的核心机密情报", "统筹地下黑市的资源调配大会"], "black_swan": "过度满足多方导致底线失守，签下丧权辱国的投降协议。", "patch": "建立独立的风控过滤网，谁敢越界就开枪。", "skills": ["【被动】政企超级链接", "【光环】社会化缓冲护盾", "【法术】多方仇恨均衡"], "base_roi": 1.20, "volatility": 0.15, "market_style": "庞大资金盘吸血与引导基金空手套白狼", "evolution_path": ["L1 见习掮客", "L2 黑市巨头"], "ultimate_evolution": "【政企超导桥梁】构筑不可替代的情报网护城河"},
+    "ISTP": {"role": "暗夜拔线刺客", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 5.4%", "base_hash": 8950, "desc": "只对杀戮逻辑负责的幽灵，面对崩溃拔线即是真理。", "tags": ["物理切断", "硬核排爆", "极客杀手"], "partner": "ESTP", "partner_advice": "当 ESTP 在前线引来暴走仇恨时，由您负责底层直接拔线。", "tasks": ["执行核心设施的灾备抢修与物理破坏", "在炮火中执行机甲热更新"], "black_swan": "独狼作风。一旦陷入包围圈且通讯切断，极易被集火秒杀。", "patch": "将排雷经验写成防呆手册扔给炮灰。", "skills": ["【被动】致命物理拔线", "【法术】量子黑盒引爆", "【光环】超体极客杀意"], "base_roi": 1.35, "volatility": 0.35, "market_style": "黑天鹅事件狙击、困境反转与暴力破解", "evolution_path": ["L1 独狼猎兵", "L2 灾备指挥官"], "ultimate_evolution": "【代码幽灵】掌控国家机房的物理生命力"},
+    "ISFP": {"role": "幻象编织者", "tier": "R", "tier_color": "#3b82f6", "rarity": "Top 8.8%", "base_hash": 8150, "desc": "在血腥战争中，用致幻的美学神经毒素瓦解敌人的战意。", "tags": ["视觉致幻", "感官剥夺", "体验巅峰"], "partner": "ESFP", "partner_advice": "将幻象炸弹交由 ESFP 在广场上引爆。", "tasks": ["重构敌方作战大盘的动态致幻渲染", "主导视觉洗脑体验升级"], "black_swan": "造出极其炫酷但无法击穿护甲的烟雾弹。", "patch": "在幻境中加入致命的木马负荷。", "skills": ["【被动】沉浸感官叙事", "【法术】低维美学抹杀", "【光环】心流深渊捕获"], "base_roi": 1.18, "volatility": 0.22, "market_style": "高奢非标资产与情绪致幻投资估值", "evolution_path": ["L1 幻觉特工", "L2 视觉暴君"], "ultimate_evolution": "【感官具象师】以一己之力拉升百倍幻象溢价"},
+    "ESTP": {"role": "嗜血狂徒", "tier": "SSR", "tier_color": "#ffd700", "rarity": "Top 4.3%", "base_hash": 8800, "desc": "战线最前沿的敏锐猎手，能在枪林弹雨中嗅到暴利的机会。", "tags": ["野性直觉", "极速割喉", "实战暴徒"], "partner": "ISTP", "partner_advice": "尽情在前线厮杀，让 ISTP 为您提供最稳固的火力掩护。", "tasks": ["敏锐收割财团崩溃后的第一波物资红利", "针对敌对阵营发起极速闪电斩首"], "black_swan": "为了极速抢人头，踩中高爆地雷区，遭到毁灭性反噬。", "patch": "冲锋前先扔个探测器。", "skills": ["【被动】毫秒瞬时割喉", "【战技】全图火力覆盖", "【光环】血腥红利嗅探"], "base_roi": 1.50, "volatility": 0.50, "market_style": "超高频日内白刃战与极限突发利好嗜血收割", "evolution_path": ["L1 突击兵", "L2 战地狼王"], "ultimate_evolution": "【极速套利猎手】全网废土套利空间的绝杀狙击者"},
+    "ESFP": {"role": "末日偶像", "tier": "SR", "tier_color": "#a855f7", "rarity": "Top 9.9%", "base_hash": 8300, "desc": "各大阵营争夺的前台形象窗口，一言一行足以左右全网军心。", "tags": ["全域魅惑", "舆情控制", "精神广播"], "partner": "ISFP", "partner_advice": "穿上 ISFP 为你打造的战袍，去前线开一场鼓舞士气的演唱会。", "tasks": ["在全网引爆最新型机甲的展会级宣发", "冲在第一线安抚溃败士兵的情绪"], "black_swan": "对外宣发时大嘴巴泄露了基地的坐标，引发灭顶之灾。", "patch": "把稿子背熟，不要即兴发挥。", "skills": ["【被动】全域舆论脑控", "【光环】情绪频率劫持", "【奥义】暴走危机降维"], "base_roi": 1.35, "volatility": 0.38, "market_style": "狂热粉丝驱动、社交网络暴动与情绪面收割", "evolution_path": ["L1 战地记者", "L2 精神领袖"], "ultimate_evolution": "【极速情绪信标】左右资本市场波动的首席发声端"}
 }
-
-patch_data = {
-    "INTJ": {"skills": ["【被动】全知视界", "【法术】底层规则解构", "【领域】绝对秩序统御"], "base_roi": 1.45, "volatility": 0.20, "market_style": "宏观架构对冲与长期趋势跟踪策略", "evolution_path": ["L1 架构规划官", "L2 核心规则主理人"], "ultimate_evolution": "【绝对算力主宰】掌控数据产品的终极业务定价权"},
-    "INTP": {"skills": ["【被动】多维特征抽取", "【法术】零日漏洞嗅探", "【秘技】量子坍缩推演"], "base_roi": 1.60, "volatility": 0.45, "market_style": "高频统计套利与多因子量化模型", "evolution_path": ["L1 风控分析师", "L2 模型主理人"], "ultimate_evolution": "【全知算法先知】构建百分百无损的跨网底层风控引擎"},
-    "ISTJ": {"skills": ["【被动】绝对法典映射", "【护盾】程序正义壁垒", "【反击】致命风险阻断"], "base_roi": 1.15, "volatility": 0.10, "market_style": "绝对风险厌恶与固收类稳健策略", "evolution_path": ["L1 审查风控官", "L2 规则执行官"], "ultimate_evolution": "【绝对防御堡垒】全国一体化数据市场要素流转网络最终守门人"},
-    "ESTJ": {"skills": ["【被动】战略降维拆解", "【战吼】全域资源狂暴", "【光环】铁腕意志压制"], "base_roi": 1.35, "volatility": 0.25, "market_style": "动量突破与大容量核心资产配置", "evolution_path": ["L1 战区指挥官", "L2 跨域推进者"], "ultimate_evolution": "【全域秩序引擎】宏观数据业务推进的心脏中枢"},
-    "INFJ": {"skills": ["【被动】未来脉络洞视", "【光环】跨频灵魂共振", "【法术】精神信仰织网"], "base_roi": 1.55, "volatility": 0.35, "market_style": "宏观周期预判与长线价值发现", "evolution_path": ["L1 行业分析师", "L2 战略规划官"], "ultimate_evolution": "【全域生态先知】主导数字经济时代的底层精神共识"},
-    "INFP": {"skills": ["【被动】无形文化塑形", "【法术】直击灵魂叙事", "【光环】隐性品牌暴击"], "base_roi": 1.25, "volatility": 0.30, "market_style": "ESG 价值投资与利基市场长尾策略", "evolution_path": ["L1 体验叙事者", "L2 品牌调性官"], "ultimate_evolution": "【灵魂共振奇核】赋予极客冷数据极其昂贵的品牌溢价"},
-    "ENTJ": {"skills": ["【被动】绝对铁腕破局", "【战技】全域版图吞并", "【奥义】维度打击风暴"], "base_roi": 1.70, "volatility": 0.55, "market_style": "杠杆并购、特殊机会与高举高打", "evolution_path": ["L1 开拓先锋", "L2 战区统帅"], "ultimate_evolution": "【无界版图霸主】全国一体化数据市场的超级统帅"},
-    "ENTP": {"skills": ["【被动】旧有范式重塑", "【法术】跨界降维骇入", "【光环】次元逻辑破壁"], "base_roi": 1.65, "volatility": 0.60, "market_style": "风险套利、期权重组与颠覆性投资", "evolution_path": ["L1 沙盒破坏者", "L2 跨界重组官"], "ultimate_evolution": "【范式秩序破坏者】亲手定义下个十年的交易元规则"},
-    "ENFJ": {"skills": ["【被动】绝对共识结盟", "【光环】极客温情统御", "【战技】利益杠杆平衡"], "base_roi": 1.40, "volatility": 0.25, "market_style": "庞大资产池宏观调配与网络效应增强", "evolution_path": ["L1 渠道统筹", "L2 联盟主理人"], "ultimate_evolution": "【共识引力波】垄断全国超头数据商的绝对心智"},
-    "ENFP": {"skills": ["【被动】群体情绪煽动", "【法术】全域流量黑洞", "【光环】异构资源嫁接"], "base_roi": 1.40, "volatility": 0.40, "market_style": "高波动趋势追逐与注意力经济炒作", "evolution_path": ["L1 宣发先锋官", "L2 流量矩阵中枢"], "ultimate_evolution": "【无界传播基站】把控国家全域要素市场的流量高地"},
-    "ISFJ": {"skills": ["【被动】极限并发支撑", "【法术】毫米级量子纠错", "【护盾】最后绝对防线"], "base_roi": 1.10, "volatility": 0.08, "market_style": "极低回撤避险与无风险极致套利策略", "evolution_path": ["L1 运营专员", "L2 平台质检官"], "ultimate_evolution": "【绝对永动节点】维持交易所生命线的最终坚盾"},
-    "ESFJ": {"skills": ["【被动】政企超级链接", "【光环】社会化缓冲巨网", "【法术】多方负载均衡"], "base_roi": 1.20, "volatility": 0.15, "market_style": "庞大资金盘稳健配置与政企引导基金模式", "evolution_path": ["L1 商务专员", "L2 政企主理"], "ultimate_evolution": "【政企超导桥梁】构筑不可替代的 G 端业务护城河"},
-    "ISTP": {"skills": ["【被动】致命物理拔线", "【法术】量子黑盒破解", "【光环】超体极客直觉"], "base_roi": 1.35, "volatility": 0.35, "market_style": "黑天鹅事件驱动、困境反转与系统级技术套利", "evolution_path": ["L1 底层架构师", "L2 灾备指挥官"], "ultimate_evolution": "【底层代码幽灵】掌控国家要素机房的绝对生命力"},
-    "ISFP": {"skills": ["【被动】沉浸感官叙事", "【法术】低维美学重构", "【光环】绝对心流捕获"], "base_roi": 1.18, "volatility": 0.22, "market_style": "艺术品级别非标资产与另类情感投资估值", "evolution_path": ["L1 UI视觉专员", "L2 交互总监"], "ultimate_evolution": "【感官具象师】以一己之力拉升数据产品百倍视觉溢价"},
-    "ESTP": {"skills": ["【被动】毫秒瞬时收割", "【战技】全图火力覆盖", "【光环】血腥红利嗅探"], "base_roi": 1.50, "volatility": 0.50, "market_style": "超高频日内交易与极限突发利好嗜血收割", "evolution_path": ["L1 突击交易员", "L2 战地狼王"], "ultimate_evolution": "【极速套利猎手】全网数据交易套利空间的绝杀狙击者"},
-    "ESFP": {"skills": ["【被动】全域舆论控场", "【光环】情绪频率调控", "【奥义】暴走危机降维"], "base_roi": 1.35, "volatility": 0.38, "market_style": "舆论狂热驱动、社交媒体共振与情绪面交易", "evolution_path": ["L1 品牌代言", "L2 首席发言人"], "ultimate_evolution": "【极速情绪信标】左右资本市场情绪波动的首席发声端"}
-}
-
-for k, v in mbti_details.items():
-    if k in patch_data: v.update(patch_data[k])
 
 def get_faction_info(mbti_code):
-    if "NT" in mbti_code: return {"name": "赛博真理会 (量子)", "element": "⚡ 量子", "color": "#00f3ff"}
-    if "NF" in mbti_code: return {"name": "以太灵能网 (灵能)", "element": "✨ 灵能", "color": "#a855f7"}
-    if "SJ" in mbti_code: return {"name": "绝对秩序阵线 (钢核)", "element": "🛡️ 钢核", "color": "#10b981"}
-    if "SP" in mbti_code: return {"name": "混沌游侠公会 (炎脉)", "element": "🔥 炎脉", "color": "#ff003c"}
-    return {"name": "无界佣兵", "element": "🌌 暗物质", "color": "#ffffff"}
+    if "NT" in mbti_code: return {"name": "硅基抵抗军", "element": "⚡ 量子", "color": "#00f3ff"}
+    if "NF" in mbti_code: return {"name": "幽能清道夫", "element": "✨ 灵能", "color": "#a855f7"}
+    if "SJ" in mbti_code: return {"name": "秩序裁决所", "element": "🛡️ 钢核", "color": "#10b981"}
+    if "SP" in mbti_code: return {"name": "混沌暴徒", "element": "🔥 炎脉", "color": "#ff003c"}
+    return {"name": "无界流浪者", "element": "🌌 暗物质", "color": "#ffffff"}
 
 RELICS_POOL = [
     {"name": "【UR】中本聪的创世U盘", "rarity": "UR", "cp": 50000, "desc": "全属性巨幅飙升", "color": "#ff003c"},
@@ -275,73 +269,73 @@ RELICS_POOL = [
     {"name": "【SSR】破壁者的金库密钥", "rarity": "SSR", "cp": 20000, "desc": "剥夺对手利润", "color": "#ffd700"},
     {"name": "【SSR】统帅的暴走号角", "rarity": "SSR", "cp": 18000, "desc": "全员进入狂热状态", "color": "#ffd700"},
     {"name": "【SSR】量子裁决天平", "rarity": "SSR", "cp": 19000, "desc": "无视一切黑天鹅", "color": "#ffd700"},
-    {"name": "【SR】数据局长的不锈钢杯", "rarity": "SR", "cp": 8000, "desc": "保持绝对的冷静", "color": "#a855f7"},
+    {"name": "【SR】局长的不锈钢杯", "rarity": "SR", "cp": 8000, "desc": "保持绝对冷血", "color": "#a855f7"},
     {"name": "【SR】极客的机械义眼", "rarity": "SR", "cp": 7500, "desc": "漏洞嗅探效率飙升", "color": "#a855f7"},
     {"name": "【SR】布道者的炽热火种", "rarity": "SR", "cp": 7000, "desc": "点燃市场 FOMO 情绪", "color": "#a855f7"},
-    {"name": "【R】满是 Bug 的旧键盘", "rarity": "R", "cp": 3000, "desc": "敲击的段落感清脆", "color": "#3b82f6"},
+    {"name": "【R】满是 Bug 的旧键盘", "rarity": "R", "cp": 3000, "desc": "敲击段落感清脆", "color": "#3b82f6"},
     {"name": "【R】特氟龙防粘平底锅", "rarity": "R", "cp": 2500, "desc": "完美反弹线上事故", "color": "#3b82f6"}
 ]
 
 PETS_POOL = [
-    {"name": "【UR】虚空量子猫", "rarity": "UR", "cp": 35000, "desc": "薛定谔的梦魇，巨幅增伤", "color": "#ff003c"},
-    {"name": "【SSR】机械哈士奇", "rarity": "SSR", "cp": 15000, "desc": "绝对忠诚，拦截攻击", "color": "#ffd700"},
-    {"name": "【SR】寻宝灵狐", "rarity": "SR", "cp": 6000, "desc": "增加远征掉落概率", "color": "#a855f7"},
-    {"name": "【R】电子游隼", "rarity": "R", "cp": 2000, "desc": "略微提升通讯速度", "color": "#3b82f6"}
+    {"name": "【UR】虚空量子猫", "rarity": "UR", "cp": 35000, "desc": "薛定谔的梦魇 | 核心暴击伤害飙升至 350%", "color": "#ff003c"},
+    {"name": "【SSR】机械哈士奇", "rarity": "SSR", "cp": 25000, "desc": "绝对护主 | PVP 战败抵挡 50% 资源掠夺", "color": "#ffd700"},
+    {"name": "【SR】摸鱼寻宝狐", "rarity": "SR", "cp": 10000, "desc": "嗅觉灵敏 | 暗网远征掉落代币翻倍", "color": "#a855f7"},
+    {"name": "【R】电子监听游隼", "rarity": "R", "cp": 3000, "desc": "侦查增强 | 避风港的质押挖矿利率永久+2%", "color": "#3b82f6"}
 ]
 
 CYBER_AUGMENTS = [
-    {"id": "aug_spine", "name": "【钛合金神经脊柱】", "cost": 25000, "cp_mult": 1.15, "desc": "全战力 +15%"},
-    {"id": "aug_heart", "name": "【聚变等离子心脏】", "cost": 50000, "cp_mult": 1.30, "desc": "全战力 +30%"},
-    {"id": "aug_eye",   "name": "【高维全视之眼】", "cost": 100000, "cp_mult": 1.50, "desc": "全战力 +50%"}
+    {"id": "aug_spine", "name": "【反内卷神经切断器】", "cost": 100, "cp_mult": 1.15, "san_cost": 20, "desc": "物理改造：全战力 +15% / 永久扣除20理智上限"},
+    {"id": "aug_heart", "name": "【聚变抗压心脏】", "cost": 300, "cp_mult": 1.30, "san_cost": 40, "desc": "物理改造：全战力 +30% / 永久扣除40理智上限"},
+    {"id": "aug_eye",   "name": "【高维全视机械眼】", "cost": 800, "cp_mult": 1.50, "san_cost": 70, "desc": "物理改造：全战力 +50% / 永久扣除70理智上限"}
 ]
 
 # ==============================================================================
-# 📈 [ SDE METAVERSE 05 ] 算法核心与图表 (物理隔离拼接，防 NameError)
+# 📈 [ ECOSYSTEM 05 ] 算法与图表引擎 (纯物理隔离)
 # ==============================================================================
 def get_heatmap_html(hash_int):
     rng = np.random.RandomState(hash_int)
     cells = ""
-    colors = ["#020617", "#064e3b", "#047857", "#059669", "#10b981"]
+    colors = ["#02040a", "#022c22", "#047857", "#10b981", "#34d399"]
     for _ in range(112): 
         intensity = rng.choice([0, 1, 2, 3, 4], p=[0.4, 0.2, 0.2, 0.15, 0.05])
         cells += "<div style='background-color: " + colors[intensity] + "; width: 100%; padding-bottom: 100%; border-radius: 2px; box-shadow: 0 0 3px " + colors[intensity] + "44;'></div>"
-    return "<div style='display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; width: 100%; padding: 15px; background: rgba(0,0,0,0.6); border: 1px solid #334155; border-radius: 8px; box-sizing: border-box; margin-bottom: 15px;'>" + cells + "</div>"
+    return "<div style='display: grid; grid-template-columns: repeat(16, 1fr); gap: 3px; width: 100%; padding: 15px; background: rgba(0,0,0,0.6); border: 1px solid #002233; border-radius: 8px; box-sizing: border-box; margin-bottom: 15px;'>" + cells + "</div>"
 
 def get_3d_topology(val_E, val_I, val_S, val_N, val_T, val_F, mbti_code, tier_color, hash_int):
     rng = np.random.RandomState(hash_int)
     f3d = go.Figure()
-    f3d.add_trace(go.Scatter3d(x=rng.randint(-100,100,80), y=rng.randint(-100,100,80), z=rng.randint(-100,100,80), mode='markers', marker=dict(size=3, color='#334155', opacity=0.5), hoverinfo='none'))
+    f3d.add_trace(go.Scatter3d(x=rng.randint(-100,100,100), y=rng.randint(-100,100,100), z=rng.randint(-100,100,100), mode='markers', marker=dict(size=3, color='#00f3ff', opacity=0.3), hoverinfo='none'))
     x_v = val_E if val_E > val_I else -val_I
     y_v = val_S if val_S > val_N else -val_N
     z_v = val_T if val_T > val_F else -val_F
     f3d.add_trace(go.Scatter3d(x=[x_v], y=[y_v], z=[z_v], mode='markers+text', text=[mbti_code], textposition="top center", marker=dict(size=14, color=tier_color, symbol='diamond', line=dict(color='#fff', width=2)), textfont=dict(color=tier_color, size=16, family="Orbitron", weight="bold")))
-    f3d.update_layout(scene=dict(xaxis_title='E/I', yaxis_title='N/S', zaxis_title='T/F', xaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b", showticklabels=False), yaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b", showticklabels=False), zaxis=dict(backgroundcolor="#020617", gridcolor="#1e293b", showticklabels=False)), paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, t=0, b=0), height=320, showlegend=False)
+    f3d.update_layout(scene=dict(xaxis_title='E/I', yaxis_title='N/S', zaxis_title='T/F', xaxis=dict(backgroundcolor="#030408", gridcolor="#1e293b", showticklabels=False), yaxis=dict(backgroundcolor="#030408", gridcolor="#1e293b", showticklabels=False), zaxis=dict(backgroundcolor="#030408", gridcolor="#1e293b", showticklabels=False)), paper_bgcolor='rgba(0,0,0,0)', margin=dict(l=0, r=0, t=0, b=0), height=320, showlegend=False)
     return f3d
 
 def calculate_synergy(m1, m2):
     diff = sum(1 for a, b in zip(m1, m2) if a != b)
     if diff == 0: return 92, "【绝对镜像】回路高度一致，无缝衔接。"
-    elif diff == 1: return 98, "【黄金羁绊】具备极佳互补，最强双打组合！"
-    elif diff == 2: return 85, "【灰度容错】视角差异打磨抗风险战术。"
-    elif diff == 3: return 65, "【高频摩擦】存在通信壁垒，需缓冲。"
-    else: return 99, "【阴阳反转】代码相反，但能实现全图包抄！"
+    elif diff == 1: return 98, "【黄金羁绊】极致互补，废土最强突击小队！"
+    elif diff == 2: return 85, "【灰度同盟】存异求同，打磨抗压阵型。"
+    elif diff == 3: return 65, "【战术割裂】通信壁垒大，极易引发内讧。"
+    else: return 99, "【阴阳反转】水火不容！但在背水一战时能实现全图毁灭！"
 
 def generate_alpha_curve(base_roi, volatility, seed):
     rng = np.random.RandomState(seed) 
-    days = ["T+" + str(i) for i in range(1, 31)] 
+    days = ["DAY_" + str(i) for i in range(1, 31)] 
     roi = [100.0]
     for _ in range(29): roi.append(max(30.0, roi[-1] + (base_roi - 1.0) * 8 + rng.normal(0, volatility * 25)))
     return days, roi
 
 def generate_bids(hash_int):
     rng = np.random.RandomState(hash_int)
-    companies = ["0xAI_Core", "ByteMatrix", "G-Cloud", "Web3_Unicorn", "FinTech_Giant"]
+    companies = ["0xAI_Core", "ByteMatrix", "G-Cloud_Bastion", "Web3_Unicorn", "FinTech_Giant"]
     bids = []
     for _ in range(4):
         comp = rng.choice(companies)
         size = rng.randint(10, 99) * 1000
         premium = round(rng.uniform(5.5, 35.5), 1)
-        bids.append("<div class='order-row'><span style='width:40%; text-align:left;'>" + comp + "</span><span style='width:30%; text-align:center;'>" + str(size) + "</span><span style='width:30%; text-align:right;'>+" + str(premium) + "%</span></div>")
+        bids.append("<div style='display:flex; justify-content:space-between; margin-bottom:10px; color:#00f3ff; border-bottom:1px dashed rgba(0,243,255,0.2); padding-bottom:6px; font-family:\"Fira Code\", monospace; font-size:13px;'><span style='width:40%; text-align:left;'>" + comp + "</span><span style='width:30%; text-align:center;'>" + str(size) + "</span><span style='width:30%; text-align:right;'>+" + str(premium) + "%</span></div>")
     return "".join(bids)
 
 def get_market_depth_html(hash_int):
@@ -349,22 +343,30 @@ def get_market_depth_html(hash_int):
     bids = sorted([rng.uniform(0.1, 0.9) for _ in range(18)])
     asks = sorted([rng.uniform(0.1, 0.9) for _ in range(18)], reverse=True)
     b_html = "".join(["<div style='flex:1; background:linear-gradient(to top, rgba(16,185,129,0.1), rgba(16,185,129,0.8)); height:" + str(b*100) + "%; border-top:1px solid #10b981; margin-right:1px; border-radius:2px 2px 0 0;'></div>" for b in bids])
-    a_html = "".join(["<div style='flex:1; background:linear-gradient(to top, rgba(244,63,94,0.1), rgba(244,63,94,0.8)); height:" + str(a*100) + "%; border-top:1px solid #f43f5e; margin-left:1px; border-radius:2px 2px 0 0;'></div>" for a in asks])
+    a_html = "".join(["<div style='flex:1; background:linear-gradient(to top, rgba(255,0,60,0.1), rgba(255,0,60,0.8)); height:" + str(a*100) + "%; border-top:1px solid #ff003c; margin-left:1px; border-radius:2px 2px 0 0;'></div>" for a in asks])
     spread = str(round(rng.uniform(0.01, 0.05), 4))
-    return "<div style='display:flex; height: 80px; align-items:flex-end; width:100%; margin-bottom:15px; border-bottom: 1px solid #334155; padding-bottom:5px;'><div style='flex:1; display:flex; align-items:flex-end; height:100%; padding-right:5px;'>" + b_html + "</div><div style='width:2px; height:100%; background:#94a3b8; margin:0 2px;'></div><div style='flex:1; display:flex; align-items:flex-end; height:100%; padding-left:5px;'>" + a_html + "</div></div><div style='display:flex; justify-content:space-between; font-size:10px; color:#94a3b8; font-family:monospace; margin-bottom:20px;'><span>BIDS VOL</span><span style='color:#00f3ff; font-weight:bold;'>SPREAD: " + spread + "</span><span>ASKS VOL</span></div>"
+    return "<div style='display:flex; height: 80px; align-items:flex-end; width:100%; margin-bottom:15px; border-bottom: 1px solid #002233; padding-bottom:5px;'><div style='flex:1; display:flex; align-items:flex-end; height:100%; padding-right:5px;'>" + b_html + "</div><div style='width:2px; height:100%; background:#ff003c; margin:0 2px;'></div><div style='flex:1; display:flex; align-items:flex-end; height:100%; padding-left:5px;'>" + a_html + "</div></div><div style='display:flex; justify-content:space-between; font-size:10px; color:#94a3b8; font-family:monospace; margin-bottom:20px;'><span>BIDS VOL</span><span style='color:#ffd700; font-weight:bold;'>SPREAD: " + spread + "</span><span>ASKS VOL</span></div>"
 
 # ==============================================================================
-# 🎮 [ SDE V20 ] 新增游戏回调 
+# 🎮 [ ECOSYSTEM 06 ] 终极联动操作回调
 # ==============================================================================
-def draw_gacha_callback(pool_type):
-    tick_turn()
-    if st.session_state.tokens >= 1000:
-        st.session_state.tokens -= 1000
+def cb_gacha(pool_type):
+    tick_turn("gacha")
+    cost = 1500 if "数据干旱" in st.session_state.weather else 1000
+    if st.session_state.despair_level > 80: cost *= 2
+    
+    if st.session_state.tokens >= cost:
+        st.session_state.tokens -= cost
         st.session_state.pity_counter += 1
-        roll = random.random() if st.session_state.pity_counter < 30 else 0.01 
+        
+        base_ur = 0.05
+        if st.session_state.despair_level > 80: base_ur = 0.00 
+        if "命运之轮" in st.session_state.tarot_buff: base_ur += 0.05
+        
+        roll = random.random() if st.session_state.pity_counter < 30 else 0.001 
         target_pool = RELICS_POOL if pool_type == "relic" else PETS_POOL
         
-        if roll < 0.05: 
+        if roll < base_ur: 
             r = random.choice([x for x in target_pool if x['rarity']=='UR'])
             st.session_state.pity_counter = 0
             st.snow()
@@ -380,19 +382,18 @@ def draw_gacha_callback(pool_type):
         if pool_type == "relic": st.session_state.inventory.insert(0, r_copy)
         else: st.session_state.pets.insert(0, r_copy)
             
-        st.session_state.gacha_msg = "🎉 召唤成功！获得 " + r_copy['rarity'] + " 级：" + r_copy['name']
-        add_chat(st.session_state.user_alias + " 抽到了 " + r_copy['name'] + "！", r_copy['color'])
+        st.session_state.gacha_msg = "🎉 捕获成功！获得 " + r_copy['rarity'] + " 级：" + r_copy['name']
+        if r['rarity'] in ['SSR', 'UR']: add_chat(st.session_state.user_alias + " 拿到了 " + r_copy['name'] + "！", r_copy['color'])
         gain_exp(10)
         if r['rarity'] == 'UR': unlock_achievement("【神话之手】")
-    else: st.session_state.gacha_msg = "❌ 资金不足！需要 1,000 $SDE。"
+    else: st.session_state.gacha_msg = "❌ 资金不足！需要 " + str(cost) + " SDE。"
 
-def equip_item_callback(uid, is_pet=False):
-    tick_turn()
+def cb_equip(uid, is_pet=False):
+    tick_turn("misc")
     if is_pet:
         for p in st.session_state.pets:
             if p['uid'] == uid:
-                if st.session_state.equipped_pet and st.session_state.equipped_pet['uid'] == uid:
-                    st.session_state.equipped_pet = None
+                if st.session_state.equipped_pet and st.session_state.equipped_pet['uid'] == uid: st.session_state.equipped_pet = None
                 else: st.session_state.equipped_pet = p
                 break
     else:
@@ -407,18 +408,17 @@ def equip_item_callback(uid, is_pet=False):
                         st.session_state.equipped_relics.append(r)
                 break
 
-def dismantle_relic_callback(uid):
-    tick_turn()
-    for i, r in enumerate(st.session_state.inventory):
-        if r['uid'] == uid:
-            val = {"UR": 2000, "SSR": 800, "SR": 300, "R": 100}.get(r['rarity'], 100)
-            st.session_state.tokens += val
-            st.session_state.inventory.pop(i)
-            st.toast("♻️ 熔解成功！获得了 " + str(val) + " SDE。", icon="♻️")
-            break
-
-def forge_relic_callback(consume_rarity, target_rarity):
-    tick_turn()
+def cb_forge(consume_rarity, target_rarity):
+    if st.session_state.despair_level > 80:
+        if random.random() < 0.5:
+            avail = [r for r in st.session_state.inventory if r['rarity'] == consume_rarity and not any(eq['uid'] == r['uid'] for eq in st.session_state.equipped_relics)]
+            if len(avail) >= 3:
+                for i in range(3): st.session_state.inventory.remove(avail[i])
+            st.session_state.forge_msg = "💥 理智崩溃导致操作失误，熔炉发生大爆炸，材料全毁！"
+            st.toast("💥 熔炉大爆炸！", icon="💥")
+            add_chat("节点 " + st.session_state.user_alias + " 精神失常，炸毁了量子熔炉！", "#ff003c")
+            return
+    tick_turn("misc")
     avail = [r for r in st.session_state.inventory if r['rarity'] == consume_rarity and not any(eq['uid'] == r['uid'] for eq in st.session_state.equipped_relics)]
     if len(avail) >= 3:
         for i in range(3): st.session_state.inventory.remove(avail[i])
@@ -429,78 +429,61 @@ def forge_relic_callback(consume_rarity, target_rarity):
             st.session_state.inventory.insert(0, new_r)
             st.session_state.forge_msg = "🔥 锻造成功！获得了：" + new_r['name']
             if target_rarity == "UR": st.snow()
-    else:
-        st.session_state.forge_msg = "❌ 失败：未装备的 " + consume_rarity + " 级材料不足 3 件！"
+    else: st.session_state.forge_msg = "❌ 材料不足：需要 3 件未装备的 " + consume_rarity + " 级材料！"
 
-def upgrade_talent_callback(dim):
-    tick_turn()
-    if st.session_state.tokens >= 2000:
-        st.session_state.tokens -= 2000
-        st.session_state.talent_levels[dim] += 1
-        st.toast("🧬 " + dim + " 属性飞升成功！战力永久加成！", icon="🧬")
-    else: st.toast("❌ 资金不足！需要 2,000 $SDE。", icon="❌")
-
-def join_faction_callback(faction):
-    tick_turn()
-    st.session_state.joined_faction = faction
-    st.toast("🛡️ 成功加入 " + faction + "！阵营增幅已激活！", icon="🛡️")
-
-def stake_tokens_callback(amt):
-    tick_turn()
-    if st.session_state.tokens >= amt:
-        st.session_state.tokens -= amt
-        st.session_state.staked_tokens += amt
-        st.toast("📥 成功质押 " + str(amt) + " SDE！")
-    else: st.toast("❌ 资金不足！")
-
-def claim_yield_callback():
-    tick_turn()
-    yld = int(st.session_state.yield_pool)
-    if yld > 0:
-        st.session_state.tokens += yld
-        st.session_state.yield_pool = 0.0
-        st.toast("✅ 成功提取利息: " + str(yld) + " $SDE！", icon="💰")
-
-def buy_gpu_callback():
-    tick_turn()
-    cost = 5000 + (st.session_state.gpus * 2000)
-    if st.session_state.tokens >= cost:
-        st.session_state.tokens -= cost
-        st.session_state.gpus += 1
-        st.toast("🖥️ 矿机部署成功！挂机收益增加！", icon="📈")
-    else: st.toast("❌ 资金不足！", icon="❌")
-
-def draw_tarot_callback():
-    tick_turn()
-    if st.session_state.tokens >= 200:
-        st.session_state.tokens -= 200
-        buffs = ["【力量】讨伐伤害倍率飙升", "【命运之轮】盲盒极品爆率大幅提升", "【星币】矿机产出翻倍", "【教皇】获取经验+50%"]
-        st.session_state.tarot_buff = random.choice(buffs)
-        st.toast("🃏 塔罗指引：" + st.session_state.tarot_buff, icon="🃏")
-    else: st.toast("❌ 资金不足！", icon="❌")
-
-def buy_cyber_augment_callback(aug_id, cost):
-    tick_turn()
-    if st.session_state.tokens >= cost:
-        if aug_id not in st.session_state.cyber_augments:
-            st.session_state.tokens -= cost
-            st.session_state.cyber_augments.append(aug_id)
-            st.toast("🦾 义体装载成功！战力倍增！", icon="🦾")
-            add_chat("警告：" + st.session_state.user_alias + " 进行了非人道的义体改造！", "#ff003c")
-        else: st.toast("已拥有此义体！", icon="⚠️")
-    else: st.toast("❌ 资金不足！", icon="❌")
-
-def equip_title_callback(title):
-    tick_turn()
-    st.session_state.equipped_title = title
-    st.toast("✅ 已佩戴称号：" + title)
-
-def attack_boss_callback(player_element):
-    tick_turn()
-    if st.session_state.stamina < 15:
-        st.session_state.combat_logs.insert(0, "❌ 体力不足，需要 15 体力。")
+def cb_dispatch():
+    ok, msg = consume_action_points(20, 5)
+    if not ok:
+        st.session_state.dispatch_logs.insert(0, msg)
         return
-    st.session_state.stamina -= 15
+    tick_turn("dispatch")
+    mults = get_stat_multipliers()
+    
+    events = [
+        ("📡 潜入暗网黑市，发现无主钱包！", "token", 8000),
+        ("🛡️ 协助抵抗军拦截了一次攻击！", "exp", 150),
+        ("💀 踩中蜜罐陷阱，理智受到精神攻击...", "sanity", -25),
+        ("✨ 在数据废墟中挖到了一块逻辑碎片！", "shard", 1),
+        ("🤝 与其他流浪节点完成了一次交易。", "token", 4000)
+    ]
+    ev = random.choice(events)
+    
+    if random.random() < (0.05 * mults["drop_rate_mult"]):
+        ev = ("💎 发现隐秘宝库，挖到了高维武装！", "relic", 1)
+        
+    if ev[1] == "token":
+        amt = int(ev[2] * mults["drop_rate_mult"])
+        pet_name = st.session_state.equipped_pet['name'] if st.session_state.equipped_pet else ""
+        if "寻宝狐" in pet_name: amt = int(amt * 1.5)
+        st.session_state.tokens += amt
+        tag = " [实勘加成]" if mults["drop_rate_mult"] > 1.0 else ""
+        st.session_state.dispatch_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] " + ev[0] + " (+" + str(amt) + " SDE)" + tag)
+    elif ev[1] == "exp":
+        gain_exp(ev[2])
+        st.session_state.dispatch_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] " + ev[0] + " (+" + str(ev[2]) + " EXP)")
+    elif ev[1] == "shard":
+        st.session_state.logic_shards += ev[2]
+        st.session_state.dispatch_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] " + ev[0] + " (逻辑碎片+1)")
+    elif ev[1] == "sanity":
+        st.session_state.sanity = max(0, st.session_state.sanity + ev[2])
+        st.session_state.dispatch_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] " + ev[0] + " (SAN " + str(ev[2]) + ")")
+    elif ev[1] == "relic":
+        r = random.choice([x for x in RELICS_POOL if x['rarity'] in ['SR', 'SSR']])
+        r_copy = copy.deepcopy(r)
+        r_copy['uid'] = "rel_" + str(int(time.time()*1000)) + "_" + str(random.randint(0,999))
+        st.session_state.inventory.insert(0, r_copy)
+        st.session_state.dispatch_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] " + ev[0] + " 获得: " + r['name'])
+
+def cb_boss_attack(player_element):
+    if st.session_state.despair_level >= 100:
+        st.session_state.combat_logs.insert(0, "💀 彻底疯狂！你失去了控制能力！")
+        return
+    ok, msg = consume_action_points(15, 10)
+    if not ok:
+        st.session_state.combat_logs.insert(0, msg)
+        return
+    tick_turn("combat")
+    mults = get_stat_multipliers()
     cp = st.session_state.get('final_cp_cache', 10000)
     
     boss_element = ["⚡ 量子", "✨ 灵能", "🛡️ 钢核", "🔥 炎脉"][st.session_state.boss_level % 4]
@@ -509,170 +492,186 @@ def attack_boss_callback(player_element):
     if adv_map.get(player_element) == boss_element: element_mult = 1.5
     elif adv_map.get(boss_element) == player_element: element_mult = 0.5
     
-    is_crit = random.random() < 0.25
-    dmg = int(cp * random.uniform(0.8, 1.2) * (2.0 if is_crit else 1.0) * element_mult)
-    st.session_state.boss_hp -= dmg
+    s_lvl = st.session_state.talent_levels['S']
+    crit_rate = 0.15 + (s_lvl * 0.05)
+    is_crit = random.random() < crit_rate
     
+    crit_dmg_mult = 3.5 if (st.session_state.equipped_pet and "量子猫" in st.session_state.equipped_pet['name']) else 2.0
+    
+    base_dmg = int(cp * random.uniform(0.8, 1.2) * mults['boss_dmg_mult'] * 0.1) # 10% 真实倍率
+    if "力量" in st.session_state.tarot_buff: base_dmg *= 2
+    dmg = int(base_dmg * (crit_dmg_mult if is_crit else 1.0) * element_mult)
+    
+    st.session_state.boss_hp -= dmg
     dmg_tag = str(dmg)
     if element_mult > 1.0: dmg_tag += " (克制暴击!)"
     if is_crit: dmg_tag += " CRIT!"
+    if mults['boss_dmg_mult'] > 1.0: dmg_tag += " [E属性强化]"
     
-    st.session_state.combat_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] ⚔️ 造成了 " + dmg_tag + " 点伤害！")
-    st.session_state.tokens += int(dmg / 500)
+    st.session_state.combat_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] ⚔️ 造成了 " + dmg_tag + " 伤害！")
+    
+    dm_drop = int(dmg / 100000)
+    if dm_drop > 0: 
+        st.session_state.dark_matter += dm_drop
+        st.session_state.combat_logs.insert(0, "🔮 掉落了 " + str(dm_drop) + " 个暗物质！")
+    
+    st.session_state.tokens += int(dmg / 10)
     gain_exp(50)
     
     if st.session_state.boss_hp <= 0:
-        st.session_state.combat_logs.insert(0, "🏆 Lv." + str(st.session_state.boss_level) + " 首领被击破！")
-        add_chat("捷报！" + st.session_state.user_alias + " 击杀了 Lv." + str(st.session_state.boss_level) + " 首领！全服狂欢！", "#ff003c")
+        st.session_state.combat_logs.insert(0, "🏆 Lv." + str(st.session_state.boss_level) + " 利维坦被击破！")
+        add_chat("捷报！" + st.session_state.user_alias + " 击杀了 Lv." + str(st.session_state.boss_level) + " 利维坦！全服狂欢！", "#ff003c")
         st.session_state.tokens += 100000 * st.session_state.boss_level
+        st.session_state.dark_matter += 100 * st.session_state.boss_level
         st.session_state.boss_level += 1
-        st.session_state.boss_hp = 50000000 * st.session_state.boss_level
+        st.session_state.boss_hp = 2000000 * st.session_state.boss_level
 
-def pvp_battle_callback(target_faction):
-    tick_turn()
-    if st.session_state.stamina < 15:
-        st.session_state.pvp_logs.insert(0, "❌ 体力不足，需要 15 体力。")
+def cb_pvp_battle(target_faction):
+    if st.session_state.despair_level >= 100:
+        st.session_state.pvp_logs.insert(0, "💀 你已经疯了。")
         return
-    st.session_state.stamina -= 15
+    ok, msg = consume_action_points(15, 10)
+    if not ok:
+        st.session_state.pvp_logs.insert(0, msg)
+        return
+    tick_turn("pvp")
+    mults = get_stat_multipliers()
     cp = st.session_state.get('final_cp_cache', 10000)
     enemy_cp = int(cp * random.uniform(0.7, 1.4))
+    
     st.session_state.pvp_logs.insert(0, "=====================")
-    st.session_state.pvp_logs.insert(0, "⚔️ 遭遇敌对阵营: " + target_faction + " (敌方战力: " + str(enemy_cp) + ")")
+    st.session_state.pvp_logs.insert(0, "⚔️ 遭遇阵营: " + target_faction + " (敌战力: " + str(enemy_cp) + ")")
     if cp >= enemy_cp:
         loot = int(enemy_cp * random.uniform(0.05, 0.15))
         st.session_state.pvp_logs.insert(0, "🏆 胜利！算力碾压对手！掠夺了 " + str(loot) + " $SDE！")
         st.session_state.tokens += loot
-        gain_exp(50)
+        st.session_state.dark_matter += random.randint(1, 5)
+        gain_exp(60)
     else:
-        st.session_state.pvp_logs.insert(0, "💀 败北... 遭到降维打击，护盾破裂。")
+        loss = int(cp * random.uniform(0.01, 0.05))
+        if st.session_state.equipped_pet and "机械猎犬" in st.session_state.equipped_pet['name']:
+            loss = int(loss * 0.5)
+            st.session_state.pvp_logs.insert(0, "🐾 [猎犬] 护主，抵挡了 50% 损失！")
+        st.session_state.tokens = max(0, st.session_state.tokens - loss)
+        st.session_state.pvp_logs.insert(0, "💀 败北... 遭到降维打击，丢失 " + str(loss) + " SDE。")
+        st.session_state.despair_level = min(100, st.session_state.despair_level + 10)
         gain_exp(10)
 
-def dispatch_callback():
-    tick_turn()
-    if st.session_state.stamina < 20:
-        st.session_state.dispatch_logs.insert(0, "❌ 体力不足，需要 20 体力！")
-        return
-    st.session_state.stamina -= 20
-    events = [
-        ("📡 潜入暗网黑市，发现无主钱包！", "token", 8000),
-        ("🛡️ 协助国资云拦截了一次 DDOS 攻击！", "exp", 150),
-        ("💀 踩中蜜罐陷阱，算力受损...", "token", -2000),
-        ("✨ 在数据废墟中挖到了一件遗物！", "relic", 1),
-        ("🤝 与其他流浪节点完成了一次 P2P 交易。", "token", 3000)
-    ]
-    ev = random.choice(events)
-    if ev[1] == "token":
-        st.session_state.tokens = max(0, st.session_state.tokens + ev[2])
-        st.session_state.dispatch_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] " + ev[0] + " (" + str(ev[2]) + " SDE)")
-    elif ev[1] == "exp":
-        gain_exp(ev[2])
-        st.session_state.dispatch_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] " + ev[0] + " (+" + str(ev[2]) + " EXP)")
-    elif ev[1] == "relic":
-        r = random.choice([x for x in RELICS_POOL if x['rarity'] in ['R', 'SR']])
-        r_copy = copy.deepcopy(r)
-        r_copy['uid'] = "rel_" + str(int(time.time()*1000)) + "_" + str(random.randint(0,999))
-        st.session_state.inventory.insert(0, r_copy)
-        st.session_state.dispatch_logs.insert(0, "[" + datetime.now().strftime('%H:%M:%S') + "] " + ev[0] + " 获得: " + r['name'])
+def cb_talent_up(dim):
+    tick_turn("misc")
+    cost_sde = 2000 + st.session_state.talent_levels[dim] * 1000
+    cost_shards = 1 + st.session_state.talent_levels[dim]
+    
+    if st.session_state.tokens >= cost_sde and st.session_state.logic_shards >= cost_shards:
+        st.session_state.tokens -= cost_sde
+        st.session_state.logic_shards -= cost_shards
+        st.session_state.talent_levels[dim] += 1
+        st.toast("🧬 " + dim + " 属性飞升！生态乘区强化！", icon="🧬")
+    else: st.toast("❌ SDE 或逻辑碎片不足！(碎片需远征获得)", icon="❌")
 
-def claim_bounty_callback():
-    tick_turn()
-    st.session_state.bounties_claimed = True
-    st.session_state.tokens += 10000
-    gain_exp(200)
-
-def ascend_card_callback():
-    tick_turn()
-    cost = 5000 + (st.session_state.ascension_stars * 2000)
-    if st.session_state.tokens >= cost and st.session_state.ascension_stars < 5:
-        st.session_state.tokens -= cost
-        st.session_state.ascension_stars += 1
-        st.toast("🌌 界限突破！当前星级：" + str(st.session_state.ascension_stars) + " 星！战力飙升！", icon="✨")
-        if st.session_state.ascension_stars == 5:
-            st.session_state.ascended = True
-            unlock_achievement("【超维神明】")
+def cb_upgrade_foil():
+    tick_turn("misc")
+    foils = ["【标准拉丝工艺】", "【镭射碎冰闪卡】", "【暗黑反转闪卡】", "【创世血腥幻彩】"]
+    costs = [0, 500, 1500, 5000]
+    current = st.session_state.card_foil
+    try: idx = foils.index(current)
+    except: idx = 0
+    if idx < 3:
+        cost = costs[idx+1]
+        if st.session_state.dark_matter >= cost:
+            st.session_state.dark_matter -= cost
+            st.session_state.card_foil = foils[idx+1]
+            st.toast("✨ 卡面工艺升级成功！战力乘区扩大！")
             st.balloons()
-    else:
-        st.toast("❌ SDE 余额不足！", icon="❌")
+            if idx+1 == 3: unlock_achievement("【创世之影】")
+        else: st.toast("❌ 暗物质不足！", icon="❌")
+    else: st.toast("已达到最高工艺！")
 
-def buy_stamina_callback():
-    tick_turn()
-    if st.session_state.tokens >= 2000:
-        st.session_state.tokens -= 2000
-        st.session_state.stamina = min(150, st.session_state.stamina + 50)
-        st.toast("💊 体力恢复 50 点！", icon="🔋")
-    else: st.toast("❌ 资金不足！", icon="❌")
-
-def buy_ssr_relic_callback():
-    tick_turn()
-    if st.session_state.tokens >= 15000:
-        st.session_state.tokens -= 15000
-        r = random.choice([x for x in RELICS_POOL if x['rarity']=='SSR'])
-        r_copy = copy.deepcopy(r)
-        r_copy['uid'] = "rel_" + str(int(time.time()*1000)) + "_" + str(random.randint(0,999))
-        st.session_state.inventory.insert(0, r_copy)
-        st.toast("📦 黑市交易成功！获得 " + r['name'] + "！", icon="🎁")
-    else: st.toast("❌ 资金不足！", icon="❌")
+def cb_exchange_dm(action):
+    tick_turn("misc")
+    rate = st.session_state.exchange_rate
+    if action == "buy":
+        cost = rate * 10
+        if st.session_state.tokens >= cost:
+            st.session_state.tokens -= cost
+            st.session_state.dark_matter += 10
+            st.session_state.exchange_rate = int(st.session_state.exchange_rate * 1.05)
+            st.toast("✅ 成功买入 10 暗物质")
+        else: st.toast("❌ SDE 不足")
+    elif action == "sell":
+        if st.session_state.dark_matter >= 10:
+            st.session_state.dark_matter -= 10
+            earn = int(rate * 10 * 0.9)
+            st.session_state.tokens += earn
+            st.session_state.exchange_rate = max(50, int(st.session_state.exchange_rate * 0.95))
+            st.toast("✅ 卖出 10 暗物质")
+        else: st.toast("❌ 暗物质不足")
 
 
 # ==============================================================================
-# 🖥️ [ SDE V20 ] 塔台级路由与全息仪表盘渲染 (绝对免疫 NameError)
+# 🖥️ [ WARFRAME 07 ] 塔台级路由与全息渲染 (内联消除 NameError)
 # ==============================================================================
 if not st.session_state.started:
     safe_html("<div style='margin-top:50px;'></div>")
     if not st.session_state.boot_played:
-        BOOT_CSS = "<style>.sys-boot-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030712; z-index: 9999999; display: flex; justify-content: center; align-items: center; flex-direction: column; animation: sys-boot-fade 1.5s 2.2s cubic-bezier(0.8, 0, 0.2, 1) forwards; pointer-events: none; }.sys-boot-logo { color: #00f3ff; font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900; letter-spacing: 4px; overflow: hidden; border-right: 3px solid #00f3ff; white-space: nowrap; animation: typing-boot 0.8s steps(20, end) forwards, blink-boot 0.4s step-end infinite; margin-bottom: 15px; }.sys-boot-bar-bg { width: 300px; height: 2px; background: rgba(0,243,255,0.1); position: relative; }.sys-boot-bar-fill { position: absolute; top: 0; left: 0; height: 100%; background: #00f3ff; box-shadow: 0 0 15px #00f3ff; animation: load-boot 1.8s ease-out forwards; }.sys-boot-logs { margin-top: 15px; font-family: 'Fira Code', monospace; font-size: 10px; color: #10b981; opacity: 0.8; height: 45px; overflow: hidden; width: 300px; text-align: left; line-height: 15px; }.log-line { animation: log-scroll 1.8s steps(10, end) forwards; transform: translateY(45px); }@keyframes typing-boot { from { width: 0; } to { width: 300px; } }@keyframes blink-boot { 50% { border-color: transparent; } }@keyframes load-boot { 0% { width: 0%; } 10% { width: 30%; } 40% { width: 40%; } 60% { width: 80%; } 100% { width: 100%; } }@keyframes sys-boot-fade { to { opacity: 0; visibility: hidden; } }@keyframes log-scroll { 100% { transform: translateY(-100px); } }</style>"
-        safe_html(BOOT_CSS.replace('\n', '') + "<div class=\"sys-boot-overlay\"><div class=\"sys-boot-logo\">SDE_TCG_V20.0</div><div class=\"sys-boot-bar-bg\"><div class=\"sys-boot-bar-fill\"></div></div><div class=\"sys-boot-logs\"><div class=\"log-line\">[OK] Booting GOD MODE Engine...<br>[OK] Connecting to Ledger...<br>[OK] Decrypting Matrix...<br>[OK] Loading Augmentations...<br>[OK] Handshake Established.</div></div></div>")
+        BOOT_CSS = "<style>.sys-boot-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #030408; z-index: 9999999; display: flex; justify-content: center; align-items: center; flex-direction: column; animation: sys-boot-fade 1.5s 2.2s cubic-bezier(0.8, 0, 0.2, 1) forwards; pointer-events: none; }.sys-boot-logo { color: #00f3ff; font-family: 'Orbitron', monospace; font-size: 24px; font-weight: 900; letter-spacing: 4px; overflow: hidden; border-right: 3px solid #00f3ff; white-space: nowrap; animation: typing-boot 0.8s steps(20, end) forwards, blink-boot 0.4s step-end infinite; margin-bottom: 15px; text-shadow: 0 0 20px #00f3ff; }.sys-boot-bar-bg { width: 300px; height: 2px; background: rgba(0,243,255,0.2); position: relative; }.sys-boot-bar-fill { position: absolute; top: 0; left: 0; height: 100%; background: #00f3ff; box-shadow: 0 0 15px #00f3ff; animation: load-boot 1.8s ease-out forwards; }.sys-boot-logs { margin-top: 15px; font-family: 'Fira Code', monospace; font-size: 10px; color: #10b981; opacity: 0.8; height: 45px; overflow: hidden; width: 300px; text-align: left; line-height: 15px; }.log-line { animation: log-scroll 1.8s steps(10, end) forwards; transform: translateY(45px); }@keyframes typing-boot { from { width: 0; } to { width: 300px; } }@keyframes blink-boot { 50% { border-color: transparent; } }@keyframes load-boot { 0% { width: 0%; } 10% { width: 30%; } 40% { width: 40%; } 60% { width: 80%; } 100% { width: 100%; } }@keyframes sys-boot-fade { to { opacity: 0; visibility: hidden; } }@keyframes log-scroll { 100% { transform: translateY(-100px); } }</style>"
+        safe_html(BOOT_CSS.replace('\n', '') + "<div class=\"sys-boot-overlay\"><div class=\"sys-boot-logo\">OMNIVERSE_CORE_V35</div><div class=\"sys-boot-bar-bg\"><div class=\"sys-boot-bar-fill\"></div></div><div class=\"sys-boot-logs\"><div class=\"log-line\">[SYS] Booting Ecosystem Fusion...<br>[SYS] Connecting to Global Matrix...<br>[SYS] Linking Talent Nodes...<br>[SYS] Spawning War Pets...<br>[OK] Handshake Established.</div></div></div>")
         st.session_state.boot_played = True
 
-    _spacer1, c_login, _spacer2 = st.columns([1, 2, 1])
-    with c_login:
-        safe_html("<div style=\"text-align: center; margin-bottom: 20px;\"><div style=\"color:#00f3ff; font-family:'Orbitron', monospace; font-size:14px; letter-spacing:8px; margin-bottom:10px;\">SHANGHAI DATA EXCHANGE</div><h1 class=\"hero-title\" data-text=\"职场元宇宙 V20\">职场元宇宙 V20</h1><div style=\"color:#a855f7; font-family:'Orbitron', sans-serif; font-size:13px; font-weight:900; letter-spacing:6px; margin-bottom:30px; margin-top:5px;\">OMNIVERSE_GOD_MODE</div></div>")
-        safe_html("<div style=\"background: rgba(8, 15, 30, 0.85); border: 1px solid rgba(0,243,255,0.4); padding: clamp(15px, 4vw, 25px); border-radius: 8px; font-family: 'Fira Code', monospace; font-size: clamp(12px, 3vw, 14px); color: #e2e8f0; box-shadow: inset 0 0 20px rgba(0,243,255,0.1), 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 30px;\"><div style=\"color:#94a3b8; margin-bottom:5px;\">[SYSTEM] Securing root connection... <span style=\"color:#10b981;\">[ESTABLISHED]</span></div><div style=\"color:#94a3b8;\">[KERNEL] Loading 40-Node Matrix V20.0... <span style=\"color:#10b981;\">[READY]</span></div><div style=\"margin-top:15px; font-family: 'Noto Sans SC', sans-serif; line-height: 1.8; color:#fff;\"><b>数据要素价值释放的纪元已经降临。</b><br>本终端将全方位扫描您的职场决策链路。<br>您的物理能力将被<b>「全息要素化」</b>，系统将为您解封一张独一无二的<b>高阶职场算力实体卡牌 (SBT)</b>，并开启属于您的深潜远征！</div></div>")
+    c_l1, c_l2, c_l3 = st.columns([1, 2, 1])
+    with c_l2:
+        safe_html("<div style=\"text-align: center; margin-bottom: 20px;\"><div style=\"color:#00f3ff; font-family:'Orbitron', monospace; font-size:14px; letter-spacing:8px; margin-bottom:10px;\">SDE OMNIVERSE</div><h1 class=\"hero-title\" data-text=\"寰宇闭环 V35\">寰宇闭环 V35</h1><div style=\"color:#a855f7; font-family:'Orbitron', sans-serif; font-size:13px; font-weight:900; letter-spacing:6px; margin-bottom:30px; margin-top:5px;\">ECOSYSTEM_FUSION_EDITION</div></div>")
+        safe_html("<div style=\"background: rgba(4, 9, 20, 0.85); border: 1px solid rgba(0,243,255,0.4); padding: clamp(15px, 4vw, 25px); border-radius: 8px; font-family: 'Fira Code', monospace; font-size: clamp(12px, 3vw, 14px); color: #e2e8f0; box-shadow: inset 0 0 20px rgba(0,243,255,0.1), 0 10px 30px rgba(0,0,0,0.8); margin-bottom: 30px;\"><div style=\"color:#10b981; margin-bottom:5px;\">[SYSTEM] Securing root connection... <span style=\"color:#00f3ff;\">[CONNECTED]</span></div><div style=\"color:#10b981;\">[KERNEL] Loading Ecosystem Matrix V35... <span style=\"color:#00f3ff;\">[READY]</span></div><div style=\"margin-top:15px; font-family: 'Noto Sans SC', sans-serif; line-height: 1.8; color:#fff;\"><b>万物互联的职场生态纪元已经降临。</b><br>一切行为皆有因果。天赋、宠物、污染度与天气将形成紧密的齿轮效应。<br>系统将为您空投一张独一无二的<b>高阶职场算力实体卡牌 (SBT)</b>，努力活下去吧！</div></div>")
         with st.form(key="login_form", border=False):
-            safe_html("<div style='color:#ffd700; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:8px; text-align:center;'>▼ 挂载节点代号 (MOUNT_NODE) ▼</div>")
+            safe_html("<div style='color:#00f3ff; font-family:\"Orbitron\", sans-serif; font-size:12px; font-weight:bold; margin-bottom:8px; text-align:center;'>▼ 登记神经元代号 (MOUNT_NODE) ▼</div>")
             st.text_input("", key="login_input", placeholder="输入您的职场代号", label_visibility="collapsed")
             safe_html("<br>")
-            st.form_submit_button("▶ 开启神经元校准并抽卡 (PULL CARD)", on_click=start_assessment_callback, type="primary", use_container_width=True)
+            if st.form_submit_button("▶ 开启神经元接驳并呼叫空投", type="primary", use_container_width=True):
+                start_assessment_callback()
+                st.rerun()
 
 elif st.session_state.calculating:
-    _spacer1, c_calc, _spacer2 = st.columns([1, 2, 1])
-    with c_calc:
-        safe_html("<h2 class='hero-title' data-text='[ ZK-PROOF UNSEALING... ]' style='font-size:clamp(20px, 4vw, 28px) !important; margin-top:50px; text-align:center; display:block;'>[ ZK-PROOF UNSEALING... ]</h2>")
+    c_c1, c_c2, c_c3 = st.columns([1, 2, 1])
+    with c_c2:
+        safe_html("<h2 class='hero-title' data-text='[ ZK-PROOF UNSEALING... ]' style='font-size:clamp(20px, 4vw, 28px) !important; margin-top:50px; text-align:center; display:block; color:#00f3ff !important;'>[ ZK-PROOF UNSEALING... ]</h2>")
         mint_box = st.empty()
-        phases = ["[SYNCING EVM]", "[EXTRACTING]", "[ZK-PROOF]", "[MINTING CARDS]"]
+        phases = ["[SYNCING EVM]", "[EXTRACTING DATA]", "[ZK-PROOF]", "[WEAPONIZING CARDS]"]
         h_logs = ""
         for i in range(12):
             fake_hash = hashlib.sha256(str(random.random()).encode()).hexdigest().upper()
-            h_logs = "<span style='color:#94a3b8;'>" + phases[i % 4] + "</span> <span style='color:#ffd700;'>0x" + fake_hash[:24] + "...</span> <span style='color:#10b981;'>[OK]</span><br>" + h_logs
-            mint_box.markdown("<div style='background:#000; border:1px solid #334155; border-left:4px solid #00f3ff; padding:20px; border-radius:8px; font-family:monospace; font-size:13px; height:250px; overflow:hidden; color:#4ade80;'>" + h_logs + "</div>", unsafe_allow_html=True)
+            h_logs = "<span style='color:#94a3b8;'>" + phases[i % 4] + "</span> <span style='color:#00f3ff;'>0x" + fake_hash[:24] + "...</span> <span style='color:#10b981;'>[OK]</span><br>" + h_logs
+            mint_box.markdown("<div style='background:#030408; border:1px solid #002233; border-left:4px solid #00f3ff; padding:20px; border-radius:8px; font-family:monospace; font-size:13px; height:250px; overflow:hidden; color:#10b981; box-shadow: inset 0 0 20px rgba(0,243,255,0.1);'>" + h_logs + "</div>", unsafe_allow_html=True)
             time.sleep(0.15)
         st.session_state.calculating = False; st.rerun()
 
 elif st.session_state.current_q < len(questions):
     with st.sidebar:
-        safe_html("<div style='text-align:center; font-family:Orbitron; font-size:20px; font-weight:900; color:#ffd700; margin-bottom:20px;'>SDE V20 HUD</div>")
-        safe_html("<div class='hud-box'><div class='hud-title'>[ NODE IDENTIFIER ]</div><div class='hud-val' style='color:#fff;'>" + st.session_state.user_alias + "</div></div>")
+        safe_html("<div style='text-align:center; font-family:Orbitron; font-size:20px; font-weight:900; color:#00f3ff; margin-bottom:20px; text-shadow: 0 0 10px #00f3ff;'>ECO HUD</div>")
+        safe_html("<div class='hud-box'><div class='hud-title'>[ SURVIVOR ID ]</div><div class='hud-val' style='color:#fff;'>" + st.session_state.user_alias + "</div></div>")
         safe_html("<div class='hud-box'><div class='hud-title'>[ SYSTEM SYNC ]</div><div class='hud-val' style='color:#10b981; animation: blink 1s infinite;'>IN PROGRESS...</div></div>")
         
-    _spacer1, c_q, _spacer2 = st.columns([1, 2, 1])
-    with c_q:
+    c_q1, c_q2, c_q3 = st.columns([1, 2, 1])
+    with c_q2:
         q_data = questions[st.session_state.current_q]
-        module_name = {"E": "外联输出网络", "S": "颗粒实务穿透", "T": "客观量化护甲", "J": "秩序架构锚定"}.get(q_data['dim'])
+        module_name = {"E": "外联生态网络", "S": "颗粒实务穿透", "T": "量化护甲屏障", "J": "秩序规则锚定"}.get(q_data['dim'])
         dynamic_hash = hashlib.sha256(("BLOCK_" + str(st.session_state.current_q) + "_" + q_data['q']).encode()).hexdigest()[:10].upper()
         
         safe_html("<div style='padding-top:10px;'></div>")
         progress_val = (st.session_state.current_q + 1) / len(questions)
         st.progress(progress_val)
-        safe_html("<div style='text-align:right; font-family:Orbitron, monospace; color:#ffd700; font-size:12px; margin-top:5px; font-weight:bold;'>SYNC RATE: " + str(int(progress_val*100)) + "%</div>")
+        safe_html("<div style='text-align:right; font-family:Orbitron, monospace; color:#00f3ff; font-size:12px; margin-top:5px; font-weight:bold;'>SYNC RATE: " + str(int(progress_val*100)) + "%</div>")
         
-        safe_html("<div style=\"background: rgba(10, 15, 25, 0.9); border: 2px solid rgba(0, 243, 255, 0.4); border-radius: 12px; padding: clamp(20px, 4vw, 30px); box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 20px rgba(0, 243, 255, 0.05); margin-top: 20px; margin-bottom: 30px;\"><div style=\"display:flex; justify-content:space-between; font-family:monospace; color:#00f3ff; font-size:11px; margin-bottom:15px; border-bottom: 1px dashed rgba(0,243,255,0.3); padding-bottom:10px;\"><span style=\"font-family:'Orbitron', sans-serif;\">MOD: " + module_name + "</span><span style=\"font-family:'Orbitron', sans-serif;\">HASH: 0x" + dynamic_hash + "</span></div><div style=\"font-size: clamp(15px, 4vw, 18px); color: #ffffff !important; line-height: 1.8; font-weight: 700;\">" + q_data['q'] + "</div></div>")
+        safe_html("<div style=\"background: rgba(4, 9, 20, 0.9); border: 2px solid rgba(0, 243, 255, 0.4); border-radius: 12px; padding: clamp(20px, 4vw, 30px); box-shadow: 0 10px 30px rgba(0,0,0,0.9), inset 0 0 30px rgba(0, 243, 255, 0.1); margin-top: 20px; margin-bottom: 30px;\"><div style=\"display:flex; justify-content:space-between; font-family:monospace; color:#00f3ff; font-size:11px; margin-bottom:15px; border-bottom: 1px dashed rgba(0,243,255,0.3); padding-bottom:10px;\"><span style=\"font-family:'Orbitron', sans-serif;\">MOD: " + module_name + "</span><span style=\"font-family:'Orbitron', sans-serif;\">HASH: 0x" + dynamic_hash + "</span></div><div style=\"font-size: clamp(15px, 4vw, 18px); color: #ffffff !important; line-height: 1.8; font-weight: 700;\">" + q_data['q'] + "</div></div>")
         
-        opts = [("🚫 强制阻断 (完全背离直觉)", 1), ("⚠️ 弱态耦合 (极少采用)", 2), ("⚖️ 视境判定 (看情况而定)", 3), ("🤝 逻辑握手 (常用决策流)", 4), ("🔒 绝对锁定 (完美复刻思维)", 5)]
-        for text, val in opts: st.button(text, type="secondary", key="q_" + str(st.session_state.current_q) + "_" + str(val), on_click=answer_callback, args=(val, q_data['dim']))
+        opts = [("🚫 强制阻断 (找死)", 1), ("⚠️ 战术规避 (抗拒)", 2), ("⚖️ 视境判定 (看情况保命)", 3), ("🤝 残酷执行 (常用)", 4), ("🔒 绝对信仰 (死忠)", 5)]
+        for text, val in opts: 
+            if st.button(text, key="q_" + str(st.session_state.current_q) + "_" + str(val), use_container_width=True):
+                answer_callback(val, q_data['dim'])
+                st.rerun()
 
 else:
     # ==========================
-    # V20 终极数据结算与隔离沙盒 (绝对防御 NameError)
+    # V35 终极生态大一统演算与渲染 (严格字典安全)
     # ==========================
     res = st.session_state.total_scores
     mbti = ("E" if res.get("E", 0) >= 0 else "I") + ("S" if res.get("S", 0) >= 0 else "N") + ("T" if res.get("T", 0) >= 0 else "F") + ("J" if res.get("J", 0) >= 0 else "P")
@@ -688,8 +687,8 @@ else:
     if not st.session_state.anim_played: 
         st.balloons()
         glow_color = "#ffffff" if st.session_state.ascended else ("#ff003c" if tier_level == "UR" else ("#ffd700" if tier_level == "SSR" else "#00f3ff"))
-        GACHA_CSS = "<style>.gacha-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3,7,18,0.98); z-index: 999999; display: flex; justify-content: center; align-items: center; flex-direction: column; animation: cyber-fadeout 3.5s cubic-bezier(0.8, 0, 0.2, 1) forwards; pointer-events: none; backdrop-filter: blur(8px); }.gacha-cube { width: 80px; height: 80px; border: 4px solid #fff; box-shadow: 0 0 20px #fff, inset 0 0 20px #fff; transform: rotate(45deg); animation: cube-shake 2s ease-in forwards, cube-burst 0.5s 2s forwards; position: relative; }.gacha-cube::after { content:''; position: absolute; top:0; left:0; width:100%; height:100%; background: " + glow_color + "; opacity:0; animation: cube-glow 2s forwards; }.gacha-text { font-family: 'Orbitron', sans-serif; font-size: clamp(24px, 5vw, 64px); font-weight: 900; color: #fff; letter-spacing: 12px; opacity: 0; animation: pop-in 1.5s 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; position: relative; z-index: 2; margin-top: 60px; text-transform: uppercase; text-shadow: 0 0 40px " + glow_color + ", 0 0 80px " + glow_color + "; }@keyframes cube-shake { 0% { transform: rotate(45deg) scale(1); } 80% { transform: rotate(405deg) scale(1.2); border-color: " + glow_color + "; box-shadow: 0 0 40px " + glow_color + "; } 100% { transform: rotate(405deg) scale(0.1); opacity: 0; } }@keyframes cube-glow { 80% { opacity: 0.8; } 100% { opacity: 1; } }@keyframes cube-burst { 0% { transform: scale(0.1); opacity: 1; box-shadow: 0 0 100px 50px " + glow_color + "; } 100% { transform: scale(15); opacity: 0; box-shadow: 0 0 0 0 transparent; } }@keyframes pop-in { 0% { transform: scale(0.5); opacity: 0; } 40% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }@keyframes cyber-fadeout { 0%, 85% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }</style>"
-        safe_html(GACHA_CSS + "<div class='gacha-overlay'><div class='gacha-cube'></div><div class='gacha-text'>" + tier_level + " CARD UNLOCKED</div></div>")
+        GACHA_CSS = "<style>.gacha-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(3,4,8,0.98); z-index: 999999; display: flex; justify-content: center; align-items: center; flex-direction: column; animation: cyber-fadeout 3.5s cubic-bezier(0.8, 0, 0.2, 1) forwards; pointer-events: none; backdrop-filter: blur(8px); }.gacha-cube { width: 80px; height: 80px; border: 4px solid #fff; box-shadow: 0 0 20px #fff, inset 0 0 20px #fff; transform: rotate(45deg); animation: cube-shake 2s ease-in forwards, cube-burst 0.5s 2s forwards; position: relative; }.gacha-cube::after { content:''; position: absolute; top:0; left:0; width:100%; height:100%; background: " + glow_color + "; opacity:0; animation: cube-glow 2s forwards; }.gacha-text { font-family: 'Orbitron', sans-serif; font-size: clamp(24px, 5vw, 64px); font-weight: 900; color: #fff; letter-spacing: 12px; opacity: 0; animation: pop-in 1.5s 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards; position: relative; z-index: 2; margin-top: 60px; text-transform: uppercase; text-shadow: 0 0 40px " + glow_color + ", 0 0 80px " + glow_color + "; }@keyframes cube-shake { 0% { transform: rotate(45deg) scale(1); } 80% { transform: rotate(405deg) scale(1.2); border-color: " + glow_color + "; box-shadow: 0 0 40px " + glow_color + "; } 100% { transform: rotate(405deg) scale(0.1); opacity: 0; } }@keyframes cube-glow { 80% { opacity: 0.8; } 100% { opacity: 1; } }@keyframes cube-burst { 0% { transform: scale(0.1); opacity: 1; box-shadow: 0 0 100px 50px " + glow_color + "; } 100% { transform: scale(15); opacity: 0; box-shadow: 0 0 0 0 transparent; } }@keyframes pop-in { 0% { transform: scale(0.5); opacity: 0; } 40% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }@keyframes cyber-fadeout { 0%, 85% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }</style>"
+        safe_html(GACHA_CSS + "<div class='gacha-overlay'><div class='gacha-cube'></div><div class='gacha-text'>ECOSYSTEM LINKED<br>" + tier_level + " UNLOCKED</div></div>")
         st.session_state.anim_played = True
         
     full_title = st.session_state.equipped_title + " " + role_name
@@ -705,13 +704,12 @@ else:
 
     p_score = -res.get("J", 0); s_score = res.get("S", 0)
     risk_score = int(max(5, min(95, 50 + (p_score * 1.5) - (s_score * 1.5))))
-    if risk_score < 35: r_tag, r_color = "绝对合规防线", "#10b981"
+    if risk_score < 35: r_tag, r_color = "城墙级绝对防线", "#10b981"
     elif risk_score < 65: r_tag, r_color = "动态灰度平衡", "#ffd700"
-    else: r_tag, r_color = "无界极限破局", "#ff003c"
+    else: r_tag, r_color = "疯狗级极限破局", "#ff003c"
 
     time_taken = max(1.0, st.session_state.end_time - st.session_state.start_time)
     
-    # 🔐 资产防篡改物理锁
     h_code_gen = hashlib.sha256((safe_alias_final + mbti + str(time_taken) + VERSION).encode()).hexdigest().upper()
     h_int_gen = int(h_code_gen[:8], 16)
     
@@ -721,20 +719,16 @@ else:
         extremity_score = sum(abs(v) for v in res.values()) / 80.0
         random_factor = 0.9 + (h_int_gen % 200) / 1000.0
         
-        base_hash_val = data.get('base_hash', 8000)
-        computed_base_cp = int(base_hash_val * (1 + extremity_score * 0.4) * (0.8 + (dec_index/100.0) * 0.5) * random_factor * 10000)
+        computed_base_cp = int(data.get('base_hash', 8000) * (1 + extremity_score * 0.4) * (0.8 + (dec_index/100.0) * 0.5) * random_factor * 10000)
         computed_pct_beat = round(min(99.9, max(50.0, 60 + (dec_index * 0.3) + (extremity_score * 20))), 1)
         
-        st.session_state.tokens += 15000 
         d_arr_gen, roi_arr_gen = generate_alpha_curve(data.get('base_roi', 1.35), data.get('volatility', 0.35), int(h_code_gen[:6], 16))
-        
-        foils = ["【标准拉丝工艺】", "【镭射碎冰闪卡】", "【暗黑反转闪卡】", "【创世幽灵幻彩】"]
-        assigned_foil = np.random.choice(foils, p=[0.6, 0.25, 0.1, 0.05])
         
         st.session_state.asset_minted = {
             "version": VERSION,
             "hash_code": h_code_gen,
-            "block_height": "V20-" + str((int(time.time()) % 1000000)).zfill(6),
+            "mbti": mbti,
+            "block_height": "V35-" + str((int(time.time()) % 1000000)).zfill(6),
             "time_str": datetime.now().strftime("%Y-%m-%d %H:%M:%S UTC"),
             "token_id": int(hashlib.md5((safe_alias_final + str(time_taken)).encode()).hexdigest()[:8], 16),
             "contract_addr": "0x" + hashlib.sha256(("contract_" + mbti + "_" + str(h_int_gen)).encode()).hexdigest()[:38],
@@ -743,13 +737,12 @@ else:
             "d_arr": d_arr_gen,
             "roi_arr": roi_arr_gen,
             "bids_html": generate_bids(h_int_gen),
-            "decisiveness": dec_index,
-            "foil": assigned_foil
+            "decisiveness": dec_index
         }
         
     asset = st.session_state.asset_minted
     hash_code = asset.get("hash_code", h_code_gen)
-    block_height = asset.get("block_height", "V20-000000")
+    block_height = asset.get("block_height", "V35-000000")
     current_time_str = asset.get("time_str", "")
     token_id = asset.get("token_id", 0)
     contract_addr = asset.get("contract_addr", "0x00")
@@ -758,18 +751,17 @@ else:
     d_arr = asset.get("d_arr", [])
     roi_arr = asset.get("roi_arr", [])
     bids_html = asset.get("bids_html", "")
-    card_foil = asset.get("foil", "【标准拉丝工艺】")
-    decisiveness = asset.get("decisiveness", 50)
+    card_foil = st.session_state.card_foil
     h_int = int(hash_code[:8], 16) if hash_code else 0
     
-    # === 终极战力算法 ===
+    # === 寰宇级战力结算算法 ===
+    sys_mults = get_stat_multipliers()
+    
     relic_cp_total = sum([r.get('cp', 0) for r in st.session_state.equipped_relics])
     pet_cp_total = st.session_state.equipped_pet.get('cp', 0) if st.session_state.equipped_pet else 0
     
     ur_count = sum(1 for r in st.session_state.equipped_relics if r['rarity'] == 'UR')
-    if ur_count >= 3: 
-        set_bonus_cp = 200000
-        unlock_achievement("【位面之主】")
+    if ur_count >= 3: set_bonus_cp = 200000
     elif ur_count >= 2: set_bonus_cp = 50000
     else: set_bonus_cp = 0
     
@@ -777,318 +769,513 @@ else:
     level_mult = 1.0 + (st.session_state.level - 1) * 0.05
     ascend_mult = 1.0 + (st.session_state.ascension_stars * 0.25)
     
-    # 义体增幅计算
     aug_mult = 1.0
     aug_html_str = ""
     for aug in CYBER_AUGMENTS:
         if aug['id'] in st.session_state.cyber_augments:
             aug_mult *= aug['cp_mult']
-            aug_html_str += "<span style='display:inline-block; font-size:10px; color:#ff003c; border:1px solid #ff003c; padding:2px 5px; margin-right:5px; border-radius:3px;'>🦾 " + aug['name'] + "</span>"
+            aug_html_str += "<span style='display:inline-block; font-size:10px; color:#ff003c; border:1px solid #ff003c; background:rgba(255,0,60,0.1); padding:2px 5px; margin-right:5px; border-radius:2px; margin-bottom:5px;'>🦾 " + aug['name'] + "</span>"
+
+    foil_mult = 1.0
+    if "镭射" in card_foil: foil_mult = 1.1
+    elif "暗黑" in card_foil: foil_mult = 1.25
+    elif "创世" in card_foil: foil_mult = 1.5
+
+    squad_mult = 1.0
+    if st.session_state.squad[0] and st.session_state.squad[1]:
+        squad_mult = 1.2
+        f1 = get_faction_info(st.session_state.squad[0])
+        f2 = get_faction_info(st.session_state.squad[1])
+        if faction_data['element'] == f1['element'] == f2['element']:
+            squad_mult = 1.5 
     
-    final_cp = int((base_cp + relic_cp_total + pet_cp_total + talent_cp_total + set_bonus_cp) * level_mult * ascend_mult * aug_mult)
+    raw_cp = (base_cp + relic_cp_total + pet_cp_total + talent_cp_total + set_bonus_cp) * level_mult * ascend_mult * aug_mult * foil_mult * squad_mult
     
-    # 阵营增幅判定
     faction_buff_str = ""
     if st.session_state.joined_faction and st.session_state.joined_faction in faction_data['name']:
-        final_cp = int(final_cp * 1.1)
-        faction_buff_str = "<div style='color:#10b981; font-size:10px; font-weight:bold; margin-top:5px;'>🛡️ 阵营本命增幅: ACTIVE (+10% CP)</div>"
-        unlock_achievement("【阵营死忠】")
+        raw_cp *= 1.1
+        faction_buff_str = "<div style='color:#10b981; font-size:10px; font-weight:bold; margin-top:5px;'>🛡️ 阵营本命觉醒: ACTIVE (+10% CP)</div>"
 
-    # 天气增幅判定
     weather_buff_str = ""
     if ("量子" in st.session_state.weather and "量子" in faction_data['element']) or \
        ("灵能" in st.session_state.weather and "灵能" in faction_data['element']) or \
        ("钢核" in st.session_state.weather and "钢核" in faction_data['element']) or \
        ("炎脉" in st.session_state.weather and "炎脉" in faction_data['element']):
-        final_cp = int(final_cp * 1.2)
-        weather_buff_str = "<div style='color:#ff003c; font-size:10px; font-weight:bold; margin-top:5px; animation:blink 1.5s infinite;'>⛈️ 天气属性共鸣: +20% CP</div>"
+        raw_cp *= 1.2
+        weather_buff_str = "<div style='color:#ffd700; font-size:10px; font-weight:bold; margin-top:5px; animation:blink 1.5s infinite;'>⛈️ 天象极速共鸣: ACTIVE</div>"
+        
+    despair_buff_str = ""
+    if st.session_state.despair_level > 80:
+        raw_cp *= 0.5 
+        despair_buff_str = "<div style='color:#ff003c; font-size:10px; font-weight:bold; margin-top:5px; animation:blink 0.5s infinite;'>💀 基因崩溃: 战力强制减半 (-50%)</div>"
+    elif st.session_state.despair_level >= 40:
+        raw_cp *= 1.2
+        despair_buff_str = "<div style='color:#ffd700; font-size:10px; font-weight:bold; margin-top:5px;'>🔥 绝境狂暴: 战力极度虚高 (+20%)</div>"
 
+    final_cp = int(raw_cp)
     st.session_state.final_cp_cache = final_cp
+    
     rank_name, rank_color = get_rank_tier(final_cp)
     valuation_str = f"{final_cp:,}"
-    pct_beat_final = min(99.99, pct_beat + (relic_cp_total/200000) + (st.session_state.ascension_stars * 1.5))
+    pct_beat_final = min(99.99, pct_beat + (st.session_state.level * 0.1) + (st.session_state.ascension_stars * 1.5))
     
     svg_icon = get_identicon_html(hash_code, border_color)
     stars_html = "".join(["★" for _ in range(st.session_state.ascension_stars)])
     stars_display = "<span style='color:#ffd700; margin-left:10px; font-size:18px;'>" + stars_html + "</span>" if stars_html else ""
 
     # =========================================================================
-    # 🕹️ 游戏化左侧栏 (HUD)
+    # 🕹️ 左侧 HUD (寰宇仪表盘)
     # =========================================================================
     with st.sidebar:
-        safe_html("<div style='text-align:center; font-family:Orbitron; font-size:20px; font-weight:900; color:#ffd700; margin-bottom:20px;'>TCG HUD V20</div>")
-        safe_html("<div class='hud-box'><div class='hud-title'>DAY [" + str(st.session_state.turn_count) + "] - " + st.session_state.weather + "</div></div>")
+        safe_html("<div style='text-align:center; font-family:Orbitron; font-size:20px; font-weight:900; color:#00f3ff; margin-bottom:20px;'>ECO HUD V35</div>")
+        safe_html("<div class='hud-box'><div class='hud-title'>SURVIVAL DAY [" + str(st.session_state.turn_count) + "] - 环境状况</div><div style='color:#ffd700; font-size:12px; font-weight:bold;'>" + st.session_state.weather + "</div></div>")
         
+        despair_color = "#10b981" if st.session_state.despair_level < 40 else "#ffd700" if st.session_state.despair_level < 80 else "#ff003c"
+        despair_text = "理智尚存 (0-39)" if st.session_state.despair_level < 40 else "绝境边缘 (战力+20%)" if st.session_state.despair_level < 80 else "基因崩溃 (战力减半/熔炉易爆)"
+        safe_html("<div class='hud-box' style='border-color:" + despair_color + ";'><div class='hud-title' style='color:" + despair_color + ";'>[ DESPAIR (污染度): " + str(st.session_state.despair_level) + "% ]</div><div style='color:" + despair_color + "; font-size:11px; font-weight:bold;'>" + despair_text + "</div><div style='background:rgba(255,255,255,0.1); height:4px; margin-top:5px;'><div style='background:" + despair_color + "; width:" + str(st.session_state.despair_level) + "%; height:100%; transition: width 0.5s;'></div></div></div>")
+
         idx = st.session_state.titles_owned.index(st.session_state.equipped_title) if st.session_state.equipped_title in st.session_state.titles_owned else 0
-        title_select = st.selectbox("佩戴称号:", st.session_state.titles_owned, index=idx, label_visibility="collapsed")
-        if title_select != st.session_state.equipped_title:
-            equip_title_callback(title_select)
+        new_title = st.selectbox("佩戴军衔:", st.session_state.titles_owned, index=idx, label_visibility="collapsed")
+        if new_title != st.session_state.equipped_title:
+            st.session_state.equipped_title = new_title
+            st.toast("✅ 已佩戴：" + new_title)
             st.rerun()
 
         safe_html("<div class='hud-box'><div class='hud-title'>[ ALIAS ]</div><div class='hud-val' style='color:#fff;'>" + safe_alias_final + stars_display + "</div></div>")
-        safe_html("<div class='hud-box' style='margin-top:15px;'><div class='hud-title'>[ RANK TIER ]</div><div class='hud-val' style='color:" + rank_color + "; font-size:16px;'>" + rank_name + "</div></div>")
+        safe_html("<div class='hud-box' style='margin-top:15px;'><div class='hud-title'>[ WAR TIER ]</div><div class='hud-val' style='color:" + rank_color + "; font-size:16px;'>" + rank_name + "</div></div>")
         safe_html("<div class='hud-box'><div class='hud-title'>[ LEVEL ]</div><div class='hud-val' style='color:#a855f7;'>Lv. " + str(st.session_state.level) + "</div><div style='background:rgba(255,255,255,0.1); height:4px; margin-top:5px;'><div style='background:#a855f7; width:" + str(min(100, st.session_state.exp / (st.session_state.level * 100) * 100)) + "%; height:100%;'></div></div></div>")
-        safe_html("<div class='hud-box'><div class='hud-title'>[ STAMINA ]</div><div class='hud-val' style='color:#10b981;'>" + str(st.session_state.stamina) + " / 150</div></div>")
         
-        gpu_str = " (产出: " + str(st.session_state.gpus * 150) + "/回合)" if st.session_state.gpus > 0 else ""
-        safe_html("<div class='hud-box'><div class='hud-title'>[ SDE TOKENS ]</div><div class='hud-val' style='color:#ffd700;'>" + f"{int(st.session_state.tokens):,}" + " 🪙</div><div style='font-size:9px; color:#10b981; margin-top:5px;'>矿机: " + str(st.session_state.gpus) + " 台" + gpu_str + "</div></div>")
+        stam_color = "#10b981" if st.session_state.stamina > 30 else "#ff003c"
+        safe_html("<div class='hud-box'><div class='hud-title'>[ STAMINA (体力) ]</div><div class='hud-val' style='color:" + stam_color + ";'>" + str(st.session_state.stamina) + " / 150</div></div>")
         
-        if st.session_state.tarot_buff != "无":
-            safe_html("<div class='hud-box' style='border-color:#ff003c;'><div class='hud-title' style='color:#ff003c;'>[ TAROT BUFF ]</div><div style='color:#fff; font-size:12px; font-weight:bold;'>" + st.session_state.tarot_buff + "</div></div>")
-
+        sanity_color = "#00f3ff" if st.session_state.sanity > 50 else "#ff003c"
+        safe_html("<div class='hud-box'><div class='hud-title'>[ SAN (理智) ]</div><div class='hud-val' style='color:" + sanity_color + ";'>" + str(st.session_state.sanity) + " / " + str(st.session_state.max_sanity) + "</div></div>")
+        
+        gpu_str = " (+" + str(st.session_state.gpus * 150) + "/回合)" if st.session_state.gpus > 0 else ""
+        safe_html("<div class='hud-box'><div class='hud-title'>[ WAR FUNDS (SDE 战备金) ]</div><div class='hud-val' style='color:#ffd700;'>" + f"{int(st.session_state.tokens):,}" + " 🪙</div><div style='font-size:9px; color:#10b981; margin-top:5px;'>矿机: " + str(st.session_state.gpus) + " 台" + gpu_str + "</div></div>")
+        
+        safe_html("<div class='hud-box' style='border-color:#a855f7;'><div class='hud-title' style='color:#a855f7;'>[ PREMIUM ASSETS ]</div><div style='color:#fff; font-size:12px; font-weight:bold; margin-bottom:4px;'>🌑 暗物质: " + f"{st.session_state.dark_matter:,}" + "</div><div style='color:#fff; font-size:12px; font-weight:bold;'>💠 逻辑碎片: " + f"{st.session_state.logic_shards:,}" + "</div></div>")
+        
+        ach_html = "".join(["<span class='achieve-badge'>" + a + "</span>" for a in st.session_state.achievements])
+        if ach_html: safe_html("<div class='hud-box'><div class='hud-title'>[ ACHIEVEMENTS ]</div><div>" + ach_html + "</div></div>")
+        
         if st.session_state.staked_tokens > 0:
-            safe_html("<div class='hud-box' style='border-color:#3b82f6;'><div class='hud-title' style='color:#3b82f6;'>[ YIELD POOL ]</div><div class='hud-val' style='color:#00f3ff; font-size:14px;'>+ " + f"{int(st.session_state.yield_pool):,}" + " 🪙</div></div>")
-            st.button("📤 提取利息", on_click=claim_yield_callback, use_container_width=True)
-            
-        if st.button("🛌 冥想休息 (消耗 500 SDE)", use_container_width=True):
-            tick_turn()
-            if st.session_state.tokens >= 500:
-                st.session_state.tokens -= 500
-                st.session_state.stamina = min(150, st.session_state.stamina + 20)
+            safe_html("<div class='hud-box' style='border-color:#3b82f6;'><div class='hud-title' style='color:#3b82f6;'>[ LAUNDERED POOL ]</div><div class='hud-val' style='color:#00f3ff; font-size:14px;'>+ " + f"{int(st.session_state.yield_pool):,}" + " 🪙</div></div>")
+            if st.button("📤 提取洗白资金", use_container_width=True):
+                tick_turn()
+                yld = int(st.session_state.yield_pool)
+                if yld > 0:
+                    st.session_state.tokens += yld
+                    st.session_state.yield_pool = 0.0
+                    st.toast("✅ 成功提取: " + str(yld) + " $SDE！", icon="💰")
                 st.rerun()
-            else: st.toast("余额不足！", icon="❌")
+            
+        c_act1, c_act2 = st.columns(2)
+        with c_act1:
+            if st.button("🛌 休眠(500)", use_container_width=True):
+                tick_turn()
+                if st.session_state.tokens >= 500:
+                    st.session_state.tokens -= 500
+                    st.session_state.stamina = min(150, st.session_state.stamina + 40)
+                    st.session_state.sanity = min(st.session_state.max_sanity, st.session_state.sanity + 20)
+                    st.rerun()
+                else: st.toast("信用点不足！", icon="❌")
+        with c_act2:
+            if st.button("🚿 净化(4k)", use_container_width=True):
+                tick_turn()
+                if st.session_state.tokens >= 4000:
+                    st.session_state.tokens -= 4000
+                    st.session_state.despair_level = 0
+                    st.session_state.sanity = st.session_state.max_sanity
+                    st.toast("精神净化完成，污染已清零！", icon="✨")
+                    st.rerun()
+                else: st.toast("信用点不足！", icon="❌")
             
         safe_html("<div style='font-family:Orbitron; font-size:11px; font-weight:bold; color:#00f3ff; margin-top:30px; margin-bottom:10px; border-bottom:1px solid #334155; padding-bottom:5px;'>/// WORLD CHAT ///</div>")
-        safe_html("<div style='font-family:\"Noto Sans SC\", sans-serif; font-size:11px; line-height:1.6; max-height: 200px; overflow-y: hidden;'>" + "<br>".join(st.session_state.world_chat[:20]) + "</div>")
+        safe_html("<div style='font-family:\"Noto Sans SC\", sans-serif; font-size:11px; line-height:1.6; max-height: 250px; overflow-y: hidden;'>" + "<br>".join(st.session_state.world_chat[:20]) + "</div>")
 
     # =========================================================================
-    # 📱【第一排：宇宙 11 大模块坞 Master Tabs】
+    # 📱【主面板 13 大主控终端 (完全生态闭环)】
     # =========================================================================
-    safe_html("<div style='background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(10,15,30,0.9)); border: 1px solid #10b981; border-radius: 8px; padding: 15px 25px; margin-bottom: 25px; font-family: \"Orbitron\", monospace; box-shadow: 0 0 20px rgba(16,185,129,0.2);'><div style='color: #10b981; font-size: 14px; font-weight: bold; border-bottom: 1px dashed #10b981; padding-bottom: 10px; margin-bottom: 12px;'>🏆 SDE HOLO-CARD MINTED [ GOD MODE ]</div><div style='font-size: 12px; color: #94a3b8; display:flex; justify-content: space-between;'><div>BLOCK: " + block_height + "</div><div>ID: #" + str(token_id) + "</div></div></div>")
+    safe_html("<div style='background: linear-gradient(135deg, rgba(0,243,255,0.1), rgba(10,15,30,0.9)); border: 1px solid #00f3ff; border-radius: 8px; padding: 15px 25px; margin-bottom: 25px; font-family: \"Orbitron\", monospace; box-shadow: 0 0 20px rgba(0,243,255,0.2);'><div style='color: #00f3ff; font-size: 14px; font-weight: bold; border-bottom: 1px dashed #00f3ff; padding-bottom: 10px; margin-bottom: 12px;'>🏆 ECOSYSTEM CARD MINTED [ FUSION MODE ]</div><div style='font-size: 12px; color: #94a3b8; display:flex; justify-content: space-between;'><div>BLOCK: " + block_height + "</div><div>ID: #" + str(token_id) + "</div></div><div style='margin-top:10px; font-size:11px; color:#10b981; font-family:\"Noto Sans SC\";'>【核心法则】远征得碎片 -> 升级天赋 -> 打怪得暗物质 -> 提升星级工艺 -> 暴增战力掠夺全网！</div></div>")
 
-    t_dash, t_syn, t_gacha, t_inv, t_aug, t_combat, t_growth, t_econ, t_data, t_oracle, t_mint = st.tabs([
-        "🖥️ 本机大盘", "🤝 羁绊沙盘", "🎰 神圣召唤", "🎒 武装行囊", "🦾 义体改造", 
-        "⚔️ 征战深渊", "🧬 基因飞升", "🏦 商业帝国", "📊 极客数据", "🤖 神谕解析", "📸 卡砖提取"
+    t_dash, t_combat, t_dispatch, t_growth, t_gacha, t_inv, t_aug, t_econ, t_altar, t_syn, t_data, t_oracle, t_mint = st.tabs([
+        "🖥️ 战地大盘", "⚔️ 征战深渊(产暗物质)", "🗺️ 暗网远征(产碎片)", "🧬 潜能突破", "🎰 黑箱召唤", "🎒 军火行囊", "🦾 义体改造", 
+        "🏦 黑市帝国", "🩸 禁忌祭坛", "🤝 战术小队", "📊 战场态势", "🤖 神谕降临", "📸 抽离卡砖"
     ])
 
-    # ---------------- 1. 本机大盘 (完全无损拼接) ----------------
     with t_dash:
+        # 系统生态演算流面板
+        safe_html("<div class='eco-glance'><div style='color:#00f3ff; font-family:Orbitron; font-weight:bold; border-bottom:1px dashed #00f3ff; padding-bottom:10px; margin-bottom:10px;'>/// ECOSYSTEM RESONANCE ENGINE ///</div><div style='font-size:14px; color:#e2e8f0; line-height:1.8;'><b>生态战力演算流：</b><br>基础算力 (" + f"{base_cp:,}" + ") + 军火加成 (" + f"{relic_cp_total:,}" + ") + 宠物加成 (" + f"{pet_cp_total:,}" + ") + 天赋加成 (" + f"{talent_cp_total:,}" + ") + 套装共鸣 (" + f"{set_bonus_cp:,}" + ")<br>✖️ 等级 (" + str(lvl_m) + ") ✖️ 星级 (" + str(asc_m) + ") ✖️ 义体 (" + str(aug_m) + ") ✖️ 污染 (" + str(despair_m) + ") ✖️ 工艺 (" + str(foil_mult) + ") ✖️ 小队 (" + str(squad_mult) + ")<br>🟰 <b>最终战力：<span style='color:#ffd700; font-size:20px;'>" + f"{final_cp:,}" + " CP</span></b></div></div>")
+        
         col_l, col_m, col_r = st.columns([1.2, 1.1, 1.1], gap="medium")
         with col_l:
-            tags_html_web = "".join(["<span style='background:rgba(255, 215, 0, 0.1); color:#ffd700 !important; border:1px solid rgba(255,215,0,0.4); padding:6px 14px; border-radius:6px; font-size:13px; font-weight:900; margin:4px; display:inline-block; font-family:\"Noto Sans SC\";'>" + t + "</span>" for t in data.get('tags', [])])
-            skills_html_web = "".join(["<div style='background:linear-gradient(90deg, rgba(168,85,247,0.3), rgba(168,85,247,0.05)); border:1px solid rgba(168,85,247,0.5); border-left:4px solid #a855f7; padding:8px 12px; border-radius:6px; font-size:13px; color:#e9d5ff; font-weight:bold; margin-bottom:8px; text-align:left;'>" + s + "</div>" for s in data.get('skills', [])])
+            tags_html_web = "".join(["<span style='background:rgba(0, 243, 255, 0.1); color:#00f3ff !important; border:1px solid rgba(0,243,255,0.4); padding:6px 14px; border-radius:2px; font-size:13px; font-weight:900; margin:4px; display:inline-block; font-family:\"Noto Sans SC\";'>" + t + "</span>" for t in data.get('tags', [])])
+            skills_html_web = "".join(["<div style='background:linear-gradient(90deg, rgba(0,243,255,0.2), transparent); border:1px solid rgba(0,243,255,0.5); border-left:4px solid #00f3ff; padding:8px 12px; border-radius:2px; font-size:13px; color:#fff; font-weight:bold; margin-bottom:8px; text-align:left;'>" + s + "</div>" for s in data.get('skills', [])])
             tier_bg = tier_color if st.session_state.ascended else tier_color + "55"
             
             foil_css = ""
-            if "镭射碎冰" in card_foil: foil_css = "background: linear-gradient(125deg, transparent 20%, rgba(255,255,255,0.8) 40%, rgba(0,243,255,0.8) 50%, rgba(168,85,247,0.8) 60%, transparent 80%); mix-blend-mode: color-dodge;"
-            elif "暗黑反转" in card_foil: foil_css = "background: linear-gradient(125deg, transparent 20%, rgba(0,0,0,0.9) 40%, rgba(255,0,60,0.8) 50%, rgba(0,0,0,0.9) 60%, transparent 80%); mix-blend-mode: multiply;"
-            elif "幽灵幻彩" in card_foil: foil_css = "background: linear-gradient(125deg, transparent 20%, rgba(255,215,0,0.8) 40%, rgba(255,255,255,0.9) 50%, rgba(0,243,255,0.8) 60%, transparent 80%); mix-blend-mode: overlay;"
-            else: foil_css = "background: linear-gradient(125deg, transparent 20%, rgba(255,255,255,0.4) 40%, rgba(255,215,0,0.5) 50%, rgba(0,243,255,0.4) 60%, transparent 80%); mix-blend-mode: color-dodge;"
+            if "碎冰" in card_foil: foil_css = "background: linear-gradient(125deg, transparent 20%, rgba(255,255,255,0.8) 40%, rgba(0,243,255,0.8) 50%, rgba(168,85,247,0.8) 60%, transparent 80%); mix-blend-mode: color-dodge;"
+            elif "反转" in card_foil: foil_css = "background: linear-gradient(125deg, transparent 20%, rgba(0,0,0,0.9) 40%, rgba(255,0,60,0.8) 50%, rgba(0,0,0,0.9) 60%, transparent 80%); mix-blend-mode: multiply;"
+            elif "幻彩" in card_foil: foil_css = "background: linear-gradient(125deg, transparent 20%, rgba(255,215,0,0.8) 40%, rgba(255,255,255,0.9) 50%, rgba(0,243,255,0.8) 60%, transparent 80%); mix-blend-mode: overlay;"
+            else: foil_css = "background: linear-gradient(125deg, transparent 20%, rgba(255,255,255,0.2) 40%, rgba(0,243,255,0.5) 50%, rgba(0,0,0,0.4) 60%, transparent 80%); mix-blend-mode: color-dodge;"
             
-            set_bonus_html = "<div style='margin-top:10px; font-size:11px; color:#ff003c; font-weight:bold; animation: blink 1.5s infinite;'>🔥 [UR套装共鸣] 触发！战力巨幅加成！</div>" if set_bonus_cp > 0 else ""
+            set_bonus_html = "<div style='margin-top:10px; font-size:11px; color:#ffd700; font-weight:bold; animation: blink 1.5s infinite;'>🔥 [UR套装共鸣] 触发！战力极其膨胀！</div>" if set_bonus_cp > 0 else ""
+            squad_bonus_html = "<div style='margin-top:5px; font-size:11px; color:#00f3ff; font-weight:bold;'>🤝 [小队阵列] 激活战力倍率！</div>" if squad_mult > 1.0 else ""
             
-            CARD_CSS = "<style>.tcg-card-container { perspective: 1500px; width: 100%; margin-bottom: 20px; display: flex; justify-content: center; z-index: 50; position: relative; }.tcg-card { width: 100%; max-width: 480px; position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 20px; box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 40px rgba(0,243,255,0.2); background: #0b1120; border: 2px solid " + border_color + "; overflow: hidden; }.tcg-card:hover { transform: rotateY(8deg) rotateX(-5deg) translateY(-10px) scale(1.02); box-shadow: -20px 40px 80px rgba(0,0,0,0.9), 0 0 60px " + border_color + "88; }.tcg-card::after { content: \"\"; position: absolute; inset: 0; " + foil_css + " background-size: 250% 250%; background-position: 100% 100%; pointer-events: none; transition: background-position 0.8s ease; z-index: 20; opacity: 0; }.tcg-card:hover::after { background-position: 0% 0%; opacity: 1; }.card-content { position: relative; z-index: 2; padding: clamp(25px, 6vw, 40px) clamp(20px, 5vw, 30px); text-align: center; }.card-header-bg { position: absolute; top: 0; left: 0; width: 100%; height: 160px; background: linear-gradient(180deg, " + tier_bg + " 0%, transparent 100%); z-index: 1; border-bottom: 1px solid rgba(255,255,255,0.05); }.tcg-mbti { font-family: 'Orbitron', sans-serif !important; font-size: clamp(65px, 12vw, 90px); font-weight: 900; color: #ffffff !important; line-height: 1; letter-spacing: 8px; text-shadow: 0 0 40px " + border_color + ", 0 5px 0px #000; margin: 10px 0; position: relative; z-index: 5; }.tcg-role { font-size: clamp(20px, 5vw, 24px); font-weight: 900; color: #ffd700 !important; margin: 10px 0 25px 0; letter-spacing: 3px; position: relative; z-index: 5; text-shadow: 0 0 20px rgba(255,215,0,0.5); }.tcg-rarity-badge { position: absolute; top: 25px; right: -50px; background: " + tier_color + "; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; padding: 6px 55px; transform: rotate(45deg); z-index: 15; letter-spacing: 3px; box-shadow: 0 5px 20px rgba(255,215,0,0.8); border: 1px solid #fff; }.tcg-stats-box { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; position: relative; z-index: 5; }.tcg-stat-item { flex: 1; background: rgba(0,0,0,0.7); border: 1px solid rgba(0,243,255,0.4); border-radius: 10px; padding: 15px 10px; box-shadow: inset 0 0 20px rgba(0,243,255,0.1); backdrop-filter: blur(5px); }.tcg-stat-title { font-size: 11px; color: #94a3b8; font-family: 'Orbitron', monospace; margin-bottom: 8px; letter-spacing: 1px; }.tcg-stat-val { font-size: clamp(22px, 5vw, 26px); color: #00f3ff; font-weight: 900; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px rgba(0,243,255,0.8); }</style>"
+            CARD_CSS = "<style>.tcg-card-container { perspective: 1500px; width: 100%; margin-bottom: 20px; display: flex; justify-content: center; z-index: 50; position: relative; }.tcg-card { width: 100%; max-width: 480px; position: relative; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); border-radius: 8px; box-shadow: 0 30px 60px rgba(0,0,0,0.9), 0 0 40px rgba(0,243,255,0.2); background: #0b0505; border: 2px solid " + border_color + "; overflow: hidden; }.tcg-card:hover { transform: rotateY(8deg) rotateX(-5deg) translateY(-10px) scale(1.02); box-shadow: -20px 40px 80px rgba(0,0,0,0.9), 0 0 60px " + border_color + "88; }.tcg-card::after { content: \"\"; position: absolute; inset: 0; " + foil_css + " background-size: 250% 250%; background-position: 100% 100%; pointer-events: none; transition: background-position 0.8s ease; z-index: 20; opacity: 0; }.tcg-card:hover::after { background-position: 0% 0%; opacity: 1; }.card-content { position: relative; z-index: 2; padding: clamp(25px, 6vw, 40px) clamp(20px, 5vw, 30px); text-align: center; }.card-header-bg { position: absolute; top: 0; left: 0; width: 100%; height: 160px; background: linear-gradient(180deg, " + tier_bg + " 0%, transparent 100%); z-index: 1; border-bottom: 1px solid rgba(255,255,255,0.05); }.tcg-mbti { font-family: 'Orbitron', sans-serif !important; font-size: clamp(65px, 12vw, 90px); font-weight: 900; color: #ffffff !important; line-height: 1; letter-spacing: 8px; text-shadow: 0 0 40px " + border_color + ", 0 5px 0px #000; margin: 10px 0; position: relative; z-index: 5; }.tcg-role { font-size: clamp(20px, 5vw, 24px); font-weight: 900; color: #ffd700 !important; margin: 10px 0 25px 0; letter-spacing: 3px; position: relative; z-index: 5; text-shadow: 0 0 20px rgba(255,215,0,0.5); }.tcg-rarity-badge { position: absolute; top: 25px; right: -50px; background: " + tier_color + "; color: #000; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; padding: 6px 55px; transform: rotate(45deg); z-index: 15; letter-spacing: 3px; box-shadow: 0 5px 20px rgba(0,243,255,0.8); border: 1px solid #fff; }.tcg-stats-box { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 25px; position: relative; z-index: 5; }.tcg-stat-item { flex: 1; background: rgba(0,0,0,0.8); border: 1px solid rgba(0,243,255,0.4); border-radius: 4px; padding: 15px 10px; box-shadow: inset 0 0 20px rgba(0,243,255,0.1); backdrop-filter: blur(5px); }.tcg-stat-title { font-size: 11px; color: #94a3b8; font-family: 'Orbitron', monospace; margin-bottom: 8px; letter-spacing: 1px; }.tcg-stat-val { font-size: clamp(22px, 5vw, 26px); color: #00f3ff; font-weight: 900; font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px rgba(0,243,255,0.8); }</style>"
             
-            HTML_CARD = CARD_CSS.replace('\n', '') + "<div class=\"tcg-card-container\"><div class=\"tcg-card\"><div class=\"card-header-bg\"></div><div class=\"card-content\"><div class=\"tcg-rarity-badge\">" + tier_level + "</div><div style=\"position:relative; z-index:5; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom:10px;\"><div style=\"font-family:'Orbitron', monospace; font-size:11px; color:#94a3b8; letter-spacing:4px;\">LV." + str(st.session_state.level) + " AWAKENED</div><div style=\"font-size:12px; font-weight:bold; color:" + faction_data['color'] + "; text-shadow: 0 0 5px " + faction_data['color'] + ";\">" + faction_data['element'] + "</div></div><div style=\"position:relative; z-index:5; display:flex; justify-content:center; align-items:center; gap:15px; margin-bottom:5px;\">" + svg_icon + "<div style=\"color:#ffffff; font-family:'Orbitron', monospace; font-size:20px; font-weight:bold; letter-spacing:2px; text-shadow: 0 0 10px rgba(255,255,255,0.5);\">" + safe_alias_final + stars_display + "</div></div><div class=\"tcg-mbti\">" + mbti + "</div><div style=\"position:relative; z-index:5; text-align:center;font-size:12px;color:#94a3b8;margin-bottom:10px; font-family:'Orbitron';\">FOIL: <span style=\"color:" + tier_color + ";font-weight:bold;font-size:14px;\">" + card_foil + "</span></div><div style=\"position:relative; z-index:5; display:flex; justify-content:center; gap:10px; margin-bottom:10px;\"><span style=\"background:rgba(255,255,255,0.1); border:1px solid #94a3b8; padding:3px 10px; border-radius:15px; font-size:10px; font-weight:bold;\">" + faction_data['name'] + "</span></div><div class=\"tcg-role\">" + full_title + "</div><div class=\"tcg-stats-box\"><div class=\"tcg-stat-item\"><div class=\"tcg-stat-title\">COMBAT POWER</div><div class=\"tcg-stat-val\" style=\"color:#ffd700;\">" + f"{final_cp:,}" + "</div></div><div class=\"tcg-stat-item\"><div class=\"tcg-stat-title\">PERCENTILE</div><div class=\"tcg-stat-val\">TOP " + f"{100-pct_beat_final:.1f}" + "%</div></div></div><div style=\"position:relative; z-index:5; margin-bottom:15px;\">" + aug_html_str + "</div><div style=\"position:relative; z-index:5; margin-bottom:20px;\">" + tags_html_web + "</div><div style=\"position:relative; z-index:5; width:100%;\"><div style=\"font-size:11px; color:#a855f7; margin-bottom:10px; font-family:'Orbitron'; letter-spacing:2px; font-weight:bold; text-align:left; border-bottom:1px dashed #a855f7; padding-bottom:5px;\">[ ABILITY MOVES ]</div>" + skills_html_web + faction_buff_str + weather_buff_str + set_bonus_html + "</div></div></div></div>"
+            HTML_CARD = CARD_CSS.replace('\n', '') + "<div class=\"tcg-card-container\"><div class=\"tcg-card\"><div class=\"card-header-bg\"></div><div class=\"card-content\"><div class=\"tcg-rarity-badge\">" + tier_level + "</div><div style=\"position:relative; z-index:5; display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom:10px;\"><div style=\"font-family:'Orbitron', monospace; font-size:11px; color:#94a3b8; letter-spacing:4px;\">LV." + str(st.session_state.level) + " MERCENARY</div><div style=\"font-size:12px; font-weight:bold; color:" + faction_data['color'] + "; text-shadow: 0 0 5px " + faction_data['color'] + ";\">" + faction_data['element'] + "</div></div><div style=\"position:relative; z-index:5; display:flex; justify-content:center; align-items:center; gap:15px; margin-bottom:5px;\">" + svg_icon + "<div style=\"color:#ffffff; font-family:'Orbitron', monospace; font-size:20px; font-weight:bold; letter-spacing:2px; text-shadow: 0 0 10px rgba(255,255,255,0.5);\">" + safe_alias_final + stars_display + "</div></div><div class=\"tcg-mbti\">" + mbti + "</div><div style=\"position:relative; z-index:5; text-align:center;font-size:12px;color:#94a3b8;margin-bottom:10px; font-family:'Orbitron';\">FOIL: <span style=\"color:" + border_color + ";font-weight:bold;font-size:14px;\">" + card_foil + "</span></div><div style=\"position:relative; z-index:5; display:flex; justify-content:center; gap:10px; margin-bottom:10px;\"><span style=\"background:rgba(255,255,255,0.1); border:1px solid #94a3b8; padding:3px 10px; border-radius:15px; font-size:10px; font-weight:bold;\">" + faction_data['name'] + "</span></div><div class=\"tcg-role\">" + full_title + "</div><div class=\"tcg-stats-box\"><div class=\"tcg-stat-item\"><div class=\"tcg-stat-title\">COMBAT POWER</div><div class=\"tcg-stat-val\" style=\"color:#ffd700;\">" + f"{final_cp:,}" + "</div></div><div class=\"tcg-stat-item\"><div class=\"tcg-stat-title\">SURVIVAL RATE</div><div class=\"tcg-stat-val\">TOP " + f"{100-pct_beat_final:.1f}" + "%</div></div></div><div style=\"position:relative; z-index:5; margin-bottom:15px;\">" + aug_html_str + "</div><div style=\"position:relative; z-index:5; margin-bottom:20px;\">" + tags_html_web + "</div><div style=\"position:relative; z-index:5; width:100%;\"><div style=\"font-size:11px; color:#00f3ff; margin-bottom:10px; font-family:'Orbitron'; letter-spacing:2px; font-weight:bold; text-align:left; border-bottom:1px dashed #00f3ff; padding-bottom:5px;\">[ CORE PROTOCOLS ]</div>" + skills_html_web + faction_buff_str + weather_buff_str + despair_buff_str + squad_bonus_html + set_bonus_html + "</div></div></div></div>"
             safe_html(HTML_CARD)
 
         with col_m:
             safe_html("<h4 style='color:#00f3ff !important; border-left:4px solid #00f3ff; padding-left:10px; font-weight:900;'>🕸️ 六维雷达阵列</h4>")
             fig_radar = go.Figure()
-            fig_radar.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.25)', line=dict(color='#00f3ff', width=3), marker=dict(color='#ff003c', size=6, symbol='diamond')))
+            fig_radar.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.15)', line=dict(color='rgba(0, 243, 255, 0.4)', width=8), hoverinfo='none'))
+            fig_radar.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.25)', line=dict(color='#00f3ff', width=3), marker=dict(color='#ffd700', size=6, symbol='diamond')))
             fig_radar.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC", color='#e2e8f0', size=11))), showlegend=False, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=15, r=15, t=10, b=20), height=300)
             st.plotly_chart(fig_radar, use_container_width=True, config={'displayModeBar': False})
             
-            safe_html("<h4 style='color:#ff003c !important; border-left:4px solid #ff003c; padding-left:10px; font-weight:900;'>🎛️ 风险抵抗生命 (HP)</h4>")
-            fig_gauge = go.Figure(go.Indicator(mode="gauge+number", value=risk_score, number={'suffix': " HP", 'font': {'family': 'Orbitron', 'color': r_color, 'size': 36}}, gauge={'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#334155"}, 'bar': {'color': r_color}, 'bgcolor': "rgba(255,255,255,0.05)", 'steps': [{'range': [0, 35], 'color': "rgba(16, 185, 129, 0.15)"}, {'range': [35, 65], 'color': "rgba(255, 215, 0, 0.15)"}, {'range': [65, 100], 'color': "rgba(244, 63, 94, 0.15)"}]}))
+            safe_html("<h4 style='color:#ff003c !important; border-left:4px solid #ff003c; padding-left:10px; font-weight:900;'>🎛️ 风险抵抗阈值</h4>")
+            fig_gauge = go.Figure(go.Indicator(mode="gauge+number", value=risk_score, number={'suffix': " HP", 'font': {'family': 'Orbitron', 'color': r_color, 'size': 36}}, gauge={'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "#330011"}, 'bar': {'color': r_color}, 'bgcolor': "rgba(0,243,255,0.05)", 'steps': [{'range': [0, 35], 'color': "rgba(16, 185, 129, 0.15)"}, {'range': [35, 65], 'color': "rgba(255, 215, 0, 0.15)"}, {'range': [65, 100], 'color': "rgba(255, 0, 60, 0.25)"}]}))
             fig_gauge.update_layout(paper_bgcolor='rgba(0,0,0,0)', font={'color': "#94a3b8"}, height=200, margin=dict(l=30, r=30, t=10, b=10))
             st.plotly_chart(fig_gauge, use_container_width=True, config={'displayModeBar': False})
 
         with col_r:
-            safe_html("<h4 style='color:#a855f7 !important; border-left:4px solid #a855f7; padding-left:10px; font-weight:900;'>⚔️ 对抗能量槽</h4>")
-            HTML_BARS = "<div style=\"background:rgba(10,15,25,0.9); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:20px; box-shadow:inset 0 0 20px rgba(0,0,0,0.8);\"><div style=\"font-size:11px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; font-weight:bold;\"><span>外联 (E) " + str(val_E) + "%</span><span style=\"color:#94a3b8;\">深潜 (I) " + str(val_I) + "%</span></div><div style=\"background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:8px 0 15px 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);\"><div style=\"position:absolute; top:0; left:0; height:100%; border-radius:4px; width:" + str(val_E) + "%; background:linear-gradient(90deg, transparent, #00f3ff);\"></div></div><div style=\"font-size:11px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; font-weight:bold;\"><span>实勘 (S) " + str(val_S) + "%</span><span style=\"color:#94a3b8;\">前瞻 (N) " + str(val_N) + "%</span></div><div style=\"background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:8px 0 15px 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);\"><div style=\"position:absolute; top:0; left:0; height:100%; border-radius:4px; width:" + str(val_S) + "%; background:linear-gradient(90deg, transparent, #a855f7);\"></div></div><div style=\"font-size:11px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; font-weight:bold;\"><span>护甲 (T) " + str(val_T) + "%</span><span style=\"color:#94a3b8;\">共情 (F) " + str(val_F) + "%</span></div><div style=\"background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:8px 0 15px 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);\"><div style=\"position:absolute; top:0; left:0; height:100%; border-radius:4px; width:" + str(val_T) + "%; background:linear-gradient(90deg, transparent, #3b82f6);\"></div></div><div style=\"font-size:11px; color:#e2e8f0; font-family:'Orbitron', sans-serif; display:flex; justify-content:space-between; font-weight:bold;\"><span>秩序 (J) " + str(val_J) + "%</span><span style=\"color:#94a3b8;\">敏捷 (P) " + str(val_P) + "%</span></div><div style=\"background:rgba(255,255,255,0.05); border-radius:4px; height:8px; margin:8px 0 0 0; position:relative; overflow:hidden; border:1px solid rgba(255,255,255,0.1);\"><div style=\"position:absolute; top:0; left:0; height:100%; border-radius:4px; width:" + str(val_J) + "%; background:linear-gradient(90deg, transparent, #10b981);\"></div></div></div>"
-            safe_html(HTML_BARS)
+            safe_html("<h4 style='color:#a855f7 !important; border-left:4px solid #a855f7; padding-left:10px; font-weight:900;'>⚔️ 生态联动监控阵列</h4>")
+            eco_str = "<div style='background:rgba(20,5,10,0.9); border:1px solid rgba(0,243,255,0.3); padding:15px; font-size:12px; color:#e2e8f0; border-radius:4px; line-height: 1.8;'>"
+            eco_str += "<b>[E 天赋]</b> Boss 伤害附加: <span style='color:#ffd700;'>+" + str(int((sys_mults['boss_dmg_mult']-1)*100)) + "%</span><br>"
+            eco_str += "<b>[S 天赋]</b> 远征暴击爆率: <span style='color:#a855f7;'>+" + str(int((sys_mults['drop_rate_mult']-1)*100)) + "%</span><br>"
+            eco_str += "<b>[T 天赋]</b> PVP 护盾加持: <span style='color:#3b82f6;'>+" + str(int((sys_mults['pvp_def_mult']-1)*100)) + "%</span><br>"
+            eco_str += "<b>[J 天赋]</b> 挖矿利息倍率: <span style='color:#10b981;'>+" + str(int((sys_mults['yield_mult']-1)*100)) + "%</span><br>"
             
-            safe_html("<h4 style='color:#ffd700 !important; border-left:4px solid #ffd700; padding-left:10px; font-weight:900; margin-top:15px;'>🌌 3D 认知拓扑星图</h4>")
+            if st.session_state.equipped_pet:
+                eco_str += "<span style='color:#ff003c;'><b>[机甲辅助]</b> " + st.session_state.equipped_pet['name'] + " 已激活！</span><br>"
+            if st.session_state.cyber_augments:
+                eco_str += "<span style='color:#00f3ff;'><b>[义体过载]</b> 肉体改造倍率已叠加！</span><br>"
+            if foil_mult > 1.0:
+                eco_str += "<span style='color:#ffd700;'><b>[卡面幻彩]</b> 获得高阶算力增幅！</span><br>"
+            eco_str += "</div>"
+            safe_html(eco_str)
+            
+            safe_html("<h4 style='color:#ffd700 !important; border-left:4px solid #ffd700; padding-left:10px; font-weight:900; margin-top:15px;'>🌌 3D 废土星图</h4>")
             st.plotly_chart(get_3d_topology(val_E, val_I, val_S, val_N, val_T, val_F, mbti, tier_color, h_int), use_container_width=True, config={'displayModeBar': False})
 
-    # ---------------- 2. 羁绊沙盘 ----------------
+    with t_combat:
+        c_tc1, c_tc2 = st.columns(2)
+        with c_tc1:
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ff003c; margin-bottom:10px; border-bottom:1px dashed #ff003c; padding-bottom:8px;'>/// MEGA-CORP RAID (产出暗物质)</div>")
+            boss_max_hp = 2000000 * st.session_state.boss_level
+            boss_hp_pct = max(0, st.session_state.boss_hp / boss_max_hp * 100)
+            boss_element = ["⚡ 量子", "✨ 灵能", "🛡️ 钢核", "🔥 炎脉"][st.session_state.boss_level % 4]
+            boss_name = ["P0级连环线上事故", "毁灭级降本增效风暴", "跨部门背刺利维坦", "史诗级黑客入侵勒索"][st.session_state.boss_level % 4]
+            
+            safe_html("<div style=\"background:rgba(0,0,0,0.8); border:2px solid #ff003c; padding:20px; border-radius:4px; text-align:center; box-shadow: inset 0 0 30px rgba(255,0,60,0.15);\"><div style=\"font-size:40px; margin-bottom:10px;\">🏢</div><div style=\"color:#ff003c; font-weight:900; font-family:'Orbitron'; font-size:20px; margin-bottom:5px;\">LV." + str(st.session_state.boss_level) + " " + boss_name + "</div><div style=\"font-size:12px; color:#fff; font-weight:bold; margin-bottom:10px;\">弱点检测：防线呈现 " + boss_element + " 特性</div><div style=\"background:#334155; height:15px; border-radius:2px; overflow:hidden; margin-bottom:10px;\"><div style=\"background:#ff003c; width:" + str(boss_hp_pct) + "%; height:100%; transition:width 0.3s;\"></div></div><div style=\"color:#fff; font-family:'Orbitron';\">" + f"{int(st.session_state.boss_hp):,}" + " HP</div></div>")
+            safe_html("<br>")
+            if st.session_state.boss_hp > 0:
+                cost = 7 if (st.session_state.equipped_pet and "机械哈士奇" in st.session_state.equipped_pet['name']) else 15
+                if st.button("⚔️ 消耗 " + str(cost) + " 体力引爆火力 (受 E 值加成)", type="primary", use_container_width=True): 
+                    cb_boss_attack(faction_data['element'])
+                    st.rerun()
+            if st.session_state.combat_logs:
+                safe_html("<div style='background:#050505; border:1px solid #334155; padding:15px; border-radius:4px; height:180px; overflow-y:auto; font-size:13px; color:#e2e8f0; margin-top:20px; box-shadow:inset 0 0 15px rgba(0,0,0,0.8); line-height: 1.7;'>" + "<br><br>".join(st.session_state.combat_logs[:15]) + "</div>")
+        with c_tc2:
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#f43f5e; margin-bottom:10px; border-bottom:1px dashed #f43f5e; padding-bottom:8px;'>/// PVP ARENA (零和博弈)</div>")
+            target_faction = st.selectbox("🎯 锁定敌对派系:", ["硅基抵抗军", "幽能清道夫", "秩序裁决所", "混沌暴徒"], key="pvp_target", label_visibility="collapsed")
+            cost_p = 7 if (st.session_state.equipped_pet and "机械哈士奇" in st.session_state.equipped_pet['name']) else 15
+            if st.button("⚔️ 消耗 " + str(cost_p) + " 体力发起突袭 (受 T 值加成)", use_container_width=True): 
+                cb_pvp_battle(target_faction)
+                st.rerun()
+            if st.session_state.pvp_logs:
+                safe_html("<div style='background:#050505; border:1px solid #334155; padding:15px; border-radius:4px; height:180px; overflow-y:auto; font-size:13px; color:#e2e8f0; margin-top:20px; box-shadow:inset 0 0 15px rgba(0,0,0,0.8); line-height: 1.7;'>" + "<br>".join(st.session_state.pvp_logs[:20]) + "</div>")
+
+    with t_dispatch:
+        safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#00f3ff; margin-bottom:10px; border-bottom:1px dashed #00f3ff; padding-bottom:8px;'>/// WASTELAND DISPATCH (产出逻辑碎片)</div>")
+        safe_html("<div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>派遣进入暗网拾荒，高概率产出升级天赋树必备的【逻辑碎片】。受 S 值掉落加成。</div>")
+        cost_d = 10 if (st.session_state.equipped_pet and "机械哈士奇" in st.session_state.equipped_pet['name']) else 20
+        if st.button("🛸 消耗 " + str(cost_d) + " 体力进入暗网拾荒", use_container_width=True): 
+            cb_dispatch()
+            st.rerun()
+        if st.session_state.dispatch_logs:
+            safe_html("<div style='background:#050505; border:1px solid #334155; padding:15px; border-radius:4px; height:200px; overflow-y:auto; font-size:13px; color:#e2e8f0; margin-top:20px; box-shadow:inset 0 0 15px rgba(0,0,0,0.8); line-height: 1.7;'>" + "<br><br>".join(st.session_state.dispatch_logs[:15]) + "</div>")
+
+    with t_growth:
+        col_gr1, col_gr2, col_gr3 = st.columns(3)
+        with col_gr1:
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#00f3ff; margin-bottom:10px; border-bottom:1px dashed #00f3ff; padding-bottom:8px;'>/// CARD ASCENSION (星级突破)</div><div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>消耗稀有的【暗物质】升星！每次突破全属性战力提升 25%！</div>")
+            cost_dm = 100 + (st.session_state.ascension_stars * 50)
+            safe_html("<div style='text-align:center; padding:10px; background:rgba(0,0,0,0.5); border:1px solid #334155; border-radius:4px; margin-bottom:10px;'><div style='font-size:14px; color:#fff; font-weight:bold; margin-bottom:5px;'>当前星级：" + str(st.session_state.ascension_stars) + " 星</div><div style='font-size:11px; color:#94a3b8;'>需要：<b style='color:#a855f7; font-size:14px;'>" + str(cost_dm) + "</b> 🌑 暗物质</div></div>")
+            if st.session_state.ascension_stars < 5: 
+                if st.button("🌌 突破界限 (ASCEND)", type="primary", use_container_width=True): 
+                    tick_turn("misc")
+                    if st.session_state.dark_matter >= cost_dm:
+                        st.session_state.dark_matter -= cost_dm
+                        st.session_state.ascension_stars += 1
+                        st.toast("🌌 界限突破！战力飙升！", icon="✨")
+                        if st.session_state.ascension_stars == 5:
+                            st.session_state.ascended = True
+                            unlock_achievement("【超维神明】")
+                            st.balloons()
+                    else: st.toast("❌ 暗物质不足！请去打 Boss！", icon="❌")
+                    st.rerun()
+            else: safe_html("<div style='text-align:center; padding:10px; font-size:16px; font-weight:bold; color:#fff; text-shadow:0 0 10px #00f3ff;'>✨ MAX ASCENSION ✨</div>")
+        with col_gr2:
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#a855f7; margin-bottom:10px; border-bottom:1px dashed #a855f7; padding-bottom:8px;'>/// GENE TALENT (消耗逻辑碎片)</div><div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>升级不仅永久加成战力，更能提升四大生态乘区的倍率！</div>")
+            tl = st.session_state.talent_levels
+            c_e, c_s = st.columns(2)
+            c_t, c_j = st.columns(2)
+            with c_e: 
+                cost_sde = 2000 + tl['E'] * 1000; cost_shard = 1 + tl['E']
+                if st.button("升级 E [Lv" + str(tl['E']) + "]\n" + str(cost_sde) + "币 / " + str(cost_shard) + "碎", key="up_e", use_container_width=True): cb_talent_up("E"); st.rerun()
+            with c_s: 
+                cost_sde = 2000 + tl['S'] * 1000; cost_shard = 1 + tl['S']
+                if st.button("升级 S [Lv" + str(tl['S']) + "]\n" + str(cost_sde) + "币 / " + str(cost_shard) + "碎", key="up_s", use_container_width=True): cb_talent_up("S"); st.rerun()
+            with c_t: 
+                cost_sde = 2000 + tl['T'] * 1000; cost_shard = 1 + tl['T']
+                if st.button("升级 T [Lv" + str(tl['T']) + "]\n" + str(cost_sde) + "币 / " + str(cost_shard) + "碎", key="up_t", use_container_width=True): cb_talent_up("T"); st.rerun()
+            with c_j: 
+                cost_sde = 2000 + tl['J'] * 1000; cost_shard = 1 + tl['J']
+                if st.button("升级 J [Lv" + str(tl['J']) + "]\n" + str(cost_sde) + "币 / " + str(cost_shard) + "碎", key="up_j", use_container_width=True): cb_talent_up("J"); st.rerun()
+        with col_gr3:
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #ffd700; padding-bottom:8px;'>/// FOIL UPGRADE (幻彩重铸)</div><div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>消耗暗物质重铸卡面材质，扩大全局战力乘区！</div>")
+            foils = ["【标准拉丝工艺】", "【镭射碎冰闪卡】", "【暗黑反转闪卡】", "【创世血腥幻彩】"]
+            costs = [0, 500, 1500, 5000]
+            current = st.session_state.card_foil
+            try: idx = foils.index(current)
+            except: idx = 0
+            safe_html("<div style='text-align:center; padding:10px; background:rgba(0,0,0,0.5); border:1px solid #334155; border-radius:4px; margin-bottom:10px;'><div style='font-size:12px; color:#fff; font-weight:bold; margin-bottom:5px;'>当前：<span style='color:#ffd700;'>" + current + "</span></div>")
+            if idx < 3:
+                cost = costs[idx+1]
+                safe_html("<div style='font-size:11px; color:#94a3b8;'>升级需要：<b style='color:#a855f7;'>" + str(cost) + "</b> 🌑 暗物质</div></div>")
+                if st.button("✨ 重铸卡面材质", type="primary", use_container_width=True): cb_upgrade_foil(); st.rerun()
+            else:
+                safe_html("</div><div style='text-align:center; padding:10px; font-size:16px; font-weight:bold; color:#fff; text-shadow:0 0 10px #ffd700;'>✨ 巅峰工艺达成 ✨</div>")
+
     with t_syn:
-        safe_html("<div style='background:rgba(10, 15, 25, 0.8); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:clamp(15px, 4vw, 25px); box-shadow:inset 0 0 20px rgba(0,0,0,0.5);'><h4 style='color:#3b82f6 !important; border-left:4px solid #3b82f6; padding-left:10px; font-weight:900; margin-bottom:15px;'>🎴 三卡小队构筑沙盘 (DECK BUILDER)</h4><div style='font-size:13px; color:#94a3b8; margin-bottom:15px;'>选择两名队友，触发三轨雷达重叠与羁绊！(同元素触发史诗共鸣)</div>")
+        safe_html("<div style='background:rgba(10, 2, 4, 0.8); border:1px solid rgba(255,0,60,0.2); border-radius:12px; padding:clamp(15px, 4vw, 25px); box-shadow:inset 0 0 20px rgba(0,0,0,0.5);'><h4 style='color:#3b82f6 !important; border-left:4px solid #3b82f6; padding-left:10px; font-weight:900; margin-bottom:15px;'>🎴 三卡小队实体编成 (SQUAD BUILDER)</h4><div style='font-size:13px; color:#94a3b8; margin-bottom:15px;'>在绝境中招募两名实体盟友！编成后所有队员共享 20% 战力加成，若三人同属同一元素，将引发【元素共鸣】，全体战力暴增 50%！</div>")
         options_list = list(mbti_details.keys())
         format_func = lambda x: f"{x} - {mbti_details[x]['role']}"
-        col_s1, col_s2 = st.columns(2)
-        with col_s1: pmbti1 = st.selectbox("🎯 队友 1:", options=options_list, index=options_list.index("ESTJ"), format_func=format_func, label_visibility="collapsed")
-        with col_s2: 
-            p2_idx = options_list.index(data.get('partner', 'ENTJ')[:4]) if data.get('partner', 'ENTJ')[:4] in options_list else 0
-            pmbti2 = st.selectbox("🎯 队友 2:", options=options_list, index=p2_idx, format_func=format_func, label_visibility="collapsed")
+        col_s1, col_s2, col_s3 = st.columns([2, 2, 1])
         
-        sc1, sd1 = calculate_synergy(mbti, pmbti1); sc2, sd2 = calculate_synergy(mbti, pmbti2)
+        idx1 = options_list.index(st.session_state.squad[0]) if st.session_state.squad[0] else options_list.index("ESTJ")
+        idx2 = options_list.index(st.session_state.squad[1]) if st.session_state.squad[1] else options_list.index("INTJ")
+        
+        with col_s1: pmbti1 = st.selectbox("🎯 战术小队成员 1:", options=options_list, index=idx1, format_func=format_func, label_visibility="collapsed")
+        with col_s2: pmbti2 = st.selectbox("🎯 战术小队成员 2:", options=options_list, index=idx2, format_func=format_func, label_visibility="collapsed")
+        with col_s3: 
+            if st.button("✅ 确认编队", use_container_width=True):
+                tick_turn("misc")
+                st.session_state.squad = [pmbti1, pmbti2]
+                st.toast("🤝 战术小队编成确认！")
+                st.rerun()
+        
+        # 使用当前编队的成员进行雷达展示
+        curr_m1 = st.session_state.squad[0] if st.session_state.squad[0] else pmbti1
+        curr_m2 = st.session_state.squad[1] if st.session_state.squad[1] else pmbti2
+        
+        sc1, sd1 = calculate_synergy(mbti, curr_m1); sc2, sd2 = calculate_synergy(mbti, curr_m2)
         total_sc = int((sc1 + sc2) / 2)
         
-        fac1 = get_faction_info(pmbti1); fac2 = get_faction_info(pmbti2)
+        fac1 = get_faction_info(curr_m1); fac2 = get_faction_info(curr_m2)
         tri_element = (faction_data['element'] == fac1['element'] == fac2['element'])
         if tri_element: total_sc = min(150, total_sc + 30)
         sc_color = "#ff003c" if tri_element else ("#ffd700" if total_sc >= 90 else ("#00f3ff" if total_sc >= 80 else "#a855f7"))
         
-        v1_E = 85 if 'E' in pmbti1 else 15; v2_E = 85 if 'E' in pmbti2 else 15
-        v1_S = 85 if 'S' in pmbti1 else 15; v2_S = 85 if 'S' in pmbti2 else 15
-        v1_T = 85 if 'T' in pmbti1 else 15; v2_T = 85 if 'T' in pmbti2 else 15
-        v1_J = 85 if 'J' in pmbti1 else 15; v2_J = 85 if 'J' in pmbti2 else 15
+        v1_E = 85 if 'E' in curr_m1 else 15; v2_E = 85 if 'E' in curr_m2 else 15
+        v1_S = 85 if 'S' in curr_m1 else 15; v2_S = 85 if 'S' in curr_m2 else 15
+        v1_T = 85 if 'T' in curr_m1 else 15; v2_T = 85 if 'T' in curr_m2 else 15
+        v1_J = 85 if 'J' in curr_m1 else 15; v2_J = 85 if 'J' in curr_m2 else 15
         target_values = [(v1_E+v2_E)/2, (v1_S+v2_S)/2, (v1_T+v2_T)/2, (v1_J+v2_J)/2, 100-(v1_E+v2_E)/2, 100-(v1_S+v2_S)/2, 100-(v1_T+v2_T)/2, 100-(v1_J+v2_J)/2]
 
         fig_syn = go.Figure()
         fig_syn.add_trace(go.Scatterpolar(r=target_values + [target_values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(168, 85, 247, 0.15)', line=dict(color='rgba(168, 85, 247, 0.8)', width=2, dash='dash'), name='小队平均阵型'))
-        fig_syn.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(0, 243, 255, 0.3)', line=dict(color='#00f3ff', width=3), name='本机节点'))
+        fig_syn.add_trace(go.Scatterpolar(r=values + [values[0]], theta=categories + [categories[0]], fill='toself', fillcolor='rgba(255, 0, 60, 0.3)', line=dict(color='#ff003c', width=3), name='本机节点'))
         fig_syn.update_layout(polar=dict(radialaxis=dict(visible=False, range=[0, 100]), angularaxis=dict(tickfont=dict(family="Noto Sans SC", color='#e2e8f0', size=10))), showlegend=True, legend=dict(orientation="h", yanchor="bottom", y=-0.2, xanchor="center", x=0.5, font=dict(color="#fff")), paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=25, r=25, t=10, b=20), height=320)
         st.plotly_chart(fig_syn, use_container_width=True, config={'displayModeBar': False})
 
-        if tri_element:
-            safe_html("<style>.link-skill-active { background: linear-gradient(90deg, rgba(255,0,60,0.1), rgba(255,0,60,0.4), rgba(255,0,60,0.1)); border: 2px solid #ff003c; box-shadow: 0 0 30px rgba(255,0,60,0.8), inset 0 0 20px rgba(255,0,60,0.5); animation: pulse-link 1s infinite alternate; border-radius: 12px; padding: 25px; text-align: center; margin-top: 10px;} @keyframes pulse-link { 0% { transform: scale(1); } 100% { transform: scale(1.02); box-shadow: 0 0 50px rgba(255,0,60,1); } }</style><div class=\"link-skill-active\"><div style=\"font-family:'Orbitron'; color:#ff003c; font-size:12px; font-weight:bold; margin-bottom:10px; letter-spacing: 4px;\">💥 " + faction_data['element'] + " 元素共鸣大爆发 💥</div><div style=\"font-family:'Orbitron'; font-size:65px; font-weight:900; color:#fff; text-shadow:0 0 35px #ff003c; margin-bottom:15px;\">" + str(total_sc) + "%</div><div style=\"color:#e2e8f0; font-size:15px; font-weight:bold; line-height:1.7;\">神级羁绊！同阵营小队战力突破极限！</div></div>")
-        else:
-            safe_html("<div style=\"background: rgba(0,0,0,0.5); border: 1px solid " + sc_color + "66; border-left: 4px solid " + sc_color + "; padding: 25px; border-radius: 8px; margin-top:10px; text-align:center; box-shadow: 0 0 30px " + sc_color + "22;\"><div style=\"font-family:'Orbitron'; color:" + sc_color + "; font-size:12px; font-weight:bold; margin-bottom:10px; letter-spacing: 3px;\">[ TEAM RESONANCE ]</div><div style=\"font-family:'Orbitron'; font-size:55px; font-weight:900; color:#fff; text-shadow:0 0 35px " + sc_color + "99; margin-bottom:15px;\">" + str(total_sc) + "%</div><div style=\"color:#e2e8f0; font-size:14px; font-weight:bold; line-height:1.7;\">系统评级：已完成基础阵列组合。</div></div>")
+        if st.session_state.squad[0]:
+            if tri_element:
+                safe_html("<style>.link-skill-active { background: linear-gradient(90deg, rgba(255,0,60,0.1), rgba(255,0,60,0.4), rgba(255,0,60,0.1)); border: 2px solid #ff003c; box-shadow: 0 0 30px rgba(255,0,60,0.8), inset 0 0 20px rgba(255,0,60,0.5); animation: pulse-link 1s infinite alternate; border-radius: 12px; padding: 25px; text-align: center; margin-top: 10px;} @keyframes pulse-link { 0% { transform: scale(1); } 100% { transform: scale(1.02); box-shadow: 0 0 50px rgba(255,0,60,1); } }</style><div class=\"link-skill-active\"><div style=\"font-family:'Orbitron'; color:#ff003c; font-size:12px; font-weight:bold; margin-bottom:10px; letter-spacing: 4px;\">💥 " + faction_data['element'] + " 军团共鸣大爆发 💥</div><div style=\"font-family:'Orbitron'; font-size:65px; font-weight:900; color:#fff; text-shadow:0 0 35px #ff003c; margin-bottom:15px;\">" + str(total_sc) + "%</div><div style=\"color:#e2e8f0; font-size:15px; font-weight:bold; line-height:1.7;\">神级羁绊！已为您带来 50% 战力乘区扩大！</div></div>")
+            else:
+                safe_html("<div style=\"background: rgba(0,0,0,0.5); border: 1px solid " + sc_color + "66; border-left: 4px solid " + sc_color + "; padding: 25px; border-radius: 8px; margin-top:10px; text-align:center; box-shadow: 0 0 30px " + sc_color + "22;\"><div style=\"font-family:'Orbitron'; color:" + sc_color + "; font-size:12px; font-weight:bold; margin-bottom:10px; letter-spacing: 3px;\">[ TEAM RESONANCE ]</div><div style=\"font-family:'Orbitron'; font-size:55px; font-weight:900; color:#fff; text-shadow:0 0 35px " + sc_color + "99; margin-bottom:15px;\">" + str(total_sc) + "%</div><div style=\"color:#e2e8f0; font-size:14px; font-weight:bold; line-height:1.7;\">已激活普通编队，获得 20% 战力加成。</div></div>")
         safe_html("</div>")
 
-    # ---------------- 3. 神圣召唤 ----------------
     with t_gacha:
         col_g1, col_g2 = st.columns(2)
         with col_g1:
-            safe_html("<div style='font-family:Orbitron; font-size:16px; font-weight:bold; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #ffd700; padding-bottom:8px;'>/// WEAPON BANNER (圣物盲盒)</div>")
+            safe_html("<div style='font-family:Orbitron; font-size:16px; font-weight:bold; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #ffd700; padding-bottom:8px;'>/// WEAPON BANNER (黑市空投)</div>")
             if st.session_state.pity_counter > 0:
-                safe_html("<div style='color:#a855f7; font-size:11px; margin-bottom:5px; font-weight:bold;'>再抽 " + str(30 - st.session_state.pity_counter) + " 次必出神话级！</div>")
-            st.button("🎲 抽取武装 (消耗 1,000 SDE)", on_click=draw_gacha_callback, args=("relic",), use_container_width=True)
+                safe_html("<div style='color:#ff003c; font-size:11px; margin-bottom:5px; font-weight:bold;'>再打捞 " + str(30 - st.session_state.pity_counter) + " 次必出神话级！</div>")
             
-            safe_html("<div style='font-family:Orbitron; font-size:16px; font-weight:bold; color:#00f3ff; margin-bottom:10px; border-bottom:1px dashed #00f3ff; padding-bottom:8px; margin-top:20px;'>/// CYBER TAROT (每日占卜)</div>")
-            st.button("🃏 占卜今日运势 (消耗 200 SDE)", on_click=draw_tarot_callback, use_container_width=True)
-
-            safe_html("<div style='margin-top:20px; padding:15px; background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.4); border-radius:8px; font-size:14px; font-weight:bold; text-align:center;'>" + st.session_state.gacha_msg + "</div>")
+            if st.button("🎲 呼叫空投军火 (消耗 SDE)", use_container_width=True): 
+                cb_gacha("relic"); st.rerun()
+            
+            safe_html("<div style='font-family:Orbitron; font-size:16px; font-weight:bold; color:#00f3ff; margin-bottom:10px; border-bottom:1px dashed #00f3ff; padding-bottom:8px; margin-top:20px;'>/// CYBER TAROT (命运占卜)</div>")
+            if st.button("🃏 占卜今日运势 (消耗 200 SDE)", use_container_width=True): 
+                tick_turn("misc")
+                if st.session_state.tokens >= 200:
+                    st.session_state.tokens -= 200
+                    buffs = ["【力量】讨伐伤害倍增", "【命运之轮】空投爆率大增", "【星币】矿机产出翻倍", "【教皇】获取经验+50%"]
+                    st.session_state.tarot_buff = random.choice(buffs)
+                    st.toast("🃏 塔罗指引：" + st.session_state.tarot_buff, icon="🃏")
+                else: st.toast("❌ 资金不足！", icon="❌")
+                st.rerun()
+            
+            safe_html("<div style='margin-top:20px; padding:15px; background:rgba(255,0,60,0.1); border:1px solid rgba(255,0,60,0.4); border-radius:4px; font-size:14px; font-weight:bold; text-align:center; color:#ff003c;'>" + st.session_state.gacha_msg + "</div>")
         
         with col_g2:
-            safe_html("<div style='font-family:Orbitron; font-size:16px; font-weight:bold; color:#a855f7; margin-bottom:10px; border-bottom:1px dashed #a855f7; padding-bottom:8px;'>/// PET BANNER (赛博宠物池)</div>")
-            st.button("🐾 抽取赛博宠物 (消耗 1,000 SDE)", on_click=draw_gacha_callback, args=("pet",), use_container_width=True)
+            safe_html("<div style='font-family:Orbitron; font-size:16px; font-weight:bold; color:#a855f7; margin-bottom:10px; border-bottom:1px dashed #a855f7; padding-bottom:8px;'>/// PET BANNER (伴生机甲)</div>")
+            if st.button("🐾 抽取伴生机甲 (消耗 SDE)", use_container_width=True): 
+                cb_gacha("pet"); st.rerun()
 
-    # ---------------- 4. 武装行囊 ----------------
     with t_inv:
-        safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ff8c00; margin-bottom:10px; border-bottom:1px dashed #ff8c00; padding-bottom:8px;'>/// QUANTUM FORGE (融合升阶)</div>")
+        safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ff8c00; margin-bottom:10px; border-bottom:1px dashed #ff8c00; padding-bottom:8px;'>/// QUANTUM FORGE (量子熔炉)</div>")
+        if st.session_state.despair_level > 80:
+            safe_html("<div style='color:#ff003c; font-size:12px; font-weight:bold; animation:blink 1.5s infinite;'>⚠️ 警告：污染超载，融合有 50% 概率发生大爆炸导致材料全毁！</div>")
         col_f1, col_f2, col_f3 = st.columns(3)
-        with col_f1: st.button("🔥 融合 3 件 R 级", on_click=forge_relic_callback, args=("R", "SR"), use_container_width=True)
-        with col_f2: st.button("🔥 融合 3 件 SR 级", on_click=forge_relic_callback, args=("SR", "SSR"), use_container_width=True)
-        with col_f3: st.button("🔥 融合 3 件 SSR 级", on_click=forge_relic_callback, args=("SSR", "UR"), use_container_width=True)
+        with col_f1: 
+            if st.button("🔥 融合 3 件 R 级", use_container_width=True): cb_forge("R", "SR"); st.rerun()
+        with col_f2: 
+            if st.button("🔥 融合 3 件 SR 级", use_container_width=True): cb_forge("SR", "SSR"); st.rerun()
+        with col_f3: 
+            if st.button("🔥 融合 3 件 SSR 级", use_container_width=True): cb_forge("SSR", "UR"); st.rerun()
+                
         safe_html("<div style='margin-top:10px; margin-bottom:20px; font-size:12px; color:#ff8c00; text-align:center;'>" + st.session_state.forge_msg + "</div>")
         
-        safe_html("<h5 style='color:#00f3ff;'>🎒 我的武装库：</h5>")
+        safe_html("<h5 style='color:#ff003c;'>🎒 我的武装库 (最多装备 3 件武器 + 1 只机甲)：</h5>")
         if not st.session_state.inventory and not st.session_state.pets:
-            safe_html("<div style='color:#64748b; font-size:13px; text-align:center; padding:20px; border:1px dashed #334155; border-radius:8px;'>空空如也，快去抽卡吧！</div>")
+            safe_html("<div style='color:#64748b; font-size:13px; text-align:center; padding:20px; border:1px dashed #334155; border-radius:4px;'>空空如也，快去空投区抽卡吧！</div>")
         else:
             for r in st.session_state.inventory:
                 is_eq = any(eq['uid'] == r['uid'] for eq in st.session_state.equipped_relics)
-                bg = "rgba(16,185,129,0.2)" if is_eq else "rgba(255,255,255,0.05)"
+                bg = "rgba(255,0,60,0.2)" if is_eq else "rgba(255,255,255,0.05)"
                 btn_txt = "卸下" if is_eq else "装备"
                 r_col1, r_col2, r_col3 = st.columns([3, 1, 1])
                 with r_col1:
-                    safe_html("<div style=\"border-left: 4px solid " + r['color'] + "; background: " + bg + "; padding: 10px; margin-bottom: 5px; border-radius: 0 6px 6px 0;\"><div style=\"display:flex; justify-content:space-between; margin-bottom:5px;\"><b style=\"color:" + r['color'] + "; font-size:14px;\">[圣物] " + r['name'] + "</b><span style=\"color:#10b981; font-weight:bold; font-family:Orbitron; font-size:12px;\">+" + f"{r['cp']:,}" + " CP</span></div><div style=\"color:#94a3b8; font-size:11px;\">" + r['desc'] + "</div></div>")
-                with r_col2: st.button(btn_txt, key="eq_"+r['uid'], on_click=equip_item_callback, args=(r['uid'], False), use_container_width=True)
+                    safe_html("<div style=\"border-left: 4px solid " + r['color'] + "; background: " + bg + "; padding: 10px; margin-bottom: 5px; border-radius: 0 4px 4px 0;\"><div style=\"display:flex; justify-content:space-between; margin-bottom:5px;\"><b style=\"color:" + r['color'] + "; font-size:14px;\">[武装] " + r['name'] + "</b><span style=\"color:#ff003c; font-weight:bold; font-family:Orbitron; font-size:12px;\">+" + f"{r['cp']:,}" + " CP</span></div><div style=\"color:#94a3b8; font-size:11px;\">" + r['desc'] + "</div></div>")
+                with r_col2: 
+                    if st.button(btn_txt, key="eq_"+r['uid'], use_container_width=True): cb_equip(r['uid'], False); st.rerun()
                 with r_col3:
-                    if not is_eq: st.button("熔解", key="ds_"+r['uid'], on_click=dismantle_relic_callback, args=(r['uid'],), use_container_width=True)
+                    if not is_eq: 
+                        if st.button("拆解", key="ds_"+r['uid'], use_container_width=True): dismantle_relic_callback(r['uid']); st.rerun()
             for p in st.session_state.pets:
                 is_eq = st.session_state.equipped_pet and st.session_state.equipped_pet['uid'] == p['uid']
-                bg = "rgba(16,185,129,0.2)" if is_eq else "rgba(255,255,255,0.05)"
-                btn_txt = "休息" if is_eq else "出战"
+                bg = "rgba(255,0,60,0.2)" if is_eq else "rgba(255,255,255,0.05)"
+                btn_txt = "待机" if is_eq else "出战"
                 p_col1, p_col2 = st.columns([3, 2])
                 with p_col1:
-                    safe_html("<div style=\"border-left: 4px solid " + p['color'] + "; background: " + bg + "; padding: 10px; margin-bottom: 5px; border-radius: 0 6px 6px 0;\"><div style=\"display:flex; justify-content:space-between; margin-bottom:5px;\"><b style=\"color:" + p['color'] + "; font-size:14px;\">[宠物] " + p['name'] + "</b><span style=\"color:#10b981; font-weight:bold; font-family:Orbitron; font-size:12px;\">+" + f"{p['cp']:,}" + " CP</span></div><div style=\"color:#94a3b8; font-size:11px;\">" + p['desc'] + "</div></div>")
-                with p_col2: st.button(btn_txt, key="eq_"+p['uid'], on_click=equip_item_callback, args=(p['uid'], True), use_container_width=True)
+                    safe_html("<div style=\"border-left: 4px solid " + p['color'] + "; background: " + bg + "; padding: 10px; margin-bottom: 5px; border-radius: 0 4px 4px 0;\"><div style=\"display:flex; justify-content:space-between; margin-bottom:5px;\"><b style=\"color:" + p['color'] + "; font-size:14px;\">[伴生] " + p['name'] + "</b><span style=\"color:#ff003c; font-weight:bold; font-family:Orbitron; font-size:12px;\">+" + f"{p['cp']:,}" + " CP</span></div><div style=\"color:#94a3b8; font-size:11px;\">" + p['desc'] + "</div></div>")
+                with p_col2: 
+                    if st.button(btn_txt, key="eq_"+p['uid'], use_container_width=True): cb_equip(p['uid'], True); st.rerun()
 
-    # ---------------- 5. 义体改造 ----------------
     with t_aug:
         safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ff003c; margin-bottom:10px; border-bottom:1px dashed #ff003c; padding-bottom:8px;'>/// CYBERNETIC AUGMENTATION CLINIC</div>")
-        safe_html("<div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>花费巨额资金进行非人道的义体改造，获得永久倍率加成，并在卡牌上点亮义体徽章！</div>")
+        safe_html("<div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>消耗海量资金与<b style='color:#ff003c;'>永久理智上限</b>进行肉体改造，获得不可逆的倍率加成！</div>")
         for aug in CYBER_AUGMENTS:
             has_aug = aug['id'] in st.session_state.cyber_augments
             a_col1, a_col2 = st.columns([3, 1])
             with a_col1:
                 bg = "rgba(255,0,60,0.15)" if has_aug else "rgba(0,0,0,0.5)"
                 border = "border-left: 4px solid #ff003c;" if has_aug else "border-left: 4px solid #334155;"
-                safe_html("<div style='background:" + bg + "; " + border + " padding:15px; border-radius:4px; margin-bottom:10px;'><div style='display:flex; justify-content:space-between;'><b style='color:#fff;'>" + aug['name'] + "</b><span style='color:#ffd700; font-family:Orbitron;'>成本: " + f"{aug['cost']:,}" + " SDE</span></div><div style='color:#ff003c; font-size:12px; margin-top:5px;'>" + aug['desc'] + "</div></div>")
+                safe_html("<div style='background:" + bg + "; " + border + " padding:15px; border-radius:4px; margin-bottom:10px;'><div style='display:flex; justify-content:space-between;'><b style='color:#fff;'>" + aug['name'] + "</b><span style='color:#ffd700; font-family:Orbitron;'>成本: " + f"{aug['cost']:,}" + " 币</span></div><div style='color:#ff003c; font-size:12px; margin-top:5px;'>" + aug['desc'] + "</div></div>")
             with a_col2:
                 if has_aug: st.button("已安装", key="aug_"+aug['id'], disabled=True, use_container_width=True)
-                else: st.button("安装义体", key="aug_"+aug['id'], on_click=buy_cyber_augment_callback, args=(aug['id'], aug['cost']), use_container_width=True)
+                else: 
+                    if st.button("安装义体", key="aug_"+aug['id'], use_container_width=True): 
+                        buy_cyber_augment_callback(aug['id'], aug['cost'], aug['san_cost']); st.rerun()
 
-    # ---------------- 6. 征战深渊 ----------------
-    with t_combat:
-        c_tc1, c_tc2, c_tc3 = st.tabs(["🐉 世界首领", "⚔️ 阵营竞技", "🗺️ 暗网远征"])
-        with c_tc1:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ff003c; margin-bottom:10px; border-bottom:1px dashed #ff003c; padding-bottom:8px;'>/// WORLD BOSS RAID</div>")
-            boss_max_hp = 50000000 * st.session_state.boss_level
-            boss_hp_pct = max(0, st.session_state.boss_hp / boss_max_hp * 100)
-            boss_element = ["⚡ 量子", "✨ 灵能", "🛡️ 钢核", "🔥 炎脉"][st.session_state.boss_level % 4]
-            safe_html("<div style=\"background:rgba(0,0,0,0.8); border:2px solid #ff003c; padding:20px; border-radius:8px; text-align:center; box-shadow: inset 0 0 30px rgba(255,0,60,0.15);\"><div style=\"font-size:40px; margin-bottom:10px;\">👾</div><div style=\"color:#ff003c; font-weight:900; font-family:'Orbitron'; font-size:20px; margin-bottom:5px;\">LV." + str(st.session_state.boss_level) + " DATA LEVIATHAN</div><div style=\"font-size:12px; color:#fff; font-weight:bold; margin-bottom:10px;\">弱点检测：防线呈现 " + boss_element + " 特性</div><div style=\"background:#334155; height:15px; border-radius:10px; overflow:hidden; margin-bottom:10px;\"><div style=\"background:#ff003c; width:" + str(boss_hp_pct) + "%; height:100%; transition:width 0.3s;\"></div></div><div style=\"color:#fff; font-family:'Orbitron';\">" + f"{int(st.session_state.boss_hp):,}" + " HP</div></div>")
-            safe_html("<br>")
-            if st.session_state.boss_hp > 0:
-                st.button("⚔️ 消耗 15 体力发起量子打击", on_click=attack_boss_callback, args=(faction_data['element'],), type="primary", use_container_width=True)
-            if st.session_state.combat_logs:
-                safe_html("<div style='background:#050505; border:1px solid #334155; padding:15px; border-radius:8px; height:180px; overflow-y:auto; font-size:13px; color:#e2e8f0; margin-top:20px; box-shadow:inset 0 0 15px rgba(0,0,0,0.8);'>" + "<br><br>".join(st.session_state.combat_logs[:15]) + "</div>")
-        with c_tc2:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#f43f5e; margin-bottom:10px; border-bottom:1px dashed #f43f5e; padding-bottom:8px;'>/// PVP ARENA</div>")
-            target_faction = st.selectbox("🎯 锁定目标阵营:", ["赛博真理会", "以太灵能网", "绝对秩序阵线", "混沌游侠公会"], key="pvp_target", label_visibility="collapsed")
-            st.button("⚔️ 消耗 15 体力发起突击 (BATTLE)", on_click=pvp_battle_callback, args=(target_faction,), use_container_width=True)
-            if st.session_state.pvp_logs:
-                safe_html("<div style='background:#050505; border:1px solid #334155; padding:15px; border-radius:8px; height:180px; overflow-y:auto; font-size:13px; color:#e2e8f0; margin-top:20px; box-shadow:inset 0 0 15px rgba(0,0,0,0.8);'>" + "<br>".join(st.session_state.pvp_logs[:20]) + "</div>")
-        with c_tc3:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#00f3ff; margin-bottom:10px; border-bottom:1px dashed #00f3ff; padding-bottom:8px;'>/// ROGUELIKE DISPATCH</div>")
-            st.button("🛸 消耗 20 体力进入暗网巡游", on_click=dispatch_callback, use_container_width=True)
-            if st.session_state.dispatch_logs:
-                safe_html("<div style='background:#050505; border:1px solid #334155; padding:15px; border-radius:8px; height:180px; overflow-y:auto; font-size:13px; color:#e2e8f0; margin-top:20px; box-shadow:inset 0 0 15px rgba(0,0,0,0.8);'>" + "<br><br>".join(st.session_state.dispatch_logs[:15]) + "</div>")
-
-    # ---------------- 7. 基因飞升 ----------------
-    with t_growth:
-        col_gr1, col_gr2 = st.columns(2)
-        with col_gr1:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#00f3ff; margin-bottom:10px; border-bottom:1px dashed #00f3ff; padding-bottom:8px;'>/// CARD ASCENSION (星级突破)</div><div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>满级 5 星。每次突破全属性战力提升 25%！如果达到 5 星，将触发【超维神明】效果！</div>")
-            cost = 5000 + (st.session_state.ascension_stars * 2000)
-            safe_html("<div style='text-align:center; padding:20px; background:rgba(0,0,0,0.5); border:1px solid #334155; border-radius:8px; margin-bottom:20px;'><div style='font-size:16px; color:#fff; font-weight:bold; margin-bottom:10px;'>当前星级：" + str(st.session_state.ascension_stars) + " 星</div><div style='font-size:12px; color:#94a3b8;'>突破需要：<b style='color:#ffd700; font-size:18px;'>" + f"{cost:,}" + "</b> $SDE</div></div>")
-            if st.session_state.ascension_stars < 5: st.button("🌌 突破界限 (ASCEND)", on_click=ascend_card_callback, type="primary", use_container_width=True)
-            else: safe_html("<div style='text-align:center; padding:20px; font-size:24px; font-weight:bold; color:#fff; text-shadow:0 0 20px #00f3ff; font-family:Orbitron;'>✨ MAX ASCENSION REACHED ✨</div>")
-        with col_gr2:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#a855f7; margin-bottom:10px; border-bottom:1px dashed #a855f7; padding-bottom:8px;'>/// GENE TALENT TREE (天赋飞升)</div><div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>消耗 2,000 $SDE 提升核心四维等级，每次永久加成 5,000 战力！</div>")
-            tl = st.session_state.talent_levels
-            c_e, c_s, c_t, c_j = st.columns(4)
-            with c_e: st.metric("外联(E)", f"Lv.{tl['E']}"); st.button("升级 E", key="up_e", on_click=upgrade_talent_callback, args=("E",), use_container_width=True)
-            with c_s: st.metric("实勘(S)", f"Lv.{tl['S']}"); st.button("升级 S", key="up_s", on_click=upgrade_talent_callback, args=("S",), use_container_width=True)
-            with c_t: st.metric("护甲(T)", f"Lv.{tl['T']}"); st.button("升级 T", key="up_t", on_click=upgrade_talent_callback, args=("T",), use_container_width=True)
-            with c_j: st.metric("秩序(J)", f"Lv.{tl['J']}"); st.button("升级 J", key="up_j", on_click=upgrade_talent_callback, args=("J",), use_container_width=True)
-
-    # ---------------- 8. 商业帝国 ----------------
     with t_econ:
-        c_te1, c_te2, c_te3 = st.tabs(["🏦 质押挖矿", "🛒 黑市商店", "📜 每日悬赏"])
+        c_te1, c_te2, c_te3 = st.tabs(["🏦 避风港质押", "🛒 动态外汇大盘", "📜 军令状"])
         with c_te1:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#3b82f6; margin-bottom:10px; border-bottom:1px dashed #3b82f6; padding-bottom:8px;'>/// STAKING POOL (流动性挖矿)</div><div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>将 $SDE 存入智能合约。你任何操作导致的时间流逝都会生息！</div>")
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#3b82f6; margin-bottom:10px; border-bottom:1px dashed #3b82f6; padding-bottom:8px;'>/// OFFSHORE STAKING POOL (复利)</div><div style='font-size:13px; color:#e2e8f0; margin-bottom:15px;'>将 $SDE 转移至海外避风港。你在终端的<b>每一次行动</b>都会产生复利！(受 J 值加成)</div>")
             c_st1, c_st2 = st.columns(2)
             with c_st1:
-                safe_html("<div style='background:rgba(0,0,0,0.6); border:1px solid #334155; border-radius:8px; padding:20px; margin-bottom:15px;'><div style='color:#94a3b8; font-size:11px; margin-bottom:5px;'>已质押金额</div><div style='color:#00f3ff; font-size:24px; font-family:Orbitron; font-weight:bold;'>" + f"{int(st.session_state.staked_tokens):,}" + " SDE</div></div>")
-                st.button("📥 存入 5,000 $SDE", on_click=stake_tokens_callback, args=(5000,), use_container_width=True)
+                safe_html("<div style='background:rgba(0,0,0,0.6); border:1px solid #334155; border-radius:8px; padding:20px; margin-bottom:15px;'><div style='color:#94a3b8; font-size:11px; margin-bottom:5px;'>已洗白金额 (SDE)</div><div style='color:#00f3ff; font-size:24px; font-family:Orbitron; font-weight:bold;'>" + f"{int(st.session_state.staked_tokens):,}" + " 🪙</div></div>")
+                if st.button("📥 转移 5,000 $SDE", use_container_width=True): stake_tokens_callback(5000); st.rerun()
             with c_st2:
                 safe_html("<div style='background:rgba(0,0,0,0.6); border:1px solid #334155; border-radius:8px; padding:20px; margin-bottom:15px;'><div style='color:#94a3b8; font-size:11px; margin-bottom:5px;'>未提取收益</div><div style='color:#10b981; font-size:24px; font-family:Orbitron; font-weight:bold;'>+ " + f"{int(st.session_state.yield_pool):,}" + " SDE</div></div>")
-                st.button("📤 提取全部利息", on_click=claim_yield_callback, type="primary", use_container_width=True)
+                if st.button("📤 提取全部利息", type="primary", use_container_width=True): claim_yield_callback(); st.rerun()
         with c_te2:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#f43f5e; margin-bottom:10px; border-bottom:1px dashed #f43f5e; padding-bottom:8px;'>/// BLACK MARKET & MINING</div>")
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#a855f7; margin-bottom:10px; border-bottom:1px dashed #a855f7; padding-bottom:8px;'>/// DARK MATTER EXCHANGE (暗物质外汇)</div>")
+            safe_html("<div style='background:rgba(0,0,0,0.6); border:1px solid #a855f7; border-radius:8px; padding:15px; margin-bottom:15px; text-align:center;'><div style='color:#94a3b8; font-size:11px;'>实时汇率 (SDE / 1 暗物质)</div><div style='color:#a855f7; font-size:28px; font-weight:bold; font-family:Orbitron;'>" + str(st.session_state.exchange_rate) + "</div></div>")
+            col_ex1, col_ex2 = st.columns(2)
+            with col_ex1:
+                cost = st.session_state.exchange_rate * 10
+                if st.button("📉 买入 10 暗物质 (" + str(cost) + " SDE)", use_container_width=True): cb_exchange_dm("buy"); st.rerun()
+            with col_ex2:
+                earn = int(st.session_state.exchange_rate * 10 * 0.9)
+                if st.button("📈 卖出 10 暗物质 (得 " + str(earn) + " SDE)", use_container_width=True): cb_exchange_dm("sell"); st.rerun()
+                
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#f43f5e; margin-bottom:10px; border-bottom:1px dashed #f43f5e; padding-bottom:8px; margin-top:20px;'>/// BLACK MARKET</div>")
             col_sm1, col_sm2 = st.columns(2)
             with col_sm1: 
-                st.button("💊 购买 50 体力 (2,000 SDE)", on_click=buy_stamina_callback, use_container_width=True)
-                st.button("📦 必得随机 SSR (15,000 SDE)", on_click=buy_ssr_relic_callback, use_container_width=True)
+                if st.button("💊 购买神经安定剂 (+50理智 | 2,000 SDE)", use_container_width=True): buy_stamina_callback(); st.rerun()
+                if st.button("📦 走私交易：必得 SSR (20,000 SDE)", use_container_width=True): buy_ssr_relic_callback(); st.rerun()
             with col_sm2:
-                gpu_cost = 5000 + (st.session_state.gpus * 2000)
-                st.button("🖥️ 部署 RTX 量子矿机 (消耗 " + f"{gpu_cost:,}" + " SDE)", on_click=buy_gpu_callback, use_container_width=True)
-                safe_html("<div style='margin-top:5px; color:#10b981; font-size:11px;'>拥有矿机后，每一次操作都会为你带来巨额代币收益！</div>")
+                gpu_cost = 5000 + (st.session_state.gpus * 3000)
+                if st.button("🖥️ 部署僵尸矿机 (消耗 " + f"{gpu_cost:,}" + " SDE)", use_container_width=True): 
+                    tick_turn("misc")
+                    if st.session_state.tokens >= gpu_cost: st.session_state.tokens -= gpu_cost; st.session_state.gpus += 1; st.toast("矿机部署成功！")
+                    else: st.toast("资金不足")
+                    st.rerun()
+                safe_html("<div style='margin-top:5px; color:#10b981; font-size:11px;'>矿机会在每次生态循环中自动产币！受 J 值加成！</div>")
         with c_te3:
             safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#10b981; margin-bottom:10px; border-bottom:1px dashed #10b981; padding-bottom:8px;'>/// DAILY BOUNTIES</div>")
             if not st.session_state.bounties_claimed:
-                safe_html("<div style='background:rgba(16,185,129,0.1); border-left:4px solid #10b981; padding:15px; border-radius:4px; margin-bottom:15px;'><b style='color:#10b981;'>【日常】深度链接 SDE 节点</b><br><span style='font-size:12px; color:#94a3b8;'>奖励：10,000 $SDE + 200 EXP</span></div>")
-                st.button("🎁 领取悬赏奖励", on_click=claim_bounty_callback, use_container_width=True)
+                safe_html("<div style='background:rgba(16,185,129,0.1); border-left:4px solid #10b981; padding:15px; border-radius:4px; margin-bottom:15px;'><b style='color:#10b981;'>【日常】活下来，并激活节点</b><br><span style='font-size:12px; color:#94a3b8;'>奖励：10,000 SDE + 200 EXP</span></div>")
+                if st.button("🎁 领取悬赏奖励", use_container_width=True): claim_bounty_callback(); st.rerun()
             else: st.success("✅ 今日悬赏已全部完成！")
 
-    # ---------------- 9. 极客数据 ----------------
+    with t_altar:
+        col_al1, col_al2 = st.columns(2)
+        with col_al1:
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ff003c; margin-bottom:10px; border-bottom:1px dashed #ff003c; padding-bottom:8px;'>/// BLOOD SACRIFICE (鲜血祭祀)</div><div style='font-size:12px; color:#e2e8f0; margin-bottom:15px;'>用理智换取暴利，或去赌场梭哈！</div>")
+            if st.button("🩸 献祭 30 理智 换取 暗物质", use_container_width=True): 
+                tick_turn("misc")
+                if st.session_state.sanity > 30:
+                    st.session_state.sanity -= 30
+                    st.session_state.despair_level += 15 
+                    gain = random.randint(5, 15)
+                    st.session_state.dark_matter += gain
+                    st.toast("🩸 祭祀成功！获得 " + str(gain) + " 暗物质！污染加深...", icon="🩸")
+                    add_chat(st.session_state.user_alias + " 进行了禁忌的鲜血祭祀...", "#ff003c")
+                else: st.toast("❌ 理智太低，祭祀会死的！", icon="❌")
+                st.rerun()
+            if st.button("🗑️ 献祭 1 件 R级武装 降低 20 污染", use_container_width=True):
+                tick_turn("misc")
+                rs = [r for r in st.session_state.inventory if r['rarity'] == "R" and not any(eq['uid'] == r['uid'] for eq in st.session_state.equipped_relics)]
+                if rs:
+                    st.session_state.inventory.remove(rs[0])
+                    st.session_state.despair_level = max(0, st.session_state.despair_level - 20)
+                    st.toast("✨ 污染降低 20 点！")
+                else: st.toast("没有多余未装备的 R级 武装！")
+                st.rerun()
+
+        with col_al2:
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #ffd700; padding-bottom:8px;'>/// CYBER CASINO (地下赌局)</div><div style='font-size:12px; color:#e2e8f0; margin-bottom:15px;'>消耗 1000 SDE，30% 概率赢得 3500 SDE。</div>")
+            if st.button("🎰 赛博赌盘 (消耗 1000 SDE)", use_container_width=True): 
+                tick_turn("misc")
+                if st.session_state.tokens >= 1000:
+                    st.session_state.tokens -= 1000
+                    if random.random() < 0.3:
+                        st.session_state.tokens += 3500
+                        st.toast("🎰 狂热大奖！赢得 3500 SDE！", icon="🤑")
+                        add_chat(st.session_state.user_alias + " 在地下赌场赢得了大奖！", "#ffd700")
+                    else: st.toast("💀 血本无归！", icon="💸")
+                else: st.toast("❌ 战备金不足！", icon="❌")
+                st.rerun()
+
     with t_data:
-        c_td1, c_td2, c_td3, c_td6, c_td7 = st.tabs(["🛡️ 阵营公会", "📉 战力走势", "📊 撮合盘口", "🏆 全网排行", "🟩 算力热力"])
+        c_td1, c_td2, c_td3, c_td6, c_td7 = st.tabs(["🛡️ 军阀阵营", "📉 走势压测", "📊 黑市盘口", "🏆 生还者榜", "🟩 战损热力"])
         with c_td1:
             safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#10b981; margin-bottom:10px; border-bottom:1px dashed #10b981; padding-bottom:8px;'>/// FACTION GUILD</div>")
             if not st.session_state.joined_faction:
-                st.selectbox("选择宣誓效忠的阵营 (若匹配核心将获10%增幅):", ["赛博真理会", "以太灵能网", "绝对秩序阵线", "混沌游侠公会"], key="faction_sel")
-                st.button("🛡️ 宣誓效忠 (不可更改)", on_click=join_faction_callback, args=(st.session_state.faction_sel,))
+                new_faction = st.selectbox("宣誓效忠的阵营 (若匹配核心将获10%战力增幅):", ["硅基抵抗军 (量子)", "幽能清道夫 (灵能)", "秩序裁决所 (钢核)", "混沌暴徒 (炎脉)"], key="faction_sel")
+                if st.button("🛡️ 宣誓效忠 (不可更改)"): join_faction_callback(new_faction); st.rerun()
             else:
                 safe_html("<div style='text-align:center; padding:20px; background:rgba(0,0,0,0.5); border:1px solid #10b981; border-radius:8px;'><div style='color:#10b981; font-weight:bold; font-size:18px;'>已加入：[" + st.session_state.joined_faction + "]</div><div style='color:#e2e8f0; font-size:13px; margin-top:10px;'>享受该阵营的专属被动增益。</div></div>")
         with c_td2:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #ffd700; padding-bottom:8px;'>/// 30-DAY SIMULATION</div><div style='font-size:14px; color:#e2e8f0; margin-bottom:10px;'>基于高斯随机游走与标准差推演：<br><span style='color:#ffd700; font-weight:bold; font-size:15px;'>【 " + data.get('market_style', '') + " 】</span></div>")
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #ffd700; padding-bottom:8px;'>/// 30-DAY COMBAT SIMULATION</div><div style='font-size:14px; color:#e2e8f0; margin-bottom:10px;'>基于高斯随机游走与标准差推演：<br><span style='color:#ffd700; font-weight:bold; font-size:15px;'>【 " + data.get('market_style', '') + " 】</span></div>")
             std_dev = np.std(roi_arr); upper_band = [val + std_dev * 1.5 for val in roi_arr]; lower_band = [val - std_dev * 1.5 for val in roi_arr]
             fig_roi = go.Figure()
             lc = "#10b981" if roi_arr[-1] >= 100 else "#ff003c"
@@ -1098,65 +1285,63 @@ else:
             st.plotly_chart(fig_roi, use_container_width=True, config={'displayModeBar': False})
         with c_td3:
             safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#3b82f6; margin-bottom:10px; border-bottom:1px dashed #3b82f6; padding-bottom:8px;'>/// LIVE MARKET DEPTH & BIDS</div>")
-            HTML_BIDS = "<div style=\"background: #050505; border: 1px solid #334155; border-radius: 8px; padding: 20px; font-family: 'Fira Code', monospace; font-size: 12px; color: #94a3b8; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);\">" + get_market_depth_html(h_int) + "<div style=\"display: flex; justify-content: space-between; border-bottom: 1px dashed #334155; padding-bottom: 12px; margin-bottom: 15px; color: #e2e8f0; font-weight: bold; font-size: 11px; letter-spacing: 1px;\"><span style=\"width:40%;\">[INSTITUTION]</span><span style=\"width:30%; text-align:center;\">[BID_SIZE]</span><span style=\"width:30%; text-align:right;\">[PREMIUM]</span></div>" + bids_html + "<div style=\"text-align: center; margin-top: 15px; font-size: 10px; color: #3b82f6; animation: blink 1.5s infinite;\">● WAITING FOR NEW BIDS...</div></div>"
+            HTML_BIDS = "<div style=\"background: #050205; border: 1px solid #330011; border-radius: 8px; padding: 20px; font-family: 'Fira Code', monospace; font-size: 12px; color: #94a3b8; box-shadow: inset 0 0 20px rgba(255,0,60,0.2);\">" + get_market_depth_html(h_int) + "<div style=\"display: flex; justify-content: space-between; border-bottom: 1px dashed #330011; padding-bottom: 12px; margin-bottom: 15px; color: #e2e8f0; font-weight: bold; font-size: 11px; letter-spacing: 1px;\"><span style=\"width:40%;\">[INSTITUTION]</span><span style=\"width:30%; text-align:center;\">[BID_SIZE]</span><span style=\"width:30%; text-align:right;\">[PREMIUM]</span></div>" + bids_html + "<div style=\"text-align: center; margin-top: 15px; font-size: 10px; color: #ff003c; animation: blink 1.5s infinite;\">● WAITING FOR NEW BIDS...</div></div>"
             safe_html(HTML_BIDS)
         with c_td6:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #ffd700; padding-bottom:8px;'>/// GLOBAL LEADERBOARD</div>")
-            HTML_RANK = "<div style=\"background:#050505; border:1px solid #334155; border-radius:8px; padding:15px; font-family:'Orbitron', monospace; font-size:12px;\"><div style=\"display:flex; justify-content:space-between; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #334155; padding-bottom:5px;\"><span>RANK</span><span>NODE_ID</span><span>CP</span></div><div style=\"display:flex; justify-content:space-between; color:#e2e8f0; margin-bottom:8px;\"><span>#1</span><span>0xAI_GHOST</span><span>199,500,000</span></div><div style=\"display:flex; justify-content:space-between; color:#e2e8f0; margin-bottom:8px;\"><span>#2</span><span style=\"color:#00f3ff; font-weight:bold;\">" + safe_alias_final + " (YOU)</span><span style=\"color:#00f3ff; font-weight:bold;\">" + f"{final_cp:,}" + "</span></div><div style=\"display:flex; justify-content:space-between; color:#e2e8f0; margin-bottom:8px;\"><span>#3</span><span>BYTE_SAMURAI</span><span>8,250,000</span></div></div>"
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #ffd700; padding-bottom:8px;'>/// GLOBAL SURVIVOR LEADERBOARD</div>")
+            HTML_RANK = "<div style=\"background:#050205; border:1px solid #330011; border-radius:8px; padding:15px; font-family:'Orbitron', monospace; font-size:12px;\"><div style=\"display:flex; justify-content:space-between; color:#ffd700; margin-bottom:10px; border-bottom:1px dashed #330011; padding-bottom:5px;\"><span>RANK</span><span>NODE_ID</span><span>CP</span></div><div style=\"display:flex; justify-content:space-between; color:#e2e8f0; margin-bottom:8px;\"><span>#1</span><span>0xAI_GHOST</span><span>199,500,000</span></div><div style=\"display:flex; justify-content:space-between; color:#e2e8f0; margin-bottom:8px;\"><span>#2</span><span style=\"color:#ff003c; font-weight:bold;\">" + safe_alias_final + " (YOU)</span><span style=\"color:#ff003c; font-weight:bold;\">" + f"{final_cp:,}" + "</span></div><div style=\"display:flex; justify-content:space-between; color:#e2e8f0; margin-bottom:8px;\"><span>#3</span><span>BYTE_SAMURAI</span><span>8,250,000</span></div></div>"
             safe_html(HTML_RANK)
         with c_td7:
-            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#10b981; margin-bottom:10px; border-bottom:1px dashed #10b981; padding-bottom:8px;'>/// COMMIT HEATMAP (贡献度)</div>")
+            safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#10b981; margin-bottom:10px; border-bottom:1px dashed #10b981; padding-bottom:8px;'>/// DAMAGE HEATMAP (战损分布)</div>")
             safe_html(get_heatmap_html(h_int))
 
-    # ---------------- 10. 神谕解析 ----------------
     with t_oracle:
-        ORACLE_CSS = "<style>.oracle-box { background: #050505; border: 1px solid #334155; border-left: 4px solid #a855f7; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); font-family: 'Fira Code', monospace; font-size: 12px; }.oracle-hdr { color: #a855f7; font-size: 11px; margin-bottom: 15px; border-bottom: 1px dashed #334155; padding-bottom: 8px; letter-spacing: 1px; font-weight: bold; }.oracle-line { overflow: hidden; white-space: nowrap; width: 0; display: block; margin-bottom: 8px; color: #10b981; animation: o-type 0.8s steps(40, end) forwards; border-right: 2px solid #10b981; }.oracle-line:nth-child(2) { animation-delay: 0.2s; }.oracle-line:nth-child(3) { animation-delay: 1.2s; }.oracle-line:nth-child(4) { animation-delay: 2.2s; }.oracle-line:nth-child(5) { animation-delay: 3.2s; color: #e2e8f0; border-right: none;}.oracle-line-fade { display: block; margin-top: 15px; color: #94a3b8; opacity: 0; animation: o-fade 1s 4.2s forwards; line-height: 1.8; }@keyframes o-type { 99% { border-color: #10b981; } 100% { width: 100%; border-color: transparent; } }@keyframes o-fade { to { opacity: 1; } }</style>"
-        HTML_ORACLE = ORACLE_CSS.replace('\n', '') + "<div class=\"oracle-box\"><div class=\"oracle-hdr\">[AI_ORACLE_V20] QUANTUM DIAGNOSTIC ACTIVE...</div><span class=\"oracle-line\">> Extracting Node [ " + safe_alias_final + " ] Weights... [OK]</span><span class=\"oracle-line\">> Bypassing SDE Firewall... [SUCCESS]</span><span class=\"oracle-line\">> Decrypting Matrix Topology... [OK]</span><span class=\"oracle-line\">> Node Classified As: <span style=\"color:#ffd700; font-weight:bold;\">" + mbti + "</span></span><span class=\"oracle-line-fade\">> ULTIMATE EVOLUTION PREDICTION: <br><span style=\"color:#00f3ff; font-size:14px; font-weight:bold;\">" + data.get('ultimate_evolution', '') + "</span></span></div>"
+        ORACLE_CSS = "<style>.oracle-box { background: #050205; border: 1px solid #330011; border-left: 4px solid #ff003c; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(255,0,60,0.2); font-family: 'Fira Code', monospace; font-size: 12px; }.oracle-hdr { color: #ff003c; font-size: 11px; margin-bottom: 15px; border-bottom: 1px dashed #330011; padding-bottom: 8px; letter-spacing: 1px; font-weight: bold; }.oracle-line { overflow: hidden; white-space: nowrap; width: 0; display: block; margin-bottom: 8px; color: #ff8c00; animation: o-type 0.8s steps(40, end) forwards; border-right: 2px solid #ff8c00; }.oracle-line:nth-child(2) { animation-delay: 0.2s; }.oracle-line:nth-child(3) { animation-delay: 1.2s; }.oracle-line:nth-child(4) { animation-delay: 2.2s; }.oracle-line:nth-child(5) { animation-delay: 3.2s; color: #e2e8f0; border-right: none;}.oracle-line-fade { display: block; margin-top: 15px; color: #94a3b8; opacity: 0; animation: o-fade 1s 4.2s forwards; line-height: 1.8; }@keyframes o-type { 99% { border-color: #ff8c00; } 100% { width: 100%; border-color: transparent; } }@keyframes o-fade { to { opacity: 1; } }</style>"
+        HTML_ORACLE = ORACLE_CSS.replace('\n', '') + "<div class=\"oracle-box\"><div class=\"oracle-hdr\">[AI_ORACLE_V35] SURVIVAL DIAGNOSTIC...</div><span class=\"oracle-line\">> Extracting Node [ " + safe_alias_final + " ] Weights... [OK]</span><span class=\"oracle-line\">> Bypassing Meatspace Firewall... [SUCCESS]</span><span class=\"oracle-line\">> Decrypting Matrix... [OK]</span><span class=\"oracle-line\">> Node Classified As: <span style=\"color:#ffd700; font-weight:bold;\">" + mbti + "</span></span><span class=\"oracle-line-fade\">> ULTIMATE EVOLUTION PREDICTION: <br><span style=\"color:#ff003c; font-size:14px; font-weight:bold;\">" + data.get('ultimate_evolution', '') + "</span></span></div>"
         safe_html(HTML_ORACLE)
         
-        evo_path = data.get('evolution_path', ["L1 初级节点", "L2 核心中枢"])
-        safe_html("<div style=\"margin-top:15px; margin-bottom:15px; border-left:3px solid #00f3ff; padding-left:15px; background:linear-gradient(90deg, rgba(0,243,255,0.1), transparent); padding-top:10px; padding-bottom:10px; border-radius: 0 6px 6px 0;\"><div style=\"color:#00f3ff; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;\">PHASE 1 (CURRENT STATE)</div><div style=\"color:#fff; font-weight:bold; font-size:16px;\">" + evo_path[0] + "</div></div><div style=\"margin-bottom:15px; border-left:3px solid #a855f7; padding-left:15px; background:linear-gradient(90deg, rgba(168,85,247,0.1), transparent); padding-top:10px; padding-bottom:10px; border-radius: 0 6px 6px 0; margin-left: 20px;\"><div style=\"color:#a855f7; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;\">PHASE 2 (AWAKENING)</div><div style=\"color:#fff; font-weight:bold; font-size:16px;\">" + evo_path[1] + "</div></div>")
-        with st.expander("⚠️ 绝密防线：SDE 史诗级黑天鹅宕机推演"):
+        evo_path = data.get('evolution_path', ["L1 见习炮灰", "L2 核心兵器"])
+        safe_html("<div style=\"margin-top:15px; margin-bottom:15px; border-left:3px solid #ff003c; padding-left:15px; background:linear-gradient(90deg, rgba(255,0,60,0.1), transparent); padding-top:10px; padding-bottom:10px; border-radius: 0 6px 6px 0;\"><div style=\"color:#ff003c; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;\">PHASE 1 (CURRENT STATE)</div><div style=\"color:#fff; font-weight:bold; font-size:16px;\">" + evo_path[0] + "</div></div><div style=\"margin-bottom:15px; border-left:3px solid #ffd700; padding-left:15px; background:linear-gradient(90deg, rgba(255,215,0,0.1), transparent); padding-top:10px; padding-bottom:10px; border-radius: 0 6px 6px 0; margin-left: 20px;\"><div style=\"color:#ffd700; font-family:Orbitron; font-size:11px; margin-bottom:2px; letter-spacing:1px;\">PHASE 2 (AWAKENING)</div><div style=\"color:#fff; font-weight:bold; font-size:16px;\">" + evo_path[1] + "</div></div>")
+        with st.expander("⚠️ 绝密防线：资本利维坦黑天鹅推演"):
             safe_html("<div style=\"padding: 5px 10px; font-size: 14px; color: #cbd5e1; line-height: 1.7;\"><div style=\"color: #ff003c; font-weight: 900; margin-bottom: 5px; font-size:15px; text-shadow: 0 0 5px #ff003c;\">[ 致命崩溃盲点 ]</div><div style=\"margin-bottom: 15px;\">" + data.get('black_swan', '') + "</div><div style=\"color: #10b981; font-weight: 900; margin-bottom: 5px; font-size:15px; text-shadow: 0 0 5px #10b981;\">[ 官方热修复补丁 ]</div><div>" + data.get('patch', '') + "</div></div>")
 
-    # ---------------- 11. 卡砖提取 (无死锁海报) ----------------
+    # ---------------- 13. 军官证提取 (防死锁海报) ----------------
     with t_mint:
-        tm1, tm2, tm3, tm4 = st.tabs(["📸 PSA 实体卡砖", "📝 纯文本通讯协议", "💻 智能合约", "📥 极客 JSON"])
+        tm1, tm2, tm3, tm4 = st.tabs(["📸 PSA 实体卡砖 (防死锁)", "📝 纯文本通讯协议", "💻 智能合约", "📥 极客 JSON"])
         with tm1:
-            # 🚨 终极防死锁：原生 HTML 卡砖，如果按钮失效可直接截图！
-            safe_html("<div style='font-size:13px; color:#10b981; margin-bottom:15px; line-height:1.7;'>已为您展示【可见即所得】高清卡砖。点击下方按钮生成图片，<b style='color:#ffd700; font-size:15px;'>如果无反应，请直接使用手机系统截屏保存！</b>绝对不再死锁！</div>")
+            safe_html("<div style='font-size:13px; color:#10b981; margin-bottom:15px; line-height:1.7;'>已为您展示【可见即所得】高清卡砖。点击下方按钮生成图片，<b style='color:#ff003c; font-size:15px;'>如果受环境限制无反应，请直接使用手机系统截屏保存！</b>绝对不再死锁！</div>")
             
-            tags_html_poster = "".join(["<span style='background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.5); padding:4px 8px; border-radius:4px; font-size:11px; color:#ffd700; font-weight:bold; margin:3px; display:inline-block;'>" + t + "</span>" for t in data.get('tags', [])])
-            skills_html_poster = "".join(["<div style='background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.6); border-left:3px solid #a855f7; padding:6px 10px; border-radius:4px; font-size:11px; color:#e9d5ff; font-weight:bold; margin-bottom:5px; text-align:left;'>" + s + "</div>" for s in data.get('skills', [])])
+            tags_html_poster = "".join(["<span style='background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.5); padding:4px 8px; border-radius:2px; font-size:11px; color:#ffd700; font-weight:bold; margin:3px; display:inline-block;'>" + t + "</span>" for t in data.get('tags', [])])
+            skills_html_poster = "".join(["<div style='background:rgba(255,0,60,0.1); border:1px solid rgba(255,0,60,0.6); border-left:3px solid #ff003c; padding:6px 10px; border-radius:2px; font-size:11px; color:#fca5a5; font-weight:bold; margin-bottom:5px; text-align:left;'>" + s + "</div>" for s in data.get('skills', [])])
             
             random.seed(h_int)
             gradient_stops = []
             for p in range(0, 100, int(random.uniform(2, 6))): 
-                gradient_stops.append("rgba(0,243,255,0.7) " + str(p) + "%, rgba(0,243,255,0.7) " + str(p+1) + "%, transparent " + str(p+1) + "%, transparent " + str(p+2) + "%")
+                gradient_stops.append("rgba(255,0,60,0.4) " + str(p) + "%, rgba(255,0,60,0.4) " + str(p+1) + "%, transparent " + str(p+1) + "%, transparent " + str(p+2) + "%")
             barcode_css = "linear-gradient(90deg, " + ", ".join(gradient_stops) + ")"
             
-            relics_text = "、".join([r['name'][:6] for r in st.session_state.equipped_relics]) if st.session_state.equipped_relics else "未装配"
-            pet_text = st.session_state.equipped_pet['name'] if st.session_state.equipped_pet else "无"
+            relics_text = "、".join([r['name'][:6] for r in st.session_state.equipped_relics]) if st.session_state.equipped_relics else "裸装上阵"
+            pet_text = st.session_state.equipped_pet['name'] if st.session_state.equipped_pet else "无伴生兽"
 
             POSTER_CSS = (
                 '<style>body { margin: 0; padding: 10px 0; background: transparent !important; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: #fff; overflow-x: hidden; text-align: center; } '
-                '.capture-box { width: 320px; background-color: #010308; padding: 15px; border-radius: 12px; border: 3px solid #cbd5e1; box-shadow: 0 0 25px rgba(0, 243, 255, 0.4); position: relative; overflow: hidden; margin: 0 auto; text-align: left; box-sizing: border-box; } '
-                '.cyber-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(0deg, rgba(0,243,255,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,243,255,0.05) 1px, transparent 1px); background-size: 25px 25px; z-index: 0; pointer-events:none;} '
-                '.psa-header { background: #ef4444; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #b91c1c; margin-bottom: 15px; position: relative; z-index: 2; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);} '
+                '.capture-box { width: 320px; background-color: #050205; padding: 15px; border-radius: 12px; border: 3px solid #cbd5e1; box-shadow: 0 0 25px rgba(255, 0, 60, 0.4); position: relative; overflow: hidden; margin: 0 auto; text-align: left; box-sizing: border-box; } '
+                '.cyber-grid { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(0deg, rgba(255,0,60,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,0,60,0.05) 1px, transparent 1px); background-size: 25px 25px; z-index: 0; pointer-events:none;} '
+                '.psa-header { background: #990024; padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ff003c; margin-bottom: 15px; position: relative; z-index: 2; box-shadow: inset 0 0 10px rgba(0,0,0,0.5);} '
                 '.psa-grade { font-size: 28px; font-weight: 900; color: #fff; line-height: 1; font-family: Impact, sans-serif; } '
                 '.psa-desc { font-size: 10px; color: #fecaca; text-align: right; font-weight: bold; line-height: 1.2; text-transform: uppercase; } '
-                '.inner-card { background: rgba(10,15,30,0.95); border: 2px solid rgba(255,215,0,0.4); border-radius: 8px; padding: 20px 15px; position: relative; z-index: 2; overflow: hidden;} '
-                '.hd { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(0,243,255,0.3); padding-bottom: 10px; margin-bottom: 15px; } '
+                '.inner-card { background: rgba(20,5,10,0.95); border: 2px solid rgba(255,0,60,0.4); border-radius: 8px; padding: 20px 15px; position: relative; z-index: 2; overflow: hidden;} '
+                '.hd { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(255,0,60,0.3); padding-bottom: 10px; margin-bottom: 15px; } '
                 '.nm { text-align: center; font-size: 18px; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; color: #fff; text-transform: uppercase; } '
                 '.mb { font-size: 46px; font-weight: 900; color: #ffd700; line-height: 1; text-align: center; text-shadow: 0 0 30px rgba(255,215,0,0.6); margin-bottom: 5px; letter-spacing: 4px; font-family: Impact, sans-serif; } '
-                '.rl { text-align: center; font-size: 13px; font-weight: 900; color: #00f3ff; margin-bottom: 15px; letter-spacing: 2px; } '
-                '.vb { display:flex; justify-content:space-between; text-align:center; background:rgba(0,0,0,0.8); border:1px solid rgba(255,215,0,0.4); padding:10px; border-radius:8px; margin-bottom: 15px; gap: 5px; } '
+                '.rl { text-align: center; font-size: 13px; font-weight: 900; color: #ff003c; margin-bottom: 15px; letter-spacing: 2px; } '
+                '.vb { display:flex; justify-content:space-between; text-align:center; background:rgba(0,0,0,0.8); border:1px solid rgba(255,0,60,0.4); padding:10px; border-radius:8px; margin-bottom: 15px; gap: 5px; } '
                 '.ft { text-align: center; color: #64748b; font-size: 8px; padding-top: 10px; line-height: 1.6; font-family: monospace; position: relative; z-index: 2; margin-top: 10px;} '
                 '.stat-row { display: flex; align-items: center; margin-bottom: 8px; font-size: 10px; font-weight: bold; justify-content: space-between; } '
                 '.sbc { background: rgba(255,255,255,0.05); border-radius: 3px; height: 5px; width: 130px; position: relative; overflow: hidden; margin: 0 6px; } '
                 '.sbf { position: absolute; left: 0; top: 0; height: 100%; } '
-                '.action-btn { background: linear-gradient(90deg, #10b981, #059669); color: #fff; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(16,185,129,0.4); margin-top: 20px; text-transform: uppercase; width: 320px; transition: all 0.2s ease;} '
-                '#result-img { display: none; width: 320px; border-radius: 12px; margin: 0 auto; box-shadow: 0 0 30px rgba(16,185,129,0.6); margin-top: 20px; } '
+                '.action-btn { background: linear-gradient(90deg, #ff003c, #9f1239); color: #fff; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; box-shadow: 0 5px 15px rgba(255,0,60,0.4); margin-top: 20px; text-transform: uppercase; width: 320px; transition: all 0.2s ease;} '
+                '#result-img { display: none; width: 320px; border-radius: 12px; margin: 0 auto; box-shadow: 0 0 30px rgba(255,0,60,0.6); margin-top: 20px; border: 2px solid #ff003c; } '
                 '.success-msg { display: none; color: #10b981; font-weight: bold; margin-top: 15px; font-size: 14px; background: rgba(16,185,129,0.1); padding: 10px; border-radius: 6px; border: 1px solid #10b981; width: 320px; margin: 15px auto 0 auto; box-sizing: border-box; }</style>'
             )
 
@@ -1165,29 +1350,29 @@ else:
                 '<div class="cyber-grid"></div><div class="psa-header"><div>'
                 '<div style="font-size:12px; font-weight:900; color:#fff; letter-spacing:1px; margin-bottom:2px;">SDE AUTHENTICATED</div>'
                 '<div style="font-size:9px; color:#fca5a5; font-family:monospace;">CERT: ' + hash_code[:10] + '</div></div>'
-                '<div style="display:flex; align-items:center; gap:10px;"><div class="psa-desc">GEM<br>MINT</div><div class="psa-grade">10</div></div></div>'
+                '<div style="display:flex; align-items:center; gap:10px;"><div class="psa-desc">WAR<br>ZONE</div><div class="psa-grade">10</div></div></div>'
                 '<div class="inner-card"><div style="position: absolute; top: 15px; right: -35px; background: ' + tier_color + '; color: #000; font-weight: 900; font-size: 10px; padding: 3px 35px; transform: rotate(45deg); z-index: 10; letter-spacing: 2px; box-shadow: 0 0 15px ' + border_color + '88;">' + tier_level + '</div>'
-                '<div class="hd"><div style="font-size:13px;font-weight:900; color:#00f3ff; letter-spacing:1px;">GENESIS TCG</div>'
+                '<div class="hd"><div style="font-size:13px;font-weight:900; color:#ff003c; letter-spacing:1px;">DESPERATE TCG</div>'
                 '<div style="font-size:9px;color:#94a3b8; font-weight:bold;">LV.' + str(st.session_state.level) + ' EDITION</div></div>'
-                '<div style="font-size:9px;color:#94a3b8;text-align:center;margin-bottom:5px;">NODE IDENTIFIER</div>'
+                '<div style="font-size:9px;color:#94a3b8;text-align:center;margin-bottom:5px;">MERCENARY ID</div>'
                 '<div class="nm">' + full_title + '</div><div class="mb">' + mbti + '</div>'
                 '<div style="text-align:center;font-size:10px;color:#94a3b8;margin-bottom:15px; font-weight:bold;">RARITY: <span style="color:' + border_color + ';font-size:12px;">' + data.get('rarity', 'Top 5%') + '</span></div>'
                 '<div class="rl">【 ' + role_name + ' 】</div>'
                 '<div class="vb"><div style="flex:1;"><div style="font-size:9px;color:#94a3b8;margin-bottom:5px;">COMBAT POWER</div><div style="font-size:16px;color:#ffd700;font-weight:900;">' + f"{final_cp:,}" + '</div></div>'
-                '<div style="border-left:1px dashed rgba(255,255,255,0.3);"></div>'
-                '<div style="flex:1;"><div style="font-size:9px;color:#94a3b8;margin-bottom:5px;">PERCENTILE</div><div style="font-size:16px;color:#00f3ff;font-weight:900;">TOP ' + f"{100-pct_beat_final:.1f}" + '%</div></div></div>'
-                '<div style="text-align:center; margin-bottom:12px;"><div style="font-size:10px; color:#a855f7; margin-bottom:6px; font-weight:bold;">[ ABILITY MOVES ]</div>' + skills_html_poster + '</div>'
+                '<div style="border-left:1px dashed rgba(255,0,60,0.3);"></div>'
+                '<div style="flex:1;"><div style="font-size:9px;color:#94a3b8;margin-bottom:5px;">SURVIVAL RATE</div><div style="font-size:16px;color:#ff003c;font-weight:900;">TOP ' + f"{100-pct_beat_final:.1f}" + '%</div></div></div>'
+                '<div style="text-align:center; margin-bottom:12px;"><div style="font-size:10px; color:#ff003c; margin-bottom:6px; font-weight:bold;">[ ABILITY MOVES ]</div>' + skills_html_poster + '</div>'
                 '<div style="text-align:center; margin-bottom:15px;">' + tags_html_poster + '</div>'
-                '<div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 10px; margin-bottom: 10px;">'
-                '<div style="font-size: 8px; color: #00f3ff; text-align: center; margin-bottom: 8px; font-family: monospace;">/// BASE STATS ///</div>'
-                '<div class="stat-row"><span style="color:#e2e8f0; width:35px;">输出</span><div class="sbc"><div class="sbf" style="width:' + str(val_E) + '%; background:#00f3ff;"></div></div><span style="color:#94a3b8; width:35px; text-align:right;">隐匿</span></div>'
+                '<div style="background: rgba(0,0,0,0.5); border: 1px solid rgba(255,0,60,0.2); border-radius: 8px; padding: 12px 10px; margin-bottom: 10px;">'
+                '<div style="font-size: 8px; color: #ff003c; text-align: center; margin-bottom: 8px; font-family: monospace;">/// BASE STATS ///</div>'
+                '<div class="stat-row"><span style="color:#e2e8f0; width:35px;">输出</span><div class="sbc"><div class="sbf" style="width:' + str(val_E) + '%; background:#ff003c;"></div></div><span style="color:#94a3b8; width:35px; text-align:right;">隐匿</span></div>'
                 '<div class="stat-row"><span style="color:#e2e8f0; width:35px;">精准</span><div class="sbc"><div class="sbf" style="width:' + str(val_S) + '%; background:#a855f7;"></div></div><span style="color:#94a3b8; width:35px; text-align:right;">视界</span></div>'
                 '<div class="stat-row"><span style="color:#e2e8f0; width:35px;">护甲</span><div class="sbc"><div class="sbf" style="width:' + str(val_T) + '%; background:#3b82f6;"></div></div><span style="color:#94a3b8; width:35px; text-align:right;">光环</span></div>'
                 '<div class="stat-row" style="margin-bottom:0;"><span style="color:#e2e8f0; width:35px;">秩序</span><div class="sbc"><div class="sbf" style="width:' + str(val_J) + '%; background:#10b981;"></div></div><span style="color:#94a3b8; width:35px; text-align:right;">敏捷</span></div></div>'
-                '<div style="font-size:11px; font-weight:bold; color:#10b981; text-align:center; border-top:1px dashed #334155; padding-top:10px;">武装：<span style="color:#ffd700;">' + relics_text + '</span></div>'
-                '<div style="font-size:11px; font-weight:bold; color:#00f3ff; text-align:center; margin-top:5px;">伴生：<span style="color:#ffd700;">' + pet_text + '</span></div></div>'
+                '<div style="font-size:11px; font-weight:bold; color:#10b981; text-align:center; border-top:1px dashed #330011; padding-top:10px;">军火：<span style="color:#ffd700;">' + relics_text + '</span></div>'
+                '<div style="font-size:11px; font-weight:bold; color:#00f3ff; text-align:center; margin-top:5px;">机甲：<span style="color:#ffd700;">' + pet_text + '</span></div></div>'
                 '<div class="ft"><div style="width: 90%; height: 20px; margin: 0 auto 8px auto; background: ' + barcode_css + ';"></div>'
-                '<div style="margin-bottom:2px;font-weight:bold;">SDE CYBER-NODE TCG V20.0</div><div style="color:#475569;">© ' + COPYRIGHT + ' | ID: #' + str(token_id) + '</div></div></div>'
+                '<div style="margin-bottom:2px;font-weight:bold;">SDE WARFRAME TCG V35.0</div><div style="color:#475569;">© ' + COPYRIGHT + ' | ID: #' + str(token_id) + '</div></div></div>'
                 '<button class="action-btn" id="btn-render" onclick="execRender()">📸 点击生成纯净图片版</button></div>'
                 '<img id="result-img" alt="SDE Matrix Slab" title="长按保存或分享" />'
                 '<div id="success-msg" class="success-msg">✅ <b>图片压制成功！</b><br>👆 手机端请长按上方图片保存发圈。</div>'
@@ -1196,7 +1381,7 @@ else:
             JS_SCRIPT = (
                 '<script>function execRender() { var btn = document.getElementById("btn-render"); btn.innerHTML = "⏳ 正在压制，请稍候..."; btn.style.opacity = "0.7"; '
                 'if(typeof html2canvas === "undefined") { btn.innerHTML = "❌ 环境不支持，请直接手机系统截屏"; btn.style.opacity = "1"; return; } '
-                'setTimeout(function() { html2canvas(document.getElementById("capture-target"), { scale: 2, backgroundColor: "#010308", useCORS: true, logging: false }).then(function(canvas) { '
+                'setTimeout(function() { html2canvas(document.getElementById("capture-target"), { scale: 2, backgroundColor: "#050205", useCORS: true, logging: false }).then(function(canvas) { '
                 'document.getElementById("result-img").src = canvas.toDataURL("image/png"); document.getElementById("result-img").style.display = "block"; document.getElementById("html-card").style.display = "none"; document.getElementById("success-msg").style.display = "block"; '
                 '}).catch(function(e) { btn.innerHTML = "❌ 生成失败，请直接手机系统截屏"; btn.style.opacity = "1"; }); }, 200); }</script>'
             )
@@ -1208,38 +1393,38 @@ else:
             safe_html("<div style='font-size:13px; color:#94a3b8; margin-bottom:10px; margin-top:10px;'>👇 长按下方文本框，可一键全选并复制纯文字名片：</div>")
             relics_str_txt = "、".join([r['name'] for r in st.session_state.equipped_relics]) if st.session_state.equipped_relics else "无"
             pet_str_txt = st.session_state.equipped_pet['name'] if st.session_state.equipped_pet else "无"
-            faction_str_txt = st.session_state.joined_faction if st.session_state.joined_faction else "无界佣兵"
+            faction_str_txt = st.session_state.joined_faction if st.session_state.joined_faction else "无界流浪佣兵"
             
-            share_card = f"""【SDE 职场元宇宙 · TCG 创世卡牌】
+            share_card = f"""【SDE 职场元宇宙：寰宇引擎 V35】
 =================================
-👤 节点代号：{safe_alias_final}
-称号：{st.session_state.equipped_title}
+👤 幸存者代号：{safe_alias_final}
+🎖️ 史诗军衔：{st.session_state.equipped_title}
 💎 战力估值：{final_cp:,} CP (Lv.{st.session_state.level})
 🧬 核心架构：{mbti} ({role_name})
 🛡️ 所属阵营：{faction_str_txt}
-👑 卡牌段位：{rank_name}
-⚡️ 算力击败：全球 TOP {100 - pct_beat_final:.1f}%
-⚔️ 专属遗物：{relics_str_txt}
-🐾 赛博宠物：{pet_str_txt}
+👑 生存段位：{rank_name}
+⚡️ 存活率击败：全球 TOP {100 - pct_beat_final:.1f}%
+⚔️ 专属武装：{relics_str_txt}
+🐾 伴生机甲：{pet_str_txt}
 🎴 卡面工艺：{card_foil}
 🚀 终极演进：{data.get('ultimate_evolution', '')}
 =================================
-🌐 2026 寻找你的羁绊连携节点！
+🌐 2026 齿轮转动，万物同调。
 🔗 [Token ID: #{token_id} | Hash: 0x{hash_code[:8]}]"""
             
             safe_share = html.escape(share_card).replace('\n', '<br>')
-            HTML_TXT = """<div style="background-color: #050505 !important; border: 1px solid #334155 !important; border-left: 4px solid #00f3ff !important; border-radius: 8px; padding: 20px; overflow-x: hidden; margin-bottom: 20px; margin-top: 10px; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); user-select: all; -webkit-user-select: all;"><div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; color: #e2e8f0 !important; line-height: 1.7; word-break: break-all; word-wrap: break-word; cursor: text;">""" + safe_share + """</div></div>"""
+            HTML_TXT = """<div style="background-color: #050505 !important; border: 1px solid #334155 !important; border-left: 4px solid #ff003c !important; border-radius: 8px; padding: 20px; overflow-x: hidden; margin-bottom: 20px; margin-top: 10px; box-shadow: inset 0 0 20px rgba(255,0,60,0.2); user-select: all; -webkit-user-select: all;"><div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; color: #e2e8f0 !important; line-height: 1.7; word-break: break-all; word-wrap: break-word; cursor: text;">""" + safe_share + """</div></div>"""
             safe_html(HTML_TXT)
-
+            
         with tm3:
             safe_html("<div style='font-family:Orbitron; font-size:14px; font-weight:bold; color:#10b981; margin-bottom:10px; border-bottom:1px dashed #10b981; padding-bottom:8px; margin-top:15px;'>/// SOLIDITY SMART CONTRACT</div>")
-            code_block = "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\nimport \"@sde-network/contracts/token/ERC721.sol\";\n\ncontract SDE_Card_Registry_V20 is ERC721 {\n    struct CardStats {\n        string matrix_id;\n        uint256 combat_power;\n        uint8 level;\n        uint8 ascension_stars;\n    }\n    \n    mapping(uint256 => CardStats) public deck;\n    \n    constructor() ERC721(\"SDE_TCG_V20\", \"SDETCG\") {}\n\n    // MINTED_TO: " + safe_alias_final + "\n    // BLOCK_HEIGHT: " + block_height + "\n    // CONTRACT_ADDR: " + contract_addr + "\n    \n    function executeMint() public {\n        uint256 tokenId = " + str(token_id) + ";\n        deck[tokenId] = CardStats(\"" + mbti + "\", " + str(final_cp) + ", " + str(st.session_state.level) + ", " + str(st.session_state.ascension_stars) + ");\n        _mint(msg.sender, tokenId);\n    }\n}"
+            code_block = "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\nimport \"@sde-network/contracts/token/ERC721.sol\";\n\ncontract SDE_Card_Registry_V35 is ERC721 {\n    struct CardStats {\n        string matrix_id;\n        uint256 combat_power;\n        uint8 level;\n        uint8 ascension_stars;\n    }\n    \n    mapping(uint256 => CardStats) public deck;\n    \n    constructor() ERC721(\"SDE_WAR_V35\", \"SDEWAR\") {}\n\n    // MINTED_TO: " + safe_alias_final + "\n    // BLOCK_HEIGHT: " + block_height + "\n    // CONTRACT_ADDR: " + contract_addr + "\n    \n    function executeMint() public {\n        uint256 tokenId = " + str(token_id) + ";\n        deck[tokenId] = CardStats(\"" + mbti + "\", " + str(final_cp) + ", " + str(st.session_state.level) + ", " + str(st.session_state.ascension_stars) + ");\n        _mint(msg.sender, tokenId);\n    }\n}"
             safe_code = html.escape(code_block).replace('\n', '<br>')
-            HTML_SOLIDITY = "<div style=\"background: #050505; border-radius: 8px; border: 1px solid #334155; border-left: 4px solid #10b981; width: 100%; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,243,255,0.05); margin-top: 15px; margin-bottom: 20px; overflow: hidden;\"><div style=\"background: #0f172a; padding: 10px 15px; display: flex; align-items: center; border-bottom: 1px solid #334155;\"><div style=\"width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; margin-right: 8px;\"></div><div style=\"width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; margin-right: 8px;\"></div><div style=\"width: 12px; height: 12px; border-radius: 50%; background: #27c93f; margin-right: 15px;\"></div><div style=\"color: #94a3b8; font-size: 11px; font-family: 'Fira Code', monospace; letter-spacing: 1px;\">SDE_Smart_Contract.sol</div></div><div style=\"padding: 15px; overflow-x: hidden;\"><div style=\"margin: 0; font-family: 'Fira Code', monospace; font-size: 12px; color: #10b981 !important; line-height: 1.6; background: transparent; border: none; user-select: all; -webkit-user-select: all; cursor: text; word-break: break-all;\">" + safe_code + "</div></div></div>"
+            HTML_SOLIDITY = "<div style=\"background: #050505; border-radius: 8px; border: 1px solid #334155; border-left: 4px solid #10b981; width: 100%; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,243,255,0.05); margin-top: 15px; margin-bottom: 20px; overflow: hidden;\"><div style=\"background: #14050a; padding: 10px 15px; display: flex; align-items: center; border-bottom: 1px solid #330011;\"><div style=\"width: 12px; height: 12px; border-radius: 50%; background: #ff5f56; margin-right: 8px;\"></div><div style=\"width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; margin-right: 8px;\"></div><div style=\"width: 12px; height: 12px; border-radius: 50%; background: #27c93f; margin-right: 15px;\"></div><div style=\"color: #94a3b8; font-size: 11px; font-family: 'Fira Code', monospace; letter-spacing: 1px;\">SDE_Smart_Contract.sol</div></div><div style=\"padding: 15px; overflow-x: hidden;\"><div style=\"margin: 0; font-family: 'Fira Code', monospace; font-size: 12px; color: #10b981 !important; line-height: 1.6; background: transparent; border: none; user-select: all; -webkit-user-select: all; cursor: text; word-break: break-all;\">" + safe_code + "</div></div></div>"
             safe_html(HTML_SOLIDITY)
 
         with tm4:
-            safe_html("<div style='font-size:13px; color:#94a3b8; margin-bottom:15px; margin-top:10px;'>💾 高管/极客视角：导出您的原生底层 JSON 结构树归档：</div>")
+            safe_html("<div style='font-size:13px; color:#94a3b8; margin-bottom:15px; margin-top:10px;'>💾 幸存者视角：导出您的原生底层 JSON 结构树归档：</div>")
             export_data = {
                 "version": VERSION,
                 "node_alias": safe_alias_final, 
@@ -1259,16 +1444,20 @@ else:
                     "hash_signature": hash_code,
                     "block_height": block_height
                 },
-                "tcg_stats": {
+                "war_stats": {
                     "level": st.session_state.level,
                     "exp": st.session_state.exp,
-                    "stamina": st.session_state.stamina,
+                    "san_points": st.session_state.sanity,
+                    "despair_level": st.session_state.despair_level,
                     "tokens_sde": st.session_state.tokens,
+                    "dark_matter": st.session_state.dark_matter,
+                    "logic_shards": st.session_state.logic_shards,
                     "combat_power_cp": final_cp, 
                     "cyber_augments": st.session_state.cyber_augments,
                     "talent_tree": st.session_state.talent_levels,
                     "active_tarot_buff": st.session_state.tarot_buff,
-                    "mining_rigs": st.session_state.gpus
+                    "mining_rigs": st.session_state.gpus,
+                    "squad_members": st.session_state.squad
                 },
                 "metrics": {"E_I": val_E, "S_N": val_S, "T_F": val_T, "J_P": val_J},
                 "equipped_relics": st.session_state.equipped_relics,
@@ -1277,21 +1466,21 @@ else:
                 "timestamp": current_time_str
             }
             json_str = json.dumps(export_data, indent=4, ensure_ascii=False)
-            st.download_button(label="📥 立即下载节点加密档案 (.JSON)", data=json_str, file_name=f"SDE_TCG_{safe_alias_final}.json", mime="application/json", use_container_width=True)
+            st.download_button(label="📥 立即下载节点加密档案 (.JSON)", data=json_str, file_name=f"SDE_OMNIVERSE_{safe_alias_final}.json", mime="application/json", use_container_width=True)
 
     def reset_system():
         st.session_state.clear()
 
-    _spacer1, c_btn, _spacer2 = st.columns([1, 2, 1])
+    c_empty1, c_btn, c_empty2 = st.columns([1, 2, 1])
     with c_btn:
         safe_html("<br>")
-        if st.button("☢️ 销毁当前节点痕迹并重启 (WIPE_AND_REBOOT)", type="primary", use_container_width=True):
+        if st.button("☢️ 强制格式化神经元并重置世界 (WIPE_AND_REBOOT)", type="primary", use_container_width=True):
             reset_system()
             st.rerun()
 
 # =========================================================================
-# 🛑 [ SDE TCG 07 ] 赛博呼吸专属版权区
+# 🛑 [ WAR ENGINE 08 ] 赛博呼吸专属版权区
 # =========================================================================
-HTML_FOOTER = """<div style="text-align:center; margin-top:80px; margin-bottom:40px; position:relative; z-index:10;"><div style="color:#00f3ff !important; font-family:'Orbitron', monospace; font-size:10px; opacity:0.3; letter-spacing:6px; margin-bottom:8px;">POWERED BY SDE DATA ELEMENT KERNEL</div><div style="color:#00f3ff !important; font-family:'Orbitron', monospace; font-size:10px; opacity:0.2; letter-spacing:3px; margin-bottom:30px;">SYSTEM VERSION: """ + VERSION + """</div><div class="copyright-niliu">© 2026 版权归属 · <b style="font-family:'Orbitron', sans-serif; letter-spacing: 4px;">""" + COPYRIGHT + """</b></div></div>"""
+HTML_FOOTER = """<div style="text-align:center; margin-top:80px; margin-bottom:40px; position:relative; z-index:10;"><div style="color:#ff003c !important; font-family:'Orbitron', monospace; font-size:10px; opacity:0.3; letter-spacing:6px; margin-bottom:8px;">POWERED BY OMNIVERSE ENGINE</div><div style="color:#ff003c !important; font-family:'Orbitron', monospace; font-size:10px; opacity:0.2; letter-spacing:3px; margin-bottom:30px;">SYSTEM VERSION: """ + VERSION + """</div><div style="display: inline-block; padding: 12px 40px; border-radius: 50px; font-size: 13px; font-family: 'Noto Sans SC', sans-serif; letter-spacing: 3px; color: #ff003c; font-weight: 900; background: rgba(255,0,60,0.05); border: 1px solid rgba(255,0,60,0.3); box-shadow: 0 0 20px rgba(255,0,60,0.15);">© 2026 版权归属 · <b style="font-family:'Orbitron', sans-serif; letter-spacing: 4px;">""" + COPYRIGHT + """</b></div></div>"""
 safe_html(HTML_FOOTER)
 # ================================= EOF ==================================
